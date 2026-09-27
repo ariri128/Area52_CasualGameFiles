@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using UnityEngine.InputSystem;
 
 /*
@@ -39,6 +40,33 @@ public class RoomCameraController : MonoBehaviour
     private float dragStartCamX;
     private float lastPointerX;
     private float pointerVelocityX;
+    private bool pressIgnored; // For if the press started on UI or while swiping was blocked
+
+    // Anything in here is currently blocking swipes
+    private static readonly HashSet<Object> swipeBlockers = new HashSet<Object>();
+
+    // Clears the blockers when Play starts
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        swipeBlockers.Clear();
+    }
+
+    public static void SetSwipeBlocked(Object owner, bool blocked)
+    {
+        if (owner == null) return;
+        if (blocked) swipeBlockers.Add(owner);
+        else swipeBlockers.Remove(owner);
+    }
+
+    public static bool SwipeBlocked
+    {
+        get
+        {
+            swipeBlockers.RemoveWhere(o => o == null);
+            return swipeBlockers.Count > 0;
+        }
+    }
 
     private void Awake()
     {
@@ -91,6 +119,10 @@ public class RoomCameraController : MonoBehaviour
     {
         isPressed = true;
         isDragging = false;
+
+        pressIgnored = SwipeBlocked || UIPointer.IsOverScreenUI(pointerPos);
+        if (pressIgnored) return;
+
         pressStartPos = pointerPos;
         lastPointerX = pointerPos.x;
         pointerVelocityX = 0f;
@@ -99,6 +131,7 @@ public class RoomCameraController : MonoBehaviour
 
     private void ContinuePress(Vector2 pointerPos)
     {
+        if (pressIgnored) return;
         TrackPointerVelocity(pointerPos.x);
 
         float dragPixels = pointerPos.x - pressStartPos.x;
@@ -119,11 +152,16 @@ public class RoomCameraController : MonoBehaviour
     private void EndPress()
     {
         isPressed = false;
-        if (!isDragging) return; // Recognizes if it was a tap instead of a swipe
+        if (pressIgnored)
+        {
+            pressIgnored = false;
+            return;
+        }
+        if (!isDragging) return; // Detects whether it was a tap vs a swipe
         isDragging = false;
 
         float dragWorld = (lastPointerX - pressStartPos.x) * WorldUnitsPerPixel();
-        float flick = pointerVelocityX / Screen.width;
+        float flick = pointerVelocityX / Screen.width;   // screen widths per second
 
         int direction = 0;
         if (Mathf.Abs(flick) >= flickSpeed)
@@ -171,7 +209,6 @@ public class RoomCameraController : MonoBehaviour
         return x;
     }
 
-    // Calculates many world units one screen pixel covers at the front of the rooms, so that the room under your finger moves exactly with it
     private float WorldUnitsPerPixel()
     {
         const float samplePixels = 100f;
@@ -186,7 +223,7 @@ public class RoomCameraController : MonoBehaviour
             return Vector3.Distance(rayA.GetPoint(hitA), rayB.GetPoint(hitB)) / samplePixels;
         }
 
-        return 0.01f; // Fallback, shouldn't happen with a camera in front of the rooms
+        return 0.01f;
     }
 
     private void SetCameraX(float x)
