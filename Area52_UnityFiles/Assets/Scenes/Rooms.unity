@@ -488,6 +488,7 @@ GameObject:
   m_Component:
   - component: {fileID: 516521035}
   - component: {fileID: 516521034}
+  - component: {fileID: 516521036}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -522,6 +523,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &516521036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516521033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecc7698f62b3b43c6ab6266807f3bd7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FurnitureEditor
+  cam: {fileID: 0}
+  tapLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  tapMaxMovement: 15
+  tapMaxDuration: 0.4
+  outlineMaterial: {fileID: 2100000, guid: 21b0b223d600349b193442c681109d6b, type: 2}
+  flatOutlineMaterial: {fileID: 2100000, guid: c8db464cdd46c45db8fb3701578b67c5, type: 2}
+  selectedColor: {r: 0.29038054, g: 1, b: 0.25098038, a: 1}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
