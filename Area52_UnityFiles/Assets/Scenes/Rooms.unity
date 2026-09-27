@@ -675,15 +675,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.38679248, g: 0.38679248, b: 0.38679248, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: 63b79956f7dd948449817225ab3363c6, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1208,6 +1208,9 @@ MonoBehaviour:
     startingAliens: []
   - roomName: YarnRoom
     roomPrefab: {fileID: 8265638485488312932, guid: d5157213dca704204be5e5b6ba1ea226, type: 3}
+    startingAliens: []
+  - roomName: DisplayRoom_Aliens
+    roomPrefab: {fileID: 3369584222837243426, guid: 8511945bc706d4faf97538ab1042dff3, type: 3}
     startingAliens: []
   roomSpacing: 7
   startRoomIndex: 0
@@ -2464,7 +2467,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 643154053}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.171
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
