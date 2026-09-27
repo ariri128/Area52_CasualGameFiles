@@ -1212,7 +1212,19 @@ MonoBehaviour:
   - roomName: DisplayRoom_Aliens
     roomPrefab: {fileID: 3369584222837243426, guid: 8511945bc706d4faf97538ab1042dff3, type: 3}
     startingAliens: []
-  roomSpacing: 7
+  - roomName: DisplayRoom_AlienVarients
+    roomPrefab: {fileID: 4141184714443192703, guid: d90b9ed582d8b4ae3b3bac2cef107e9d, type: 3}
+    startingAliens: []
+  - roomName: DisplayRoom_EmotionsUI
+    roomPrefab: {fileID: 4917978385473958101, guid: cee5a0b90e9964011bd41344ba3723c5, type: 3}
+    startingAliens: []
+  - roomName: DisplayRoom_FileUI
+    roomPrefab: {fileID: 3386359320610760759, guid: ff8c75d0195434cd995a110ff113bd13, type: 3}
+    startingAliens: []
+  - roomName: DisplayRoom_OtherUI
+    roomPrefab: {fileID: 3328369372828839297, guid: aecbe675760a440afafa9178aff96ac2, type: 3}
+    startingAliens: []
+  roomSpacing: 6.74
   startRoomIndex: 0
   alienMaterial: {fileID: 0}
   roomGizmoSize: {x: 6.743065, y: 2.84, z: 3.5}

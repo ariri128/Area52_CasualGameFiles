@@ -613,6 +613,7 @@ MonoBehaviour:
   titleText: {fileID: 8984984898614357409}
   grid: {fileID: 6809828055614785034}
   cellTemplate: {fileID: 4678792619673227625}
+  labelGap: 8
 --- !u!1 &8408397810613738868
 GameObject:
   m_ObjectHideFlags: 0
@@ -728,7 +729,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -4266632194253358823, guid: 1c978d7436d404fdca6bd857a65e1036, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -1782552503507924978, guid: 1c978d7436d404fdca6bd857a65e1036, type: 3}
       propertyPath: m_IsActive
