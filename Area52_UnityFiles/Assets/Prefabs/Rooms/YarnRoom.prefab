@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2886358500278009222}
   - component: {fileID: 3891360987322754965}
+  - component: {fileID: 7446290902024569183}
   m_Layer: 0
   m_Name: YarnRoom
   m_TagString: Untagged
@@ -46,6 +47,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoomView
   alienSpots: []
+--- !u!114 &7446290902024569183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8265638485488312932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b3238b0ef8f4fc784daa2648ba3ed9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoomFurnitureDetector
+  floorWidth: 7.38
+  backWidth: 6.08
+  floorDepth: 3.52
+  floorHeight: 0
+  measureFrom: {fileID: 8665338652738796862}
+  wallThickness: 0.1
+  maxFloorItems: 6
+  gap: 0.02
+  logSummary: 1
 --- !u!1001 &8277938403253195599
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -354,6 +376,11 @@ MonoBehaviour:
 --- !u!4 &8461028278000809124 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c5402e4062bcf4e598c9cb0db6cabf61, type: 3}
+  m_PrefabInstance: {fileID: 8277938403253195599}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &8665338652738796862 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -8457669349949460879, guid: c5402e4062bcf4e598c9cb0db6cabf61, type: 3}
   m_PrefabInstance: {fileID: 8277938403253195599}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &8780638234685485228 stripped
