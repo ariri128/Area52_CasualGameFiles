@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &3516388518633978446
+--- !u!1001 &6507623454822413497
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -10,39 +10,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1004322339900891873, guid: 69afa90a622504c2ab502709a20a9c99, type: 3}
       propertyPath: title
-      value: Alien Bases
-      objectReference: {fileID: 0}
-    - target: {fileID: 1004322339900891873, guid: 69afa90a622504c2ab502709a20a9c99, type: 3}
-      propertyPath: columns
-      value: 2
+      value: Emotions UI
       objectReference: {fileID: 0}
     - target: {fileID: 1004322339900891873, guid: 69afa90a622504c2ab502709a20a9c99, type: 3}
       propertyPath: entries.Array.size
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1004322339900891873, guid: 69afa90a622504c2ab502709a20a9c99, type: 3}
-      propertyPath: entries.Array.data[0].label
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 1004322339900891873, guid: 69afa90a622504c2ab502709a20a9c99, type: 3}
       propertyPath: entries.Array.data[0].sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 01afc17f8305243c0b448345dc2c922f, type: 3}
+      objectReference: {fileID: 21300000, guid: 62df08094f3f648059df545780f345ff, type: 3}
     - target: {fileID: 1004322339900891873, guid: 69afa90a622504c2ab502709a20a9c99, type: 3}
       propertyPath: entries.Array.data[1].sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 6fa72fa349d1a40bea5cf1f68a02f10f, type: 3}
+      objectReference: {fileID: 21300000, guid: 01d02a98962784a90b00d25933976b75, type: 3}
     - target: {fileID: 1004322339900891873, guid: 69afa90a622504c2ab502709a20a9c99, type: 3}
       propertyPath: entries.Array.data[2].sprite
       value: 
-      objectReference: {fileID: 21300000, guid: e1285126508ba4265bb13586d2eb8205, type: 3}
+      objectReference: {fileID: 21300000, guid: 0bc8e3a49f50f4b66bcbb5990bea57c9, type: 3}
     - target: {fileID: 1004322339900891873, guid: 69afa90a622504c2ab502709a20a9c99, type: 3}
       propertyPath: entries.Array.data[3].sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fe1394455db6c4b419767269a3f69909, type: 3}
+      objectReference: {fileID: 21300000, guid: 1c362bc609acc47dea78f3e7be4dc991, type: 3}
     - target: {fileID: 2166110772240434284, guid: 69afa90a622504c2ab502709a20a9c99, type: 3}
       propertyPath: m_Name
-      value: DisplayRoom_AlienBases
+      value: DisplayRoom_AlienEmotionsUI
       objectReference: {fileID: 0}
     - target: {fileID: 4297389785534645877, guid: 69afa90a622504c2ab502709a20a9c99, type: 3}
       propertyPath: m_LocalPosition.x
