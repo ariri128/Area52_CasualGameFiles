@@ -17,7 +17,7 @@ public class FurnitureItem : MonoBehaviour
     [SerializeField] private List<Transform> attachedParts = new List<Transform>();
 
     private BoxCollider boxCollider;
-    private RoomFurnitureDetector room;
+    // private RoomFurnitureDetector room;
 
     // Outline
     private readonly List<Renderer> ownRenderers = new List<Renderer>();
@@ -30,6 +30,16 @@ public class FurnitureItem : MonoBehaviour
 
     public FurnitureDefinition Definition => definition;
 
+    // The piece this one is sitting on
+    public FurnitureItem Host { get; internal set; }
+
+    // How far the player has turned this piece (degrees), so a replacement can face the same way later
+    public float PlayerYaw { get; internal set; }
+
+    // The room this piece is in, or null while it's in storage - set by RoomFurnitureDetector
+    public RoomFurnitureDetector Room { get; internal set; }
+
+    /*
     // The room this piece is in
     public RoomFurnitureDetector Room
     {
@@ -39,6 +49,7 @@ public class FurnitureItem : MonoBehaviour
             return room;
         }
     }
+    */
 
     public BoxCollider Collider
     {
@@ -65,6 +76,35 @@ public class FurnitureItem : MonoBehaviour
     }
 
 
+    // BOX
+
+    // Calculates the collider as a box in the world: its middle, half its size, and its rotation
+    public FurnitureBox GetBox()
+    {
+        BoxCollider col = Collider;
+        Vector3 scale = transform.lossyScale;
+        Vector3 half = new Vector3(
+            Mathf.Abs(col.size.x * scale.x),
+            Mathf.Abs(col.size.y * scale.y),
+            Mathf.Abs(col.size.z * scale.z)) * 0.5f;
+        return new FurnitureBox(transform.TransformPoint(col.center), half, transform.rotation);
+    }
+
+    // Moves and turns the piece so its collider ends up exactly at "target"
+    public void MoveBoxTo(FurnitureBox target)
+    {
+        FurnitureBox current = GetBox();
+        Quaternion turn = target.rotation * Quaternion.Inverse(current.rotation);
+
+        // Turns around the box's middle - not the boxe's pivot
+        transform.rotation = turn * transform.rotation;
+        transform.position = current.center + turn * (transform.position - current.center);
+
+        // Slides the box over
+        transform.position += target.center - current.center;
+    }
+
+
     // HIGHLIGHT OUTLINE
 
     public bool IsHighlighted { get; private set; }
@@ -82,7 +122,7 @@ public class FurnitureItem : MonoBehaviour
             MeshRenderer outline = outlineRenderers[i];
             if (outline == null) continue;
 
-            // Swaps in the requested material if it changed
+            // Swaps in the requested material (the regular or the flat outline) if it changed
             if (outline.sharedMaterial != outlineMaterial) SetAllSlots(outline, outlineMaterial);
 
             outlineBlock.Clear();
@@ -113,7 +153,7 @@ public class FurnitureItem : MonoBehaviour
             if (source == null || source.sharedMesh == null) continue;
 
             GameObject copy = new GameObject("Outline");
-            copy.transform.SetParent(r.transform, false); // Keeps the same position, rotation and scale as the mesh
+            copy.transform.SetParent(r.transform, false);
             copy.layer = r.gameObject.layer;
 
             copy.AddComponent<MeshFilter>().sharedMesh = source.sharedMesh;
@@ -153,7 +193,7 @@ public class FurnitureItem : MonoBehaviour
     }
 
 
-    // EDITOR HELPER
+    // EDITOR HELPERS
 
     // Runs when the component is first added
     private void Reset()
