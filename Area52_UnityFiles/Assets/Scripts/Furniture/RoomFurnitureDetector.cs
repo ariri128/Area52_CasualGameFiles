@@ -5,9 +5,10 @@ using System.Collections.Generic;
  * Detects where the room's floor is and which furniture pieces are in the room
  * Is also used to keep pieces inside the walls and to stop a room going from going over its limit of furniture pieces
 */
+
 public class RoomFurnitureDetector : MonoBehaviour
 {
-    // Every room currently spawned
+    // Lists every room currently spawned - used later to count what the player has placed
     public static readonly List<RoomFurnitureDetector> All = new List<RoomFurnitureDetector>();
 
     // Empties the list when Play starts
@@ -59,7 +60,7 @@ public class RoomFurnitureDetector : MonoBehaviour
     // World height of the top of the floor
     public float FloorY => transform.position.y + floorHeight;
 
-    // Detects how many standing pieces are in the room - rugs and decor don't count
+    // Counts how many standing pieces are in the room - rugs and decor aren't count
     public int FloorItemCount
     {
         get
@@ -84,12 +85,13 @@ public class RoomFurnitureDetector : MonoBehaviour
         return transform.position + FlatRotation * new Vector3(x, floorHeight, z);
     }
 
-    // Half the floor's width at "z" meters back from the front edge (the walls may angle in)
+    // Half the floor's width at "z" meters back from the front edge
     public float HalfWidthAt(float z)
     {
         float t = floorDepth > 0f ? Mathf.Clamp(z / floorDepth, 0f, 1f) : 0f;
         return Mathf.Lerp(floorWidth, backWidth, t) * 0.5f;
     }
+
 
     // SETUP
 
@@ -119,7 +121,7 @@ public class RoomFurnitureDetector : MonoBehaviour
                 Debug.LogWarning($"{name}: {item.name} has a FurnitureItem but no Definition, so it'll be ignored.", item);
                 continue;
             }
-            items.Add(item);
+            Register(item);
         }
 
         if (logSummary)
@@ -129,6 +131,80 @@ public class RoomFurnitureDetector : MonoBehaviour
             Debug.LogWarning($"{name} starts with {FloorItemCount} standing pieces, more than its limit of {maxFloorItems}. " +
                              "It'll work, but the player can't add more until some are removed.", this);
     }
+
+
+    // ADDING/REMOVING/REPLACING MECHANIC
+
+    private void Register(FurnitureItem item)
+    {
+        if (!items.Contains(item)) items.Add(item);
+        item.Room = this;
+    }
+
+    private void Unregister(FurnitureItem item)
+    {
+        items.Remove(item);
+        if (item.Room == this) item.Room = null;
+    }
+
+    public FurnitureItem Replace(FurnitureItem old, FurnitureDefinition definition, out string reason)
+    {
+        reason = null;
+        FurnitureInventory inventory = FurnitureInventory.main;
+
+        if (inventory == null) { reason = "There's no FurnitureInventory in the scene."; return null; }
+        if (old == null || old.Room != this) { reason = "That piece isn't in this room."; return null; }
+        if (definition == null || !definition.CanReplace(old.Definition)) { reason = "That can't go in this spot."; return null; }
+
+        FurnitureItem piece = inventory.Take(definition);
+        if (piece == null) { reason = $"No {definition.displayName} available."; return null; }
+
+        // Measures the old piece before anything moves
+        FurnitureBox oldBox = old.GetBox();
+        GetFlatExtents(oldBox, out Vector3 oldMin, out Vector3 oldMax);
+
+        // Brings the new piece into this room, facing the way its prefab / its last room had it
+        piece.transform.SetParent(transform, true);
+
+        FurnitureBox newBox = piece.GetBox();
+        GetFlatExtents(newBox, out Vector3 newMin, out Vector3 newMax);
+
+        Vector3 back = FlatRotation * Vector3.forward;
+        float oldBackDistance = Vector3.Dot(oldMax, back);
+        float newHalfDepth = (Vector3.Dot(newMax, back) - Vector3.Dot(newMin, back)) * 0.5f;
+
+        // Calculates where the new piece's underside should end up
+        Vector3 target = oldBox.BottomCenter;
+        target += back * ((oldBackDistance - newHalfDepth) - Vector3.Dot(target, back));
+
+        piece.MoveBoxTo(newBox.Moved(target - newBox.BottomCenter));
+
+        // Swaps them over
+        Unregister(old);
+        inventory.Store(old);
+        Register(piece);
+        inventory.NotifyChanged();
+        return piece;
+    }
+
+    private void GetFlatExtents(FurnitureBox box, out Vector3 min, out Vector3 max)
+    {
+        Vector3[] corners = new Vector3[8];
+        box.GetCorners(corners);
+        Quaternion toRoom = Quaternion.Inverse(FlatRotation);
+
+        Vector3 localMin = Vector3.one * float.MaxValue;
+        Vector3 localMax = Vector3.one * float.MinValue;
+        foreach (Vector3 corner in corners)
+        {
+            Vector3 local = toRoom * corner;
+            localMin = Vector3.Min(localMin, local);
+            localMax = Vector3.Max(localMax, local);
+        }
+        min = FlatRotation * localMin;
+        max = FlatRotation * localMax;
+    }
+
 
     // EDITOR
 

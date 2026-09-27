@@ -15,6 +15,9 @@ public class FurnitureEditor : MonoBehaviour
     [Tooltip("The Replace / Move / Remove popup.")]
     [SerializeField] private FurnitureActionPopup popup;
 
+    [Tooltip("The Furniture Owned panel.")]
+    [SerializeField] private FurnitureOwnedPanel ownedPanel;
+
     [Header("Tapping")]
     [Tooltip("Layers that can be tapped. Leave on Everything unless something else gets in the way.")]
     [SerializeField] private LayerMask tapLayers = ~0;
@@ -64,6 +67,7 @@ public class FurnitureEditor : MonoBehaviour
     private void OnDestroy()
     {
         if (RoomManager.main != null) RoomManager.main.onRoomChanged.RemoveListener(HandleRoomChanged);
+        RoomCameraController.SetSwipeBlocked(this, false);
         if (main == this) main = null;
     }
 
@@ -104,7 +108,7 @@ public class FurnitureEditor : MonoBehaviour
         else if (!pressedNow && isPressed)
         {
             isPressed = false;
-            if (pressStartedOnUI) return; // A button handles this, not the room
+            if (pressStartedOnUI) return;
 
             bool barelyMoved = (pos - pressStartPos).magnitude <= tapMaxMovement;
             bool quick = Time.unscaledTime - pressStartTime <= tapMaxDuration;
@@ -144,7 +148,7 @@ public class FurnitureEditor : MonoBehaviour
         item.ShowHighlight(OutlineMaterialFor(item), selectedColor);
         if (popup != null) popup.Show(item);
     }
-
+    
     // Rugs are too flat for the regular outline, so they get the flat one
     private Material OutlineMaterialFor(FurnitureItem item)
     {
@@ -158,16 +162,11 @@ public class FurnitureEditor : MonoBehaviour
         if (Selected != null) Selected.ClearHighlight();
         Selected = null;
         if (popup != null) popup.Hide();
+        CloseOwnedPanel();
     }
 
 
     // POPUP BUTTONS
-
-    public void OnReplacePressed()
-    {
-        if (Selected == null) return;
-        Debug.Log($"Replace pressed on {Selected.Definition.displayName}");
-    }
 
     public void OnMovePressed()
     {
@@ -179,6 +178,52 @@ public class FurnitureEditor : MonoBehaviour
     {
         if (Selected == null) return;
         Debug.Log($"Remove pressed on {Selected.Definition.displayName}");
+    }
+
+    public void OnReplacePressed()
+    {
+        if (Selected == null || ownedPanel == null) return;
+
+        popup.Hide();
+        ownedPanel.OpenForReplace(Selected.Definition);
+        RoomCameraController.SetSwipeBlocked(this, true); // No sliding between rooms when the panel is open
+    }
+
+
+    // FURNITURE OWNED PANEL
+
+    // The panel's Replace button
+    public void OnPanelConfirmed(FurnitureDefinition definition)
+    {
+        if (Selected == null || Selected.Room == null)
+        {
+            CloseOwnedPanel();
+            return;
+        }
+
+        FurnitureItem newPiece = Selected.Room.Replace(Selected, definition, out string reason);
+        if (newPiece == null)
+        {
+            Debug.Log(reason);
+            return;
+        }
+
+        Selected = null; // Puts the old piece in storage
+        CloseOwnedPanel();
+        Select(newPiece); // Shows the popup on the new piece
+    }
+
+    // The panel's X button: back to the popup on the same piece
+    public void OnPanelClosed()
+    {
+        RoomCameraController.SetSwipeBlocked(this, false);
+        if (Selected != null) Select(Selected);
+    }
+
+    private void CloseOwnedPanel()
+    {
+        if (ownedPanel != null && ownedPanel.IsOpen) ownedPanel.Hide();
+        RoomCameraController.SetSwipeBlocked(this, false);
     }
 
     // Swiping to another room drops the selection
