@@ -12,6 +12,9 @@ public class FurnitureEditor : MonoBehaviour
 
     [SerializeField] private Camera cam;
 
+    [Tooltip("The Replace / Move / Remove popup.")]
+    [SerializeField] private FurnitureActionPopup popup;
+
     [Header("Tapping")]
     [Tooltip("Layers that can be tapped. Leave on Everything unless something else gets in the way.")]
     [SerializeField] private LayerMask tapLayers = ~0;
@@ -35,6 +38,7 @@ public class FurnitureEditor : MonoBehaviour
     public FurnitureItem Selected { get; private set; }
 
     private bool isPressed;
+    private bool pressStartedOnUI;
     private Vector2 pressStartPos;
     private float pressStartTime;
 
@@ -95,10 +99,12 @@ public class FurnitureEditor : MonoBehaviour
             isPressed = true;
             pressStartPos = pos;
             pressStartTime = Time.unscaledTime;
+            pressStartedOnUI = UIPointer.IsOverScreenUI(pos);
         }
         else if (!pressedNow && isPressed)
         {
             isPressed = false;
+            if (pressStartedOnUI) return; // A button handles this, not the room
 
             bool barelyMoved = (pos - pressStartPos).magnitude <= tapMaxMovement;
             bool quick = Time.unscaledTime - pressStartTime <= tapMaxDuration;
@@ -136,6 +142,7 @@ public class FurnitureEditor : MonoBehaviour
         if (Selected != null && Selected != item) Selected.ClearHighlight();
         Selected = item;
         item.ShowHighlight(OutlineMaterialFor(item), selectedColor);
+        if (popup != null) popup.Show(item);
     }
 
     // Rugs are too flat for the regular outline, so they get the flat one
@@ -150,6 +157,28 @@ public class FurnitureEditor : MonoBehaviour
     {
         if (Selected != null) Selected.ClearHighlight();
         Selected = null;
+        if (popup != null) popup.Hide();
+    }
+
+
+    // POPUP BUTTONS
+
+    public void OnReplacePressed()
+    {
+        if (Selected == null) return;
+        Debug.Log($"Replace pressed on {Selected.Definition.displayName}");
+    }
+
+    public void OnMovePressed()
+    {
+        if (Selected == null) return;
+        Debug.Log($"Move pressed on {Selected.Definition.displayName}");
+    }
+
+    public void OnRemovePressed()
+    {
+        if (Selected == null) return;
+        Debug.Log($"Remove pressed on {Selected.Definition.displayName}");
     }
 
     // Swiping to another room drops the selection
