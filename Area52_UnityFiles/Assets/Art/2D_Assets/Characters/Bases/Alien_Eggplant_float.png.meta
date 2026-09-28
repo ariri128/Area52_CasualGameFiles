@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6fa72fa349d1a40bea5cf1f68a02f10f
+guid: a2fd6090239104fa99af73655d71f092
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 500
+  spritePixelsToUnits: 900
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -136,13 +136,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: alien_droid_0
+      name: Alien_Eggplant_float_0
       rect:
         serializedVersion: 2
-        x: 62
-        y: 10
-        width: 459
-        height: 410
+        x: 302
+        y: 1074
+        width: 6
+        height: 6
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -151,20 +151,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c3d3877ccbc2d4e04bb877f5ab84a4a7
-      internalID: -1364379954
+      spriteID: f084bf29929d14a199f2c0bd968126ef
+      internalID: 1435551318
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: alien_droid_1
+      name: Alien_Eggplant_float_1
       rect:
         serializedVersion: 2
-        x: 539
-        y: 24
-        width: 456
-        height: 396
+        x: 129
+        y: 934
+        width: 6
+        height: 12
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -173,8 +173,118 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6b74bda1dc6d449999d38d2dd17f30e9
-      internalID: -391764501
+      spriteID: 021ef44efd02547f9ab87e0534f71115
+      internalID: 2065008593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Alien_Eggplant_float_2
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 28
+        width: 498
+        height: 1032
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0e9d66a5178074bbfb3e8d5d40b6c192
+      internalID: 2195582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Alien_Eggplant_float_3
+      rect:
+        serializedVersion: 2
+        x: 767
+        y: 0
+        width: 527
+        height: 1055
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2c07e4a5d917548d985250f6a030afc2
+      internalID: -363507872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Alien_Eggplant_float_4
+      rect:
+        serializedVersion: 2
+        x: 129
+        y: 341
+        width: 6
+        height: 17
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49ef0c13f2957469da5d85ef2be532bb
+      internalID: 1063610664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Alien_Eggplant_float_5
+      rect:
+        serializedVersion: 2
+        x: 672
+        y: 336
+        width: 6
+        height: 33
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: edf83eca6455a4f5686422eda7cea1ed
+      internalID: -2127211596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Alien_Eggplant_float_6
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 246
+        width: 23
+        height: 23
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 240b823f2e29240d0b19099e95b18ff4
+      internalID: -729809775
       vertices: []
       indices: 
       edges: []
@@ -195,8 +305,13 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.0},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":7,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      alien_droid_0: -1364379954
-      alien_droid_1: -391764501
+      Alien_Eggplant_float_0: 1435551318
+      Alien_Eggplant_float_1: 2065008593
+      Alien_Eggplant_float_2: 2195582
+      Alien_Eggplant_float_3: -363507872
+      Alien_Eggplant_float_4: 1063610664
+      Alien_Eggplant_float_5: -2127211596
+      Alien_Eggplant_float_6: -729809775
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
