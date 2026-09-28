@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6fa72fa349d1a40bea5cf1f68a02f10f
+guid: 7e81d3bbc5f734f50afcba3af9260fff
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -136,13 +136,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: alien_droid_0
+      name: alien_bloobus_float_0
       rect:
         serializedVersion: 2
-        x: 62
-        y: 10
-        width: 459
-        height: 410
+        x: 124
+        y: 94
+        width: 206
+        height: 441
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -151,20 +151,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c3d3877ccbc2d4e04bb877f5ab84a4a7
-      internalID: -1364379954
+      spriteID: ffa875b73cc284a0789af60d44e09a80
+      internalID: -692079921
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: alien_droid_1
+      name: alien_bloobus_float_1
       rect:
         serializedVersion: 2
-        x: 539
-        y: 24
-        width: 456
-        height: 396
+        x: 618
+        y: 43
+        width: 203
+        height: 488
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -173,8 +173,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6b74bda1dc6d449999d38d2dd17f30e9
-      internalID: -391764501
+      spriteID: a158f484e7e904a1b89d8ffa71333946
+      internalID: 2133756636
       vertices: []
       indices: 
       edges: []
@@ -195,8 +195,8 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.0},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":7,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      alien_droid_0: -1364379954
-      alien_droid_1: -391764501
+      alien_bloobus_float_0: -692079921
+      alien_bloobus_float_1: 2133756636
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
