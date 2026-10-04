@@ -84,17 +84,3 @@ public class AlienSpecies : ScriptableObject
         return origin.rarities != null ? origin.rarities.Get(slot) : TraitRarity.Common;
     }
 }
-
-/* ver.1
-[CreateAssetMenu(menuName = "Alien Apartments/Alien Species", fileName = "AS_NewAlien")]
-public class AlienSpecies : ScriptableObject
-{
-    [Tooltip("Name shown to the player, e.g. \"Bloobus\".")]
-    public string displayName = "New Alien";
-
-    [Tooltip("Picture used in the rooms and in the breeding boxes. For now, the left pose.")]
-    public Sprite sprite;
-
-    //TODO: rarity and breeding combos, once the probability list is in
-}
-*/
