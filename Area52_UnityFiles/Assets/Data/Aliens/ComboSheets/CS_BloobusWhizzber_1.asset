@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 771eb38e728a14ea092acae7ea9bc7de, type: 3}
+  m_Name: CS_BloobusWhizzber_1
+  m_EditorClassIdentifier: Assembly-CSharp::ComboSheet
+  sheet: {fileID: 2800000, guid: 4340c63de73574024a4bf39063ae92a0, type: 3}
+  bodyFrom: {fileID: 11400000, guid: 45165f7e4984c4f9f86ff1fa1c63534c, type: 2}
+  otherParent: {fileID: 11400000, guid: 84ea2c2d5b3f04e8bbd1300f0da4d951, type: 2}
+  reversed: 0
+  catalog: {fileID: 11400000, guid: e2c6af147c7dd4e35bb003900b7596d1, type: 2}
+  columns: 5
+  rows: 3
+  pixelsPerUnit: 800
+  outputFolder: Assets/Data/Aliens/Babies
