@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e767b4568aa746b8b698136873f0858, type: 3}
+  m_Name: AS_Avaroos
+  m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
+  displayName: Avaroos
+  sprite: {fileID: 56216110, guid: 79017ae13bbac48ce8463d590ef7e035, type: 3}
+  rarities:
+    body: 1
+    antenna: 2
+    legs: 1
+    eyes: 0
+    mouth: 1
+  traitsFrom:
+    body: {fileID: 0}
+    antenna: {fileID: 0}
+    legs: {fileID: 0}
+    eyes: {fileID: 0}
+    mouth: {fileID: 0}
