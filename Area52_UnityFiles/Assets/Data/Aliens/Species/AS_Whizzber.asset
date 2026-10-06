@@ -15,10 +15,10 @@ MonoBehaviour:
   displayName: Whizzber
   sprite: {fileID: -1254201403, guid: d66d2fb8b13dc49e09a75dc15d58abcb, type: 3}
   rarities:
-    body: 0
-    antenna: 0
-    legs: 1
-    eyes: 2
+    body: 1
+    antenna: 1
+    legs: 0
+    eyes: 0
     mouth: 1
   traitsFrom:
     body: {fileID: 0}

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e767b4568aa746b8b698136873f0858, type: 3}
+  m_Name: AS_Niangaa
+  m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
+  displayName: Niangaa
+  sprite: {fileID: -449699003, guid: eea696612007a4a048cf810f848d4978, type: 3}
+  rarities:
+    body: 2
+    antenna: 2
+    legs: 0
+    eyes: 1
+    mouth: 2
+  traitsFrom:
+    body: {fileID: 0}
+    antenna: {fileID: 0}
+    legs: {fileID: 0}
+    eyes: {fileID: 0}
+    mouth: {fileID: 0}

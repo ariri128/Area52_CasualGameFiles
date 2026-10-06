@@ -139,10 +139,10 @@ TextureImporter:
       name: alien_smeeeg_0
       rect:
         serializedVersion: 2
-        x: 41
-        y: 0
-        width: 485
-        height: 509
+        x: 66
+        y: 12
+        width: 444
+        height: 405
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -161,10 +161,10 @@ TextureImporter:
       name: alien_smeeeg_1
       rect:
         serializedVersion: 2
-        x: 526
-        y: 0
-        width: 485
-        height: 509
+        x: 540
+        y: 36
+        width: 444
+        height: 381
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

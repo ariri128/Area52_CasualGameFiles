@@ -139,10 +139,10 @@ TextureImporter:
       name: alien_avaroos_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 717
-        height: 1080
+        x: 144
+        y: 35
+        width: 528
+        height: 1040
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -161,10 +161,10 @@ TextureImporter:
       name: alien_avaroos_1
       rect:
         serializedVersion: 2
-        x: 717
+        x: 762
         y: 0
-        width: 717
-        height: 1080
+        width: 528
+        height: 1075
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
