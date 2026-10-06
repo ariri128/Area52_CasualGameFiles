@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e767b4568aa746b8b698136873f0858, type: 3}
   m_Name: AS_Smeeg
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
-  displayName: Smeeg
+  displayName: Smeeeg
   sprite: {fileID: -1963621835, guid: 293dde4197c824bff8e03c15734f4136, type: 3}
   rarities:
     body: 1
-    antenna: 2
-    legs: 0
-    eyes: 1
-    mouth: 0
+    antenna: 1
+    legs: 2
+    eyes: 0
+    mouth: 1
   traitsFrom:
     body: {fileID: 0}
     antenna: {fileID: 0}

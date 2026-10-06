@@ -18,8 +18,8 @@ MonoBehaviour:
     body: 0
     antenna: 0
     legs: 1
-    eyes: 0
-    mouth: 1
+    eyes: 2
+    mouth: 0
   traitsFrom:
     body: {fileID: 0}
     antenna: {fileID: 0}
