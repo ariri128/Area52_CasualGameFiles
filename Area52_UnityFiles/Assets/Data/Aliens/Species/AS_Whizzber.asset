@@ -20,6 +20,7 @@ MonoBehaviour:
     legs: 0
     eyes: 0
     mouth: 1
+  coinsPerDrop: 10
   traitsFrom:
     body: {fileID: 0}
     antenna: {fileID: 0}
