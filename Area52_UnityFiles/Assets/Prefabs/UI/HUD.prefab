@@ -595,6 +595,7 @@ GameObject:
   - component: {fileID: 8462993378812362594}
   - component: {fileID: 2971489318791960064}
   - component: {fileID: 6149665988203481476}
+  - component: {fileID: 4359106336001058784}
   m_Layer: 5
   m_Name: RadioButton
   m_TagString: Untagged
@@ -735,6 +736,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c5a9e55bc0084377b32ab760a1132d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonClickSound
+--- !u!114 &4359106336001058784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6875668780329236081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7835569b5cb104a47ac6836b97641f9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OpenRadioButton
 --- !u!1 &7306657695080426848
 GameObject:
   m_ObjectHideFlags: 0
