@@ -903,6 +903,7 @@ GameObject:
   - component: {fileID: 7430559064399481227}
   - component: {fileID: 1862465582409940697}
   - component: {fileID: 5139508859510728227}
+  - component: {fileID: 3609321868980889911}
   m_Layer: 5
   m_Name: ApartmentViewButton
   m_TagString: Untagged
@@ -1043,3 +1044,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c5a9e55bc0084377b32ab760a1132d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonClickSound
+--- !u!114 &3609321868980889911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7754478465253142492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e0c230d1d0440f9a292eb334d19ed6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OpenRoomsOwnedButton

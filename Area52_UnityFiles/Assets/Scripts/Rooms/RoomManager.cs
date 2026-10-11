@@ -32,6 +32,135 @@ public class RoomManager : MonoBehaviour
     // Passes the new room index
     public UnityEvent<int> onRoomChanged = new UnityEvent<int>();
 
+    // Passes the index of a room that was just added (bought)
+    public UnityEvent<int> onRoomAdded = new UnityEvent<int>();
+
+    private readonly List<GameObject> spawnedRooms = new List<GameObject>();
+
+    public int CurrentRoomIndex { get; private set; }
+    public int RoomCount => rooms.Count;
+    public float RoomSpacing => roomSpacing;
+
+    private void Awake()
+    {
+        if (main != null && main != this)
+        {
+            Debug.LogWarning("More than one RoomManager in the scene. Destroying the extra one.", this);
+            Destroy(gameObject);
+            return;
+        }
+        main = this;
+
+        SpawnRooms();
+        CurrentRoomIndex = Mathf.Clamp(startRoomIndex, 0, Mathf.Max(0, rooms.Count - 1));
+    }
+
+    private void OnDestroy()
+    {
+        if (main == this) main = null;
+    }
+
+    // For now, every room is spawned up front
+    //TODO: Once there are many rooms, only keep the current room and its neighbors spawned
+    private void SpawnRooms()
+    {
+        for (int i = 0; i < rooms.Count; i++)
+            spawnedRooms.Add(SpawnRoom(i, rooms[i]));
+    }
+
+    private GameObject SpawnRoom(int index, RoomData data)
+    {
+        if (data.roomPrefab == null)
+        {
+            Debug.LogWarning($"Room {index} ({data.roomName}) has no prefab assigned.", this);
+            return null;
+        }
+
+        // Keep the prefab's own rotation in case its root isn't at (0,0,0)
+        GameObject room = Instantiate(data.roomPrefab, GetRoomPosition(index), data.roomPrefab.transform.rotation, transform);
+        room.name = $"Room_{index:00}_{data.roomName}";
+
+        RoomView view = room.GetComponent<RoomView>();
+        if (view != null) view.Init(index, data, alienMaterial);
+
+        return room;
+    }
+
+    // Adds a new room to the end of the row and returns its index (-1 if it failed)
+    // The player stays where they are; the new room is there to swipe to
+    public int AddRoom(string roomName, GameObject roomPrefab)
+    {
+        if (roomPrefab == null) return -1;
+
+        RoomData data = new RoomData { roomName = roomName, roomPrefab = roomPrefab };
+        rooms.Add(data);
+        int index = rooms.Count - 1;
+        spawnedRooms.Add(SpawnRoom(index, data));
+
+        onRoomAdded.Invoke(index);
+        return index;
+    }
+
+    public Vector3 GetRoomPosition(int index)
+    {
+        return transform.position + Vector3.right * (index * roomSpacing);
+    }
+
+    public GameObject GetRoomObject(int index)
+    {
+        return (index >= 0 && index < spawnedRooms.Count) ? spawnedRooms[index] : null;
+    }
+
+    // Always fires onRoomChanged, even for the same index, so the camera can snap back after a short drag
+    public void GoToRoom(int index)
+    {
+        if (rooms.Count == 0) return;
+
+        CurrentRoomIndex = Mathf.Clamp(index, 0, rooms.Count - 1);
+        onRoomChanged.Invoke(CurrentRoomIndex);
+    }
+
+    public void NextRoom() => GoToRoom(CurrentRoomIndex + 1);
+    public void PreviousRoom() => GoToRoom(CurrentRoomIndex - 1);
+
+    // Draws a box for each room slot so the layout is visible without pressing Play
+    private void OnDrawGizmos()
+    {
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            // Room origin is the front-center floor, so the box extends up and back (+Z)
+            Vector3 center = GetRoomPosition(i) + new Vector3(0f, roomGizmoSize.y * 0.5f, roomGizmoSize.z * 0.5f);
+            Gizmos.color = (i == startRoomIndex) ? Color.green : Color.cyan;
+            Gizmos.DrawWireCube(center, roomGizmoSize);
+        }
+    }
+}
+
+/* ver.1
+public class RoomManager : MonoBehaviour
+{
+    public static RoomManager main { get; private set; }
+
+    [Header("Rooms")]
+    [Tooltip("Rooms in swipe order, left to right.")]
+    [SerializeField] private List<RoomData> rooms = new List<RoomData>();
+
+    [Tooltip("Distance between room origins. Must be wider than what the camera can see on the widest phone, or the next room will peek in.")]
+    [SerializeField] private float roomSpacing = 15f;
+
+    [SerializeField] private int startRoomIndex = 0;
+
+    [Header("Aliens")]
+    [Tooltip("Material for alien sprites. Use Sprite-Unlit-Default so room lighting doesn't dim them.")]
+    [SerializeField] private Material alienMaterial;
+
+    [Header("Scene View Preview")]
+    [Tooltip("Rough room size, only used to draw boxes in the Scene view so you can see where rooms will spawn.")]
+    [SerializeField] private Vector3 roomGizmoSize = new Vector3(10f, 5f, 6f);
+
+    // Passes the new room index
+    public UnityEvent<int> onRoomChanged = new UnityEvent<int>();
+
     private readonly List<GameObject> spawnedRooms = new List<GameObject>();
 
     public int CurrentRoomIndex { get; private set; }
@@ -115,3 +244,4 @@ public class RoomManager : MonoBehaviour
         }
     }
 }
+*/
