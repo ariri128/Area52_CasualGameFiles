@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e767b4568aa746b8b698136873f0858, type: 3}
+  m_Name: AS_DopperHiggleBloobus_08
+  m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
+  displayName: Dopper Higgle x Bloobus 8
+  sprite: {fileID: 674307127, guid: f788ccf755deb4695a4a2d9829e00c4d, type: 3}
+  rarities:
+    body: 0
+    antenna: 0
+    legs: 0
+    eyes: 0
+    mouth: 0
+  traitsFrom:
+    body: {fileID: 11400000, guid: b53999fbf53f14f63928aa63be600404, type: 2}
+    antenna: {fileID: 11400000, guid: 45165f7e4984c4f9f86ff1fa1c63534c, type: 2}
+    legs: {fileID: 11400000, guid: 45165f7e4984c4f9f86ff1fa1c63534c, type: 2}
+    eyes: {fileID: 11400000, guid: 45165f7e4984c4f9f86ff1fa1c63534c, type: 2}
+    mouth: {fileID: 11400000, guid: 45165f7e4984c4f9f86ff1fa1c63534c, type: 2}

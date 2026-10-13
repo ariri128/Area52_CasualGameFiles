@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e767b4568aa746b8b698136873f0858, type: 3}
+  m_Name: AS_DopperHiggleAvaroos_06
+  m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
+  displayName: Dopper Higgle x Avaroos 6
+  sprite: {fileID: -1949357032, guid: 866c073cf0bdc4715b34ac7dc5245f40, type: 3}
+  rarities:
+    body: 0
+    antenna: 0
+    legs: 0
+    eyes: 0
+    mouth: 0
+  traitsFrom:
+    body: {fileID: 11400000, guid: b53999fbf53f14f63928aa63be600404, type: 2}
+    antenna: {fileID: 11400000, guid: b2e657727e6f547799de8e1426403e0b, type: 2}
+    legs: {fileID: 11400000, guid: b2e657727e6f547799de8e1426403e0b, type: 2}
+    eyes: {fileID: 11400000, guid: b53999fbf53f14f63928aa63be600404, type: 2}
+    mouth: {fileID: 11400000, guid: b2e657727e6f547799de8e1426403e0b, type: 2}
