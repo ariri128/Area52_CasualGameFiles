@@ -22,6 +22,11 @@ public class AudioManager : MonoBehaviour
 
     private AudioSource musicSource;
     private AudioSource clickSource;
+    private AudioSource previewSource;
+
+    public AudioClip CurrentMusic => musicSource != null ? musicSource.clip : null;
+    public bool IsPreviewing => previewSource != null && previewSource.isPlaying;
+    public AudioClip PreviewClip => IsPreviewing ? previewSource.clip : null;
 
     private void Awake()
     {
@@ -33,11 +38,14 @@ public class AudioManager : MonoBehaviour
         }
         main = this;
 
-        // Uses two separate speakers, so a click never cuts off the music
+        // Separate speakers, so a click never cuts off the music
         musicSource = CreateSource();
         musicSource.loop = true;
 
         clickSource = CreateSource();
+
+        previewSource = CreateSource();
+        previewSource.loop = true; // Keeps going until the player presses pause
     }
 
     private void OnDestroy()
@@ -58,6 +66,7 @@ public class AudioManager : MonoBehaviour
     private void OnValidate()
     {
         if (musicSource != null) musicSource.volume = musicVolume;
+        if (previewSource != null) previewSource.volume = musicVolume;
     }
 
     private AudioSource CreateSource()
@@ -72,5 +81,38 @@ public class AudioManager : MonoBehaviour
     {
         if (main == null || main.click == null) return;
         main.clickSource.PlayOneShot(main.click, main.clickVolume);
+    }
+
+    // Changes the background track. Starts it from the beginning, unless a preview is playing, in which case it starts when the preview stops.
+    public void SetMusic(AudioClip clip)
+    {
+        if (clip == null || musicSource.clip == clip) return;
+
+        musicSource.Stop();
+        musicSource.clip = clip;
+        musicSource.volume = musicVolume;
+        if (!IsPreviewing) musicSource.Play();
+    }
+
+    public void PlayPreview(AudioClip clip)
+    {
+        if (clip == null) return;
+
+        musicSource.Pause();
+        previewSource.clip = clip;
+        previewSource.volume = musicVolume;
+        previewSource.Play();
+    }
+
+    public void StopPreview()
+    {
+        if (previewSource.clip == null) return;
+
+        previewSource.Stop();
+        previewSource.clip = null;
+
+        // Carry on where the background music was (or start it if the track changed)
+        musicSource.UnPause();
+        if (!musicSource.isPlaying && musicSource.clip != null) musicSource.Play();
     }
 }

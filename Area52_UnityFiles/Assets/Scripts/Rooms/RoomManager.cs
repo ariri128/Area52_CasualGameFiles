@@ -32,6 +32,9 @@ public class RoomManager : MonoBehaviour
     // Passes the new room index
     public UnityEvent<int> onRoomChanged = new UnityEvent<int>();
 
+    // Passes the index of a room that was just added (bought)
+    public UnityEvent<int> onRoomAdded = new UnityEvent<int>();
+
     private readonly List<GameObject> spawnedRooms = new List<GameObject>();
 
     public int CurrentRoomIndex { get; private set; }
@@ -57,28 +60,45 @@ public class RoomManager : MonoBehaviour
         if (main == this) main = null;
     }
 
-    // For the prototype every room is spawned up front - once there are many rooms, only the current room and its neighbors will be spawned
+    // For now, every room is spawned up front
+    //TODO: Once there are many rooms, only keep the current room and its neighbors spawned
     private void SpawnRooms()
     {
         for (int i = 0; i < rooms.Count; i++)
+            spawnedRooms.Add(SpawnRoom(i, rooms[i]));
+    }
+
+    private GameObject SpawnRoom(int index, RoomData data)
+    {
+        if (data.roomPrefab == null)
         {
-            RoomData data = rooms[i];
-            if (data.roomPrefab == null)
-            {
-                Debug.LogWarning($"Room {i} ({data.roomName}) has no prefab assigned.", this);
-                spawnedRooms.Add(null);
-                continue;
-            }
-
-            // Keeps the prefab's own rotation in case its root isn't at (0,0,0)
-            GameObject room = Instantiate(data.roomPrefab, GetRoomPosition(i), data.roomPrefab.transform.rotation, transform);
-            room.name = $"Room_{i:00}_{data.roomName}";
-
-            RoomView view = room.GetComponent<RoomView>();
-            if (view != null) view.Init(i, data, alienMaterial);
-
-            spawnedRooms.Add(room);
+            Debug.LogWarning($"Room {index} ({data.roomName}) has no prefab assigned.", this);
+            return null;
         }
+
+        // Keep the prefab's own rotation in case its root isn't at (0,0,0)
+        GameObject room = Instantiate(data.roomPrefab, GetRoomPosition(index), data.roomPrefab.transform.rotation, transform);
+        room.name = $"Room_{index:00}_{data.roomName}";
+
+        RoomView view = room.GetComponent<RoomView>();
+        if (view != null) view.Init(index, data, alienMaterial);
+
+        return room;
+    }
+
+    // Adds a new room to the end of the row and returns its index (-1 if it failed)
+    // The player stays where they are; the new room is there to swipe to
+    public int AddRoom(string roomName, GameObject roomPrefab)
+    {
+        if (roomPrefab == null) return -1;
+
+        RoomData data = new RoomData { roomName = roomName, roomPrefab = roomPrefab };
+        rooms.Add(data);
+        int index = rooms.Count - 1;
+        spawnedRooms.Add(SpawnRoom(index, data));
+
+        onRoomAdded.Invoke(index);
+        return index;
     }
 
     public Vector3 GetRoomPosition(int index)

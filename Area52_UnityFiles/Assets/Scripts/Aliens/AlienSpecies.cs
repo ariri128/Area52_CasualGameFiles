@@ -65,19 +65,26 @@ public class AlienSpecies : ScriptableObject
     [Tooltip("How rare each of this alien's traits is. Only used on the four original aliens.")]
     public TraitRarities rarities = new TraitRarities();
 
+    [Tooltip("Coins this alien adds to its room's chest every drop. Babies use the value of " +
+             "the original their body came from, so this is only filled in on the originals.")]
+    public int coinsPerDrop;
+
     [Header("Babies only")]
     [Tooltip("Which original alien each trait was drawn from. Leave empty on the four originals. " +
              "The Combo Sheet tool fills this in for babies.")]
     public TraitOrigins traitsFrom = new TraitOrigins();
 
-    // The original alien this trait came from
+    // The original alien this trait came from (an original's traits all come from itself)
     public AlienSpecies TraitOrigin(TraitSlot slot)
     {
         AlienSpecies origin = traitsFrom != null ? traitsFrom.Get(slot) : null;
         return origin != null ? origin : this;
     }
 
-    // The rarity this alien's version of a trait is
+    // Coins dropped each time: decided by the body, so a baby with Smeeeg's body drops like Smeeeg
+    public int CoinsPerDrop => TraitOrigin(TraitSlot.Body).coinsPerDrop;
+
+    // How rare this alien's version of a trait is (looked up on the original it came from)
     public TraitRarity RarityOf(TraitSlot slot)
     {
         AlienSpecies origin = TraitOrigin(slot);

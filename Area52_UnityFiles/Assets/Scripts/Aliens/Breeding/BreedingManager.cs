@@ -28,7 +28,11 @@ public class BreedingManager : MonoBehaviour
     [SerializeField] private float breedingSeconds = 5f;
 
     [Header("Rooms")]
-    [Tooltip("Which rooms aliens can live in, as positions in RoomManager's Rooms list. " +
+    [Tooltip("Ticked: every room in RoomManager can hold aliens, including rooms bought " +
+             "during the game. Unticked: only the rooms listed in Alien Rooms.")]
+    [SerializeField] private bool allRoomsHoldAliens = true;
+
+    [Tooltip("Only used when All Rooms Hold Aliens is unticked. Which rooms aliens can live in, as positions in RoomManager's Rooms list. " +
              "Shown to the player as Room 1, Room 2... in this order. Leave out the display rooms.")]
     [SerializeField] private int[] alienRooms = { 0, 1 };
 
@@ -50,12 +54,22 @@ public class BreedingManager : MonoBehaviour
     public OwnedAlien ParentA { get; private set; }
     public OwnedAlien ParentB { get; private set; }
 
-    // The baby inside the egg. Picked when breeding finishes; the player doesn't see it yet.
+    // The baby inside the egg - Picked when breeding finishes; the player doesn't see it yet
     public AlienSpecies EggContents { get; private set; }
 
     public float SecondsLeft => State == BreedingState.Breeding ? Mathf.Max(0f, breedingEndsAt - Time.time) : 0f;
 
-    public IReadOnlyList<int> AlienRooms => alienRooms;
+    public IReadOnlyList<int> AlienRooms
+    {
+        get
+        {
+            if (!allRoomsHoldAliens || RoomManager.main == null) return alienRooms;
+
+            List<int> all = new List<int>();
+            for (int i = 0; i < RoomManager.main.RoomCount; i++) all.Add(i);
+            return all;
+        }
+    }
     public int MaxPerRoom => maxPerRoom;
     public IReadOnlyList<PlacedEgg> Eggs => eggs;
 
@@ -147,7 +161,7 @@ public class BreedingManager : MonoBehaviour
 
     // ROOMS AND EGGS
 
-    // Aliens that live in the room plus eggs waiting to hatch there
+    // Aliens that live in the room (including ones away breeding, since they come back) plus eggs waiting to hatch there
     public int Occupancy(int roomIndex)
     {
         int count = 0;
