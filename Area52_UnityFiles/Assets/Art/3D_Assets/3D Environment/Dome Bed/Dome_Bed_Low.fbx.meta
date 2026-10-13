@@ -8,11 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: openPBR_shader1
-<<<<<<< HEAD:Area52_UnityFiles/Assets/Art/3D_Assets/3D Environment/Dome Bed/Dome Bed Low.fbx.meta
-    second: {fileID: 2100000, guid: 9abc6d8f92b57b942a3bedc7d784678a, type: 2}
-=======
-    second: {fileID: 2100000, guid: 8ec514e93ba097a4e97363bbd63ba1b3, type: 2}
->>>>>>> main:Area52_UnityFiles/Assets/Art/3D_Assets/3D Environment/Dome Bed/Dome_Bed_Low.fbx.meta
+    second: {fileID: 2100000, guid: ba95b2d11aaf56c4cb34bdcdd2e827b6, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
