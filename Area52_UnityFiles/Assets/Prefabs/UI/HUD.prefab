@@ -762,6 +762,7 @@ GameObject:
   - component: {fileID: 7321928604778250549}
   - component: {fileID: 2055428347763305049}
   - component: {fileID: 3572926485175789403}
+  - component: {fileID: 2537153756501844462}
   m_Layer: 5
   m_Name: FilesButton
   m_TagString: Untagged
@@ -902,6 +903,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c5a9e55bc0084377b32ab760a1132d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonClickSound
+--- !u!114 &2537153756501844462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7306657695080426848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d11fdc8ed172f4b068ec494f94625c38, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OpenAlienFilesButton
 --- !u!1 &7754478465253142492
 GameObject:
   m_ObjectHideFlags: 0

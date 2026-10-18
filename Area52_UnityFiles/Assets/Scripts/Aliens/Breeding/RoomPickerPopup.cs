@@ -4,7 +4,10 @@ using TMPro;
 using UnityEngine.UI;
 
 /*
- * The popup up that shows when the player is deciding which room to put the alien egg in
+ * The "which room?" popup, used two ways:
+ *   Open()                - where to put the egg (breeding room)
+ *   OpenForMove(alien)    - where to move an alien to (alien file)
+ * Full rooms are greyed out; when moving, the alien's own room shows "Here" and can't be picked
 */
 
 public class RoomPickerPopup : MonoBehaviour
@@ -18,6 +21,10 @@ public class RoomPickerPopup : MonoBehaviour
     [Tooltip("One room box. Copied once per room.")]
     [SerializeField] private Button slotTemplate;
     [SerializeField] private Button confirmButton;
+    [Tooltip("Optional. The popup's title text.")]
+    [SerializeField] private TMP_Text titleText;
+    [Tooltip("Optional. The text on the confirm button.")]
+    [SerializeField] private TMP_Text confirmLabel;
 
     [Header("Text")]
     [Tooltip("{0} is the room number.")]
@@ -25,9 +32,17 @@ public class RoomPickerPopup : MonoBehaviour
     [Tooltip("{0} is how many are in the room, {1} is the most it holds.")]
     [SerializeField] private string countFormat = "{0}/{1}";
     [SerializeField] private string fullText = "Full";
+    [SerializeField] private string eggTitle = "Put egg in which room?";
+    [SerializeField] private string eggConfirm = "Put egg here";
+    [Tooltip("{0} is the alien's name.")]
+    [SerializeField] private string moveTitle = "Move {0} to which room?";
+    [SerializeField] private string moveConfirm = "Move Here";
+    [SerializeField] private string currentRoomText = "Here";
 
     private readonly List<GameObject> slots = new List<GameObject>();
     private int selectedRoom = -1;
+    private OwnedAlien moving; // null = placing an egg
+    private bool listening;
 
     public bool IsOpen => root != null && root.activeSelf;
 
@@ -39,17 +54,42 @@ public class RoomPickerPopup : MonoBehaviour
         root.SetActive(false);
     }
 
-    private void OnEnable()
+    // Tries in both OnEnable and Start: the managers may not be set up yet the first time this runs
+    private void OnEnable() => StartListening();
+    private void Start() => StartListening();
+
+    private void StartListening()
     {
-        if (BreedingManager.main != null) BreedingManager.main.onChanged.AddListener(RefreshIfOpen);
+        if (listening || BreedingManager.main == null || AlienRoster.main == null) return;
+        BreedingManager.main.onChanged.AddListener(RefreshIfOpen);
+        AlienRoster.main.onChanged.AddListener(RefreshIfOpen); // Moves and hatches change the counts
+        listening = true;
     }
 
     private void OnDisable()
     {
+        if (!listening) return;
         if (BreedingManager.main != null) BreedingManager.main.onChanged.RemoveListener(RefreshIfOpen);
+        if (AlienRoster.main != null) AlienRoster.main.onChanged.RemoveListener(RefreshIfOpen);
+        listening = false;
     }
 
+    // Egg mode
     public void Open()
+    {
+        moving = null;
+        OpenPopup();
+    }
+
+    // Move mode
+    public void OpenForMove(OwnedAlien alien)
+    {
+        if (alien == null) return;
+        moving = alien;
+        OpenPopup();
+    }
+
+    private void OpenPopup()
     {
         selectedRoom = -1;
         root.SetActive(true);
@@ -59,11 +99,19 @@ public class RoomPickerPopup : MonoBehaviour
     public void Close()
     {
         root.SetActive(false);
+        moving = null;
     }
 
     private void RefreshIfOpen()
     {
         if (IsOpen) Rebuild();
+    }
+
+    // Can this room be picked right now?
+    private bool CanPick(int roomIndex)
+    {
+        if (moving != null) return AlienRoster.main != null && AlienRoster.main.CanMoveTo(moving, roomIndex);
+        return BreedingManager.main != null && !BreedingManager.main.IsRoomFull(roomIndex);
     }
 
     private void Rebuild()
@@ -74,24 +122,31 @@ public class RoomPickerPopup : MonoBehaviour
         BreedingManager breeding = BreedingManager.main;
         if (breeding == null) return;
 
-        // A selected room that has filled up since is unselected
-        if (selectedRoom >= 0 && breeding.IsRoomFull(selectedRoom)) selectedRoom = -1;
+        if (titleText != null) titleText.text = moving != null ? string.Format(moveTitle, moving.DisplayName) : eggTitle;
+        if (confirmLabel != null) confirmLabel.text = moving != null ? moveConfirm : eggConfirm;
+
+        // A selected room that can't be picked anymore is unselected
+        if (selectedRoom >= 0 && !CanPick(selectedRoom)) selectedRoom = -1;
 
         for (int i = 0; i < breeding.AlienRooms.Count; i++)
         {
             int roomIndex = breeding.AlienRooms[i];
+            bool isCurrent = moving != null && moving.roomIndex == roomIndex;
             bool full = breeding.IsRoomFull(roomIndex);
 
             Button slot = Instantiate(slotTemplate, slotContainer);
             slot.gameObject.SetActive(true);
             slot.name = $"Room_{i + 1}";
-            slot.interactable = !full;
+            slot.interactable = CanPick(roomIndex);
             slot.onClick.AddListener(() => Select(roomIndex));
 
             SetText(slot.transform, "Name", string.Format(roomNameFormat, i + 1));
-            SetText(slot.transform, "Count", full
-                ? fullText
-                : string.Format(countFormat, breeding.Occupancy(roomIndex), breeding.MaxPerRoom));
+
+            string count;
+            if (isCurrent) count = currentRoomText;
+            else if (full) count = fullText;
+            else count = string.Format(countFormat, breeding.Occupancy(roomIndex), breeding.MaxPerRoom);
+            SetText(slot.transform, "Count", count);
 
             Transform border = slot.transform.Find("SelectedBorder");
             if (border != null) border.gameObject.SetActive(roomIndex == selectedRoom);
@@ -110,8 +165,16 @@ public class RoomPickerPopup : MonoBehaviour
 
     private void Confirm()
     {
-        if (selectedRoom < 0 || BreedingManager.main == null) return;
-        if (BreedingManager.main.PlaceEgg(selectedRoom)) Close();
+        if (selectedRoom < 0) return;
+
+        if (moving != null)
+        {
+            if (AlienRoster.main != null && AlienRoster.main.MoveTo(moving, selectedRoom)) Close();
+        }
+        else if (BreedingManager.main != null && BreedingManager.main.PlaceEgg(selectedRoom))
+        {
+            Close();
+        }
     }
 
     private static void SetText(Transform parent, string childName, string text)

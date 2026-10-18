@@ -2,6 +2,7 @@ using UnityEngine;
 
 /*
  * Art-prototype alien: flaots back and forth from left to right across the room, bobbing up and down a little, and turns to face the way it's going
+ * Knows which owned alien it shows, has a box collider so it can be tapped, and can be paused (stops in place) while selected
 */
 
 [RequireComponent(typeof(SpriteRenderer))]
@@ -28,7 +29,20 @@ public class FloatingAlien : MonoBehaviour
     [Tooltip("Tick this if it faces backwards while moving.")]
     [SerializeField] private bool artFacesLeft = false;
 
+    [Header("Tapping")]
+    [Tooltip("How thick (meters) the tap box is front to back.")]
+    [SerializeField] private float tapBoxDepth = 0.2f;
+
+    // The owned alien this one shows (set by AlienRoomDisplay)
+    public OwnedAlien Owner { get; private set; }
+
+    // While true it stays exactly where it is (selected by a tap)
+    public bool Paused { get; set; }
+
+    public SpriteRenderer SpriteRenderer => spriteRenderer;
+
     private SpriteRenderer spriteRenderer;
+    private BoxCollider tapBox;
     private Vector3 centerLocal;
     private float sidePhase;
     private float bobPhase;
@@ -43,8 +57,30 @@ public class FloatingAlien : MonoBehaviour
         bobPhase = Random.Range(0f, Mathf.PI * 2f);
     }
 
+    // Called right after it's spawned: which alien it is, its sprite, and a tap box that fits the sprite
+    public void Setup(OwnedAlien owner)
+    {
+        Owner = owner;
+        spriteRenderer.sprite = owner != null && owner.species != null ? owner.species.sprite : null;
+        FitTapBox();
+    }
+
+    private void FitTapBox()
+    {
+        if (tapBox == null) tapBox = GetComponent<BoxCollider>();
+        if (tapBox == null) tapBox = gameObject.AddComponent<BoxCollider>();
+        if (spriteRenderer.sprite == null) return;
+
+        // Sprite bounds are in the object's own space, so this fits whatever the pivot and scale are
+        Bounds b = spriteRenderer.sprite.bounds;
+        tapBox.center = b.center;
+        tapBox.size = new Vector3(b.size.x, b.size.y, tapBoxDepth);
+    }
+
     private void Update()
     {
+        if (Paused) return;
+
         // Sine wave: full speed in the middle, slows and turns around at the ends
         if (travelDistance > 0f) sidePhase += Time.deltaTime * speed / travelDistance;
         bobPhase += Time.deltaTime * bobSpeed * Mathf.PI * 2f;

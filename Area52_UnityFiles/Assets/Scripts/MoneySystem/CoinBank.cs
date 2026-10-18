@@ -71,7 +71,8 @@ public class CoinBank : MonoBehaviour
         {
             if (alien == null || alien.species == null || alien.inBreedingRoom) continue;
 
-            int coins = alien.species.CoinsPerDrop;
+            // Mood scales the drop: Happy all, Neutral 2/3, Sad 1/3, Angry none
+            int coins = AlienMoods.main != null ? AlienMoods.main.CoinsPerDrop(alien) : alien.species.CoinsPerDrop;
             if (coins <= 0) continue;
 
             int before = ChestAmount(alien.roomIndex);
