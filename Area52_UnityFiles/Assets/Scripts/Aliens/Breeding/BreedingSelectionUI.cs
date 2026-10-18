@@ -154,7 +154,7 @@ public class BreedingSelectionUI : MonoBehaviour
     private void ShowAlien(AlienPickerBox box, OwnedAlien alien)
     {
         if (alien != null && alien.species != null)
-            box.Show(alien.species.sprite, alien.species.displayName);
+            box.Show(alien.species.sprite, alien.DisplayName);
         else
             box.Show(nothingSelectedSprite, nothingSelectedLabel);
     }
