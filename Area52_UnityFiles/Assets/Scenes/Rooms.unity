@@ -3125,6 +3125,9 @@ MonoBehaviour:
   - roomName: Room_3
     roomPrefab: {fileID: 2166110772240434284, guid: 7bdcc9454f1d14eaf925696fc7d1ec62, type: 3}
     startingAliens: []
+  - roomName: Room_4
+    roomPrefab: {fileID: 8265638485488312932, guid: d5157213dca704204be5e5b6ba1ea226, type: 3}
+    startingAliens: []
   roomSpacing: 6.74
   startRoomIndex: 0
   alienMaterial: {fileID: 0}
@@ -3831,9 +3834,9 @@ MonoBehaviour:
     inBreedingRoom: 0
     customName: 
     dateAcquired: 
-  - name: Smeeeg - room 0
+  - name: Smeeeg - room 2
     species: {fileID: 11400000, guid: beaf08a0607ca469895c92344f40a4dd, type: 2}
-    roomIndex: 0
+    roomIndex: 2
     inBreedingRoom: 0
     customName: 
     dateAcquired: 
@@ -3843,9 +3846,9 @@ MonoBehaviour:
     inBreedingRoom: 0
     customName: 
     dateAcquired: 
-  - name: Whizzber - room 1
+  - name: Whizzber - room 3
     species: {fileID: 11400000, guid: 84ea2c2d5b3f04e8bbd1300f0da4d951, type: 2}
-    roomIndex: 1
+    roomIndex: 3
     inBreedingRoom: 0
     customName: 
     dateAcquired: 
@@ -3855,11 +3858,17 @@ MonoBehaviour:
     inBreedingRoom: 0
     customName: 
     dateAcquired: 
-  - name: Niangaa - room 2
+  - name: Niangaa - room 3
     species: {fileID: 11400000, guid: 4558e5a194047409a92808241dd3d6b8, type: 2}
-    roomIndex: 2
+    roomIndex: 3
     inBreedingRoom: 0
     customName: 
+    dateAcquired: 
+  - name: Goshil - room 0
+    species: {fileID: 11400000, guid: a5984095d0c844c7ab28952b3878f0e3, type: 2}
+    roomIndex: 0
+    inBreedingRoom: 0
+    customName: Goshil
     dateAcquired: 
   maxNameLength: 16
   noParentsText: Original
@@ -7408,7 +7417,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00024414062, y: 0.000061035156}
+  m_AnchoredPosition: {x: -0.00024414062, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &905832918
