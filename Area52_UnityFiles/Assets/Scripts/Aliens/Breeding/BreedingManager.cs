@@ -15,6 +15,8 @@ public class PlacedEgg
     public AlienSpecies baby;
     public int roomIndex;
     public float hatchAt;
+    public OwnedAlien parentA;
+    public OwnedAlien parentB;
 }
 
 public class BreedingManager : MonoBehaviour
@@ -181,7 +183,14 @@ public class BreedingManager : MonoBehaviour
     {
         if (State != BreedingState.EggReady || EggContents == null || IsRoomFull(roomIndex)) return false;
 
-        eggs.Add(new PlacedEgg { baby = EggContents, roomIndex = roomIndex, hatchAt = Time.time + hatchSeconds });
+        eggs.Add(new PlacedEgg
+        {
+            baby = EggContents,
+            roomIndex = roomIndex,
+            hatchAt = Time.time + hatchSeconds,
+            parentA = ParentA,
+            parentB = ParentB,
+        });
 
         // Breeding is free again
         ParentA = null;
@@ -203,8 +212,9 @@ public class BreedingManager : MonoBehaviour
 
             PlacedEgg egg = eggs[i];
             eggs.RemoveAt(i);
-            AlienRoster.main.Add(egg.baby, egg.roomIndex); // Shows up in the room straight away
-            Debug.Log($"An egg hatched into {egg.baby.displayName} in room {egg.roomIndex}.", this);
+            OwnedAlien baby = AlienRoster.main.Add(egg.baby, egg.roomIndex, egg.parentA, egg.parentB); // Shows up in the room straight away
+            Debug.Log($"An egg hatched into {baby.DisplayName} in Room {egg.roomIndex + 1} " +
+                      $"(parents: {AlienRoster.main.ParentsText(baby)}).", this);
             hatchedAny = true;
         }
 

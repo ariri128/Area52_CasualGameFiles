@@ -3,10 +3,13 @@ using System.Collections.Generic;
 
 /*
  * Shows each owned alien floating in its room, using the AlienRoster
+ * Each spawned alien is told which owned alien it is, so tapping it can open the right file
 */
 
 public class AlienRoomDisplay : MonoBehaviour
 {
+    public static AlienRoomDisplay main { get; private set; }
+
     [Tooltip("Prefab with a Sprite Renderer and Floating Alien. The sprite is swapped per alien.")]
     [SerializeField] private FloatingAlien alienPrefab;
 
@@ -19,7 +22,18 @@ public class AlienRoomDisplay : MonoBehaviour
         new Vector3(0f, 0.50f, 1.4f),
     };
 
-    private readonly List<GameObject> spawned = new List<GameObject>();
+    private readonly List<FloatingAlien> spawned = new List<FloatingAlien>();
+
+    private void Awake()
+    {
+        main = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (main == this) main = null;
+        if (AlienRoster.main != null) AlienRoster.main.onChanged.RemoveListener(Refresh);
+    }
 
     // Rooms spawn in RoomManager's Awake, so by Start they all exist
     private void Start()
@@ -34,16 +48,19 @@ public class AlienRoomDisplay : MonoBehaviour
         Refresh();
     }
 
-    private void OnDestroy()
+    // The spawned alien showing this owned alien right now (null if it isn't in a room)
+    public FloatingAlien Find(OwnedAlien owner)
     {
-        if (AlienRoster.main != null) AlienRoster.main.onChanged.RemoveListener(Refresh);
+        foreach (FloatingAlien alien in spawned)
+            if (alien != null && alien.Owner == owner) return alien;
+        return null;
     }
 
-    // Clears every room's aliens and spawn them again
+    // Clears every room's aliens and spawns them again
     private void Refresh()
     {
-        foreach (GameObject alien in spawned)
-            if (alien != null) Destroy(alien);
+        foreach (FloatingAlien alien in spawned)
+            if (alien != null) Destroy(alien.gameObject);
         spawned.Clear();
 
         for (int roomIndex = 0; roomIndex < RoomManager.main.RoomCount; roomIndex++)
@@ -59,10 +76,10 @@ public class AlienRoomDisplay : MonoBehaviour
 
                 // Spawned at its spot, so FloatingAlien centers its path there
                 FloatingAlien alien = Instantiate(alienPrefab, worldSpot, Quaternion.identity, room.transform);
-                alien.name = $"Alien_{aliensHere[i].species.displayName}";
-                alien.GetComponent<SpriteRenderer>().sprite = aliensHere[i].species.sprite;
+                alien.name = $"Alien_{aliensHere[i].DisplayName}";
+                alien.Setup(aliensHere[i]);
 
-                spawned.Add(alien.gameObject);
+                spawned.Add(alien);
             }
         }
     }
