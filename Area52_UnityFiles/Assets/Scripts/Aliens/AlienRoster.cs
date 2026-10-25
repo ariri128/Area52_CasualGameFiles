@@ -19,6 +19,9 @@ public class OwnedAlien
     [Tooltip("True while it's away being bred. It isn't shown in its room then.")]
     public bool inBreedingRoom;
 
+    [Tooltip("True while it's away exploring. Set by ExplorationManager - don't tick by hand.")]
+    public bool isExploring;
+
     [Tooltip("Name the player gave it. Empty = uses the species name.")]
     public string customName;
 
@@ -35,9 +38,14 @@ public class OwnedAlien
 
     public bool HasParents => parentA != null || parentB != null;
 
+    // Away breeding or away exploring: not in its room right now, but it's coming back
+    public bool IsAway => inBreedingRoom || isExploring;
+
     public void RefreshLabel()
     {
-        name = inBreedingRoom ? $"{DisplayName} - breeding" : $"{DisplayName} - room {roomIndex}";
+        if (inBreedingRoom) name = $"{DisplayName} - breeding";
+        else if (isExploring) name = $"{DisplayName} - exploring";
+        else name = $"{DisplayName} - room {roomIndex}";
     }
 }
 
@@ -95,7 +103,7 @@ public class AlienRoster : MonoBehaviour
         List<OwnedAlien> result = new List<OwnedAlien>();
         foreach (OwnedAlien alien in aliens)
         {
-            if (alien != null && alien.species != null && !alien.inBreedingRoom && alien.roomIndex == roomIndex)
+            if (alien != null && alien.species != null && !alien.IsAway && alien.roomIndex == roomIndex)
                 result.Add(alien);
         }
         return result;
@@ -107,7 +115,7 @@ public class AlienRoster : MonoBehaviour
         List<OwnedAlien> result = new List<OwnedAlien>();
         foreach (OwnedAlien alien in aliens)
         {
-            if (alien != null && alien.species != null && !alien.inBreedingRoom)
+            if (alien != null && alien.species != null && !alien.IsAway)
                 result.Add(alien);
         }
         return result;
@@ -117,6 +125,14 @@ public class AlienRoster : MonoBehaviour
     {
         if (alien == null || alien.inBreedingRoom == inBreedingRoom) return;
         alien.inBreedingRoom = inBreedingRoom;
+        alien.RefreshLabel();
+        onChanged.Invoke();
+    }
+
+    public void SetExploring(OwnedAlien alien, bool exploring)
+    {
+        if (alien == null || alien.isExploring == exploring) return;
+        alien.isExploring = exploring;
         alien.RefreshLabel();
         onChanged.Invoke();
     }

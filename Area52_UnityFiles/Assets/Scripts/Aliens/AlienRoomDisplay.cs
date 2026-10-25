@@ -56,6 +56,14 @@ public class AlienRoomDisplay : MonoBehaviour
         return null;
     }
 
+    // Takes an alien out of the list so the next Refresh doesn't destroy it (used when it flies off to explore)
+    public FloatingAlien Detach(OwnedAlien owner)
+    {
+        FloatingAlien alien = Find(owner);
+        if (alien != null) spawned.Remove(alien);
+        return alien;
+    }
+
     // Clears every room's aliens and spawns them again
     private void Refresh()
     {

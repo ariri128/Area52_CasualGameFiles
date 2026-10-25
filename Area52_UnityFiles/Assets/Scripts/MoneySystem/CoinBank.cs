@@ -69,7 +69,7 @@ public class CoinBank : MonoBehaviour
         bool changed = false;
         foreach (OwnedAlien alien in AlienRoster.main.All)
         {
-            if (alien == null || alien.species == null || alien.inBreedingRoom) continue;
+            if (alien == null || alien.species == null || alien.IsAway) continue; // Away breeding or exploring = no coins
 
             // Mood scales the drop: Happy all, Neutral 2/3, Sad 1/3, Angry none
             int coins = AlienMoods.main != null ? AlienMoods.main.CoinsPerDrop(alien) : alien.species.CoinsPerDrop;

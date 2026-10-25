@@ -4,10 +4,12 @@ using TMPro;
 using UnityEngine.UI;
 
 /*
- * The "which room?" popup, used two ways:
- *   Open()                - where to put the egg (breeding room)
- *   OpenForMove(alien)    - where to move an alien to (alien file)
- * Full rooms are greyed out; when moving, the alien's own room shows "Here" and can't be picked
+ * The "which room?" popup, used three ways:
+ *   Open()                     - where to put the egg (breeding room)
+ *   OpenForMove(alien)         - where to move an alien to (alien file)
+ *   OpenForArtifact(artifact)  - where to place an artifact (artifacts page)
+ * Full rooms are greyed out; when moving, the alien's / artifact's own room shows "Here" and can't be picked
+ * Aliens and eggs count against the room's alien limit; artifacts have their own limit
 */
 
 public class RoomPickerPopup : MonoBehaviour
@@ -39,9 +41,18 @@ public class RoomPickerPopup : MonoBehaviour
     [SerializeField] private string moveConfirm = "Move Here";
     [SerializeField] private string currentRoomText = "Here";
 
+    [Header("Text - artifacts")]
+    [Tooltip("{0} is the artifact's name. Used when it's Unplaced.")]
+    [SerializeField] private string artifactPlaceTitle = "Place {0} in which room?";
+    [SerializeField] private string artifactPlaceConfirm = "Place Here";
+    [Tooltip("{0} is the artifact's name. Used when it's already in a room.")]
+    [SerializeField] private string artifactMoveTitle = "Move {0} to which room?";
+    [SerializeField] private string artifactMoveConfirm = "Move Here";
+
     private readonly List<GameObject> slots = new List<GameObject>();
     private int selectedRoom = -1;
-    private OwnedAlien moving; // null = placing an egg
+    private OwnedAlien moving; // null = placing an egg (or an artifact)
+    private OwnedArtifact placingArtifact; // Null unless placing an artifact
     private bool listening;
 
     public bool IsOpen => root != null && root.activeSelf;
@@ -63,6 +74,7 @@ public class RoomPickerPopup : MonoBehaviour
         if (listening || BreedingManager.main == null || AlienRoster.main == null) return;
         BreedingManager.main.onChanged.AddListener(RefreshIfOpen);
         AlienRoster.main.onChanged.AddListener(RefreshIfOpen); // Moves and hatches change the counts
+        if (ArtifactInventory.main != null) ArtifactInventory.main.onChanged.AddListener(RefreshIfOpen);
         listening = true;
     }
 
@@ -71,6 +83,7 @@ public class RoomPickerPopup : MonoBehaviour
         if (!listening) return;
         if (BreedingManager.main != null) BreedingManager.main.onChanged.RemoveListener(RefreshIfOpen);
         if (AlienRoster.main != null) AlienRoster.main.onChanged.RemoveListener(RefreshIfOpen);
+        if (ArtifactInventory.main != null) ArtifactInventory.main.onChanged.RemoveListener(RefreshIfOpen);
         listening = false;
     }
 
@@ -78,6 +91,7 @@ public class RoomPickerPopup : MonoBehaviour
     public void Open()
     {
         moving = null;
+        placingArtifact = null;
         OpenPopup();
     }
 
@@ -86,6 +100,16 @@ public class RoomPickerPopup : MonoBehaviour
     {
         if (alien == null) return;
         moving = alien;
+        placingArtifact = null;
+        OpenPopup();
+    }
+
+    // Artifact mode
+    public void OpenForArtifact(OwnedArtifact artifact)
+    {
+        if (artifact == null) return;
+        moving = null;
+        placingArtifact = artifact;
         OpenPopup();
     }
 
@@ -100,6 +124,7 @@ public class RoomPickerPopup : MonoBehaviour
     {
         root.SetActive(false);
         moving = null;
+        placingArtifact = null;
     }
 
     private void RefreshIfOpen()
@@ -110,8 +135,33 @@ public class RoomPickerPopup : MonoBehaviour
     // Can this room be picked right now?
     private bool CanPick(int roomIndex)
     {
+        if (placingArtifact != null) return ArtifactInventory.main != null && ArtifactInventory.main.CanPlace(placingArtifact, roomIndex);
         if (moving != null) return AlienRoster.main != null && AlienRoster.main.CanMoveTo(moving, roomIndex);
         return BreedingManager.main != null && !BreedingManager.main.IsRoomFull(roomIndex);
+    }
+
+    // The popup's title and button text for the current mode
+    private void RefreshTexts()
+    {
+        string title, confirm;
+        if (placingArtifact != null)
+        {
+            title = string.Format(placingArtifact.IsPlaced ? artifactMoveTitle : artifactPlaceTitle, placingArtifact.DisplayName);
+            confirm = placingArtifact.IsPlaced ? artifactMoveConfirm : artifactPlaceConfirm;
+        }
+        else if (moving != null)
+        {
+            title = string.Format(moveTitle, moving.DisplayName);
+            confirm = moveConfirm;
+        }
+        else
+        {
+            title = eggTitle;
+            confirm = eggConfirm;
+        }
+
+        if (titleText != null) titleText.text = title;
+        if (confirmLabel != null) confirmLabel.text = confirm;
     }
 
     private void Rebuild()
@@ -121,9 +171,9 @@ public class RoomPickerPopup : MonoBehaviour
 
         BreedingManager breeding = BreedingManager.main;
         if (breeding == null) return;
+        ArtifactInventory artifacts = ArtifactInventory.main;
 
-        if (titleText != null) titleText.text = moving != null ? string.Format(moveTitle, moving.DisplayName) : eggTitle;
-        if (confirmLabel != null) confirmLabel.text = moving != null ? moveConfirm : eggConfirm;
+        RefreshTexts();
 
         // A selected room that can't be picked anymore is unselected
         if (selectedRoom >= 0 && !CanPick(selectedRoom)) selectedRoom = -1;
@@ -131,8 +181,14 @@ public class RoomPickerPopup : MonoBehaviour
         for (int i = 0; i < breeding.AlienRooms.Count; i++)
         {
             int roomIndex = breeding.AlienRooms[i];
-            bool isCurrent = moving != null && moving.roomIndex == roomIndex;
-            bool full = breeding.IsRoomFull(roomIndex);
+
+            // Artifacts have their own count and limit
+            bool forArtifact = placingArtifact != null && artifacts != null;
+            bool isCurrent = forArtifact ? placingArtifact.roomIndex == roomIndex
+                                         : moving != null && moving.roomIndex == roomIndex;
+            bool full = forArtifact ? artifacts.IsRoomFull(roomIndex) : breeding.IsRoomFull(roomIndex);
+            int countHere = forArtifact ? artifacts.CountInRoom(roomIndex) : breeding.Occupancy(roomIndex);
+            int maxHere = forArtifact ? artifacts.MaxPerRoom : breeding.MaxPerRoom;
 
             Button slot = Instantiate(slotTemplate, slotContainer);
             slot.gameObject.SetActive(true);
@@ -145,7 +201,7 @@ public class RoomPickerPopup : MonoBehaviour
             string count;
             if (isCurrent) count = currentRoomText;
             else if (full) count = fullText;
-            else count = string.Format(countFormat, breeding.Occupancy(roomIndex), breeding.MaxPerRoom);
+            else count = string.Format(countFormat, countHere, maxHere);
             SetText(slot.transform, "Count", count);
 
             Transform border = slot.transform.Find("SelectedBorder");
@@ -167,7 +223,11 @@ public class RoomPickerPopup : MonoBehaviour
     {
         if (selectedRoom < 0) return;
 
-        if (moving != null)
+        if (placingArtifact != null)
+        {
+            if (ArtifactInventory.main != null && ArtifactInventory.main.PlaceInRoom(placingArtifact, selectedRoom)) Close();
+        }
+        else if (moving != null)
         {
             if (AlienRoster.main != null && AlienRoster.main.MoveTo(moving, selectedRoom)) Close();
         }

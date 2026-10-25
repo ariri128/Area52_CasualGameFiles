@@ -83,6 +83,13 @@ public class AudioManager : MonoBehaviour
         main.clickSource.PlayOneShot(main.click, main.clickVolume);
     }
 
+    // One-off sound effects (exploring, etc.)
+    public static void PlaySound(AudioClip clip, float volume = 1f)
+    {
+        if (main == null || clip == null) return;
+        main.clickSource.PlayOneShot(clip, volume);
+    }
+
     // Changes the background track. Starts it from the beginning, unless a preview is playing, in which case it starts when the preview stops.
     public void SetMusic(AudioClip clip)
     {
