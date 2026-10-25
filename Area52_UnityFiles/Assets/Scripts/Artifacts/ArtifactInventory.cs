@@ -18,6 +18,9 @@ public class OwnedArtifact
     [Tooltip("Which room it's placed in: its position in RoomManager's Rooms list (0 = first room). -1 = Unplaced.")]
     public int roomIndex = -1;
 
+    [Tooltip("Shows NEW on the Artifacts page until the player has scrolled to it.")]
+    public bool isNew;
+
     public bool IsPlaced => roomIndex >= 0;
 
     public string DisplayName => definition != null ? definition.displayName : "(no artifact)";
@@ -109,7 +112,7 @@ public class ArtifactInventory : MonoBehaviour
     {
         if (definition == null) return null;
 
-        OwnedArtifact artifact = new OwnedArtifact { definition = definition, roomIndex = -1 };
+        OwnedArtifact artifact = new OwnedArtifact { definition = definition, roomIndex = -1, isNew = true };
         artifact.RefreshLabel();
         artifacts.Add(artifact);
         onChanged.Invoke();
@@ -132,6 +135,13 @@ public class ArtifactInventory : MonoBehaviour
             return null;
         }
         return Add(found);
+    }
+
+    // Called by the Artifacts page once the player has actually seen this one on screen
+    // Doesn't fire onChanged on purpose: the NEW tag stays up until the page is closed
+    public void MarkSeen(OwnedArtifact artifact)
+    {
+        if (artifact != null) artifact.isNew = false;
     }
 
 
