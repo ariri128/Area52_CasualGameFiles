@@ -110,3 +110,8 @@ MonoBehaviour:
   bobSpeed: 0.8
   flipWhenTurning: 1
   artFacesLeft: 1
+  tapBoxDepth: 0.2
+  flyHeight: 8
+  flyUpStartSpeed: 1
+  flyUpAcceleration: 5
+  flyInSeconds: 1.5

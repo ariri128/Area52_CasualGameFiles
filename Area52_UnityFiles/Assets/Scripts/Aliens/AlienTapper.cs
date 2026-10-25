@@ -102,7 +102,7 @@ public class AlienTapper : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, 200f, tapLayers, QueryTriggerInteraction.Ignore))
         {
             FloatingAlien alien = hit.collider.GetComponentInParent<FloatingAlien>();
-            if (alien != null && IsInCurrentRoom(alien.Owner))
+            if (alien != null && !alien.Flying && IsInCurrentRoom(alien.Owner))
             {
                 if (alien.Owner == Selected) Deselect();
                 else Select(alien);
@@ -115,7 +115,7 @@ public class AlienTapper : MonoBehaviour
 
     private static bool IsInCurrentRoom(OwnedAlien alien)
     {
-        return alien != null && !alien.inBreedingRoom && RoomManager.main != null
+        return alien != null && !alien.IsAway && RoomManager.main != null
                && alien.roomIndex == RoomManager.main.CurrentRoomIndex;
     }
 
@@ -176,5 +176,20 @@ public class AlienTapper : MonoBehaviour
         if (Selected == null) return;
         if (AlienFilePopup.main != null) AlienFilePopup.main.Open(Selected);
         else Debug.LogWarning("AlienTapper: no AlienFilePopup in the scene.", this);
+    }
+
+    // Sends the selected alien out to look for an artifact
+    public void OnExplorePressed()
+    {
+        if (Selected == null) return;
+        if (ExplorationManager.main == null)
+        {
+            Debug.LogWarning("AlienTapper: no ExplorationManager in the scene.", this);
+            return;
+        }
+
+        OwnedAlien alien = Selected;
+        Deselect(); // Hides the bubble and lets go of the alien before it flies off
+        ExplorationManager.main.Send(alien);
     }
 }
