@@ -4904,6 +4904,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExplorationManager
   exploreSeconds: 15
+  shipPrefab: {fileID: 1759022247469181625, guid: bac4610362ede4e64b736db93616f22d, type: 3}
+  shipStop: {x: 0, y: 1, z: 0.4}
   exploreSound: {fileID: 8300000, guid: b8771337d370843a891321542068e950, type: 3}
   soundVolume: 1
   onReturned:
