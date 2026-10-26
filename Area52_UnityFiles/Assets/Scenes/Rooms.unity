@@ -4853,6 +4853,7 @@ MonoBehaviour:
   neutralCoins: 0.6666667
   sadCoins: 0.33333334
   angryCoins: 0
+  likedArtifactBonus: 5
 --- !u!114 &516521049
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4885,7 +4886,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactInventory
   catalog: {fileID: 11400000, guid: 5379748f3206d40be99962cc9b68678a, type: 2}
-  maxPerRoom: 5
+  maxPerRoom: 4
   artifacts: []
   onChanged:
     m_PersistentCalls:

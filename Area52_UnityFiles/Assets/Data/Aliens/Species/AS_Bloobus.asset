@@ -21,6 +21,7 @@ MonoBehaviour:
     eyes: 2
     mouth: 0
   coinsPerDrop: 5
+  likedArtifact: {fileID: 11400000, guid: 52d0638f6bae54adfbedbe9a93b6477a, type: 2}
   traitsFrom:
     body: {fileID: 0}
     antenna: {fileID: 0}
