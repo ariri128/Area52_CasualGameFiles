@@ -2153,6 +2153,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c5a9e55bc0084377b32ab760a1132d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonClickSound
+--- !u!1 &186510769 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6666255409973012458, guid: 1a68e9019d5f64e76909ce76b691f599, type: 3}
+  m_PrefabInstance: {fileID: 5938509223944763339}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &198720861
 GameObject:
   m_ObjectHideFlags: 0
@@ -4904,6 +4909,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExplorationManager
   exploreSeconds: 15
+  returnDelay: 0.3
+  blockingUI:
+  - {fileID: 1397069052}
+  - {fileID: 1321059055}
+  - {fileID: 973358916}
+  - {fileID: 1405262433}
+  - {fileID: 1544098385}
+  - {fileID: 1509627717}
+  - {fileID: 1870141394}
+  - {fileID: 1927441972}
+  - {fileID: 795342697}
+  - {fileID: 186510769}
+  - {fileID: 1312063126}
+  - {fileID: 2096207645}
   shipPrefab: {fileID: 1759022247469181625, guid: bac4610362ede4e64b736db93616f22d, type: 3}
   shipStop: {x: 0, y: 1, z: 0.4}
   exploreSound: {fileID: 8300000, guid: b8771337d370843a891321542068e950, type: 3}
