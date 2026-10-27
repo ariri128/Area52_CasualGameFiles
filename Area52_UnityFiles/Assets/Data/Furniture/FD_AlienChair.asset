@@ -16,4 +16,4 @@ MonoBehaviour:
   icon: {fileID: 0}
   category: 1
   placement: 0
-  prefab: {fileID: 6327699050705557273, guid: d108b05eee0a14a2297ccd79b713a7e4, type: 3}
+  prefab: {fileID: 0}

@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d6739264b3d994690bef5ba03276194d, type: 3}
-  m_Name: FD_YarnRoomRug
+  m_Name: FD_BeadLamp
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
-  displayName: Yarn Room Rug
+  displayName: Bead Lamp
   icon: {fileID: 0}
-  category: 8
-  placement: 1
+  category: 7
+  placement: 0
   prefab: {fileID: 0}

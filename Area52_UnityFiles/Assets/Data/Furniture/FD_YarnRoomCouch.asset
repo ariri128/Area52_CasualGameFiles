@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6739264b3d994690bef5ba03276194d, type: 3}
   m_Name: FD_YarnRoomCouch
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
-  displayName: Yarn Room Couch
+  displayName: Yarn Couch
   icon: {fileID: 0}
   category: 0
   placement: 0

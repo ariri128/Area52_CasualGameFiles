@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6739264b3d994690bef5ba03276194d, type: 3}
   m_Name: FD_YarnRoomSideTable
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
-  displayName: Yarn Room Side Table
+  displayName: Yellow Table
   icon: {fileID: 0}
   category: 3
   placement: 0
