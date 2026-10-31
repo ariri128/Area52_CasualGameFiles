@@ -220,7 +220,9 @@ public class AlienTapper : MonoBehaviour
             return;
         }
 
-        AlienHunger.main.Feed(Selected); // TODO: wait for the pellet animation to land first
+        // The pellet flies over and the alien gets fuller when it lands
+        if (PelletFeeder.main != null && bubble != null) PelletFeeder.main.Feed(Selected, bubble.FeedButtonRect);
+        else AlienHunger.main.Feed(Selected);
     }
 }
 
