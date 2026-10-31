@@ -216,7 +216,8 @@ public class AlienTapper : MonoBehaviour
 
         if (PelletBank.main == null || !PelletBank.main.TryUse())
         {
-            Debug.Log("No pellets left!", this); // TODO: the "No pellets!" pop-up
+            if (NoPelletsPopup.main != null) NoPelletsPopup.main.Show();
+            else Debug.Log("No pellets left!", this);
             return;
         }
 
