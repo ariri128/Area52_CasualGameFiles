@@ -2153,11 +2153,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c5a9e55bc0084377b32ab760a1132d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonClickSound
---- !u!1 &186510769 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6666255409973012458, guid: 1a68e9019d5f64e76909ce76b691f599, type: 3}
-  m_PrefabInstance: {fileID: 5938509223944763339}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &198720861
 GameObject:
   m_ObjectHideFlags: 0
@@ -3074,7 +3069,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.3618097, z: -5.082343}
+  m_LocalPosition: {x: 0, y: 1.2056528, z: -4.4995575}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4515,6 +4510,7 @@ GameObject:
   - component: {fileID: 516521047}
   - component: {fileID: 516521048}
   - component: {fileID: 516521049}
+  - component: {fileID: 516521052}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -4665,6 +4661,7 @@ MonoBehaviour:
     roomIndex: 0
     inBreedingRoom: 0
     isExploring: 0
+    fullness: 1
     customName: 
     dateAcquired: 
   - name: Smeeeg - room 2
@@ -4672,6 +4669,7 @@ MonoBehaviour:
     roomIndex: 2
     inBreedingRoom: 0
     isExploring: 0
+    fullness: 1
     customName: 
     dateAcquired: 
   - name: Avaroos - room 1
@@ -4679,6 +4677,7 @@ MonoBehaviour:
     roomIndex: 1
     inBreedingRoom: 0
     isExploring: 0
+    fullness: 1
     customName: 
     dateAcquired: 
   - name: Whizzber - room 3
@@ -4686,6 +4685,7 @@ MonoBehaviour:
     roomIndex: 3
     inBreedingRoom: 0
     isExploring: 0
+    fullness: 1
     customName: 
     dateAcquired: 
   - name: Dopper Higgle - room 2
@@ -4693,6 +4693,7 @@ MonoBehaviour:
     roomIndex: 2
     inBreedingRoom: 0
     isExploring: 0
+    fullness: 1
     customName: 
     dateAcquired: 
   - name: Niangaa - room 3
@@ -4700,6 +4701,7 @@ MonoBehaviour:
     roomIndex: 3
     inBreedingRoom: 0
     isExploring: 0
+    fullness: 1
     customName: 
     dateAcquired: 
   - name: Goshil - room 0
@@ -4707,6 +4709,7 @@ MonoBehaviour:
     roomIndex: 0
     inBreedingRoom: 0
     isExploring: 0
+    fullness: 1
     customName: Goshil
     dateAcquired: 
   maxNameLength: 16
@@ -4925,7 +4928,6 @@ MonoBehaviour:
   - {fileID: 1870141394}
   - {fileID: 1927441972}
   - {fileID: 795342697}
-  - {fileID: 186510769}
   - {fileID: 1312063126}
   - {fileID: 2096207645}
   shipPrefab: {fileID: 1759022247469181625, guid: bac4610362ede4e64b736db93616f22d, type: 3}
@@ -4933,6 +4935,28 @@ MonoBehaviour:
   exploreSound: {fileID: 8300000, guid: b8771337d370843a891321542068e950, type: 3}
   soundVolume: 1
   onReturned:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &516521052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516521033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3ff9f746f3bd4e839fb47e627c443fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AlienHunger
+  drainInterval: 10
+  drainAmount: 0.025
+  drainWhileAway: 0
+  pelletsToFill: 10
+  sadAt: 0.5
+  angryAt: 0.1
+  logDrains: 0
+  onChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &561251155
@@ -11014,7 +11038,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 643154054}
   m_HandleRect: {fileID: 643154053}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
