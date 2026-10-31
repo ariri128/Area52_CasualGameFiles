@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6146318294176178268}
   - component: {fileID: 7560050763507964825}
   - component: {fileID: 7455420373253680166}
+  - component: {fileID: 4532503342429177076}
   m_Layer: 0
   m_Name: FloatingAlien
   m_TagString: Untagged
@@ -112,6 +113,30 @@ MonoBehaviour:
   artFacesLeft: 1
   tapBoxDepth: 0.2
   flyHeight: 8
+  chompAmount: 0.12
+  chompSeconds: 0.2
   flyUpStartSpeed: 1
   flyUpAcceleration: 5
   flyInSeconds: 1.5
+  dropOffStartScale: 0.4
+--- !u!114 &4532503342429177076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7512305479811419197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa8dd50568b694748b0e9406e062e27f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HungerGlow
+  glowSprite: {fileID: 0}
+  glowColor: {r: 1, g: 0, b: 0, a: 1}
+  glowSize: 1.6
+  minAlpha: 0.15
+  maxAlpha: 0.6
+  starvingExtraAlpha: 0.2
+  pulsesPerSecond: 0.8
+  starvingPulsesPerSecond: 1.6
+  fadeSeconds: 0.4
