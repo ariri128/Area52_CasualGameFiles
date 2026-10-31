@@ -75,6 +75,13 @@ public class AlienMoods : MonoBehaviour
 
     public AlienMood MoodOf(OwnedAlien alien)
     {
+        // Hunger beats everything else: nearly empty = Angry, half or less = Sad
+        if (AlienHunger.main != null)
+        {
+            if (AlienHunger.main.IsStarving(alien)) return AlienMood.Angry;
+            if (AlienHunger.main.IsHungry(alien)) return AlienMood.Sad;
+        }
+
         List<OwnedAlien> roommates = RoommatesOf(alien);
         if (roommates.Count == 0) return AlienMood.Sad;
 
@@ -162,7 +169,7 @@ public class AlienMoods : MonoBehaviour
 
             text.AppendLine($"  {alien.DisplayName} (Room {alien.roomIndex + 1}) - " +
                             $"{(p != null ? p.shortName : "no personality")}, " +
-                            $"with [{string.Join(", ", names)}] -> {MoodOf(alien)}, " +
+                            $"with [{string.Join(", ", names)}], {alien.fullness:P0} full -> {MoodOf(alien)}, " +
                             $"{CoinsPerDrop(alien)}/{BaseCoinsPerDrop(alien)} coins" + // BaseCoinsPerDrop
                             (HasLikedArtifact(alien) ? $" (has its {alien.species.LikedArtifact.displayName})" : "") +
                             (alien.inBreedingRoom ? " (away breeding)" : ""));

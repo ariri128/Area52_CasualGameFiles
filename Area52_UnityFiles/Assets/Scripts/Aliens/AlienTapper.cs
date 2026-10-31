@@ -131,6 +131,7 @@ public class AlienTapper : MonoBehaviour
         selectedVisual.Paused = true;
 
         if (bubble != null) bubble.Show(alien.SpriteRenderer, CurrentEmotionSprite());
+        RefreshHunger();
     }
 
     public void Deselect()
@@ -158,12 +159,22 @@ public class AlienTapper : MonoBehaviour
 
         // Explore greys out while another alien from this room is out (checked every frame, so it lights up again when the ship leaves)
         if (bubble != null) bubble.SetExploreAllowed(ExplorationManager.main != null && ExplorationManager.main.CanExplore(Selected));
+        RefreshHunger();
     }
 
     private Sprite CurrentEmotionSprite()
     {
         if (AlienMoods.main == null || Selected == null) return null;
         return AlienMoods.main.SpriteFor(AlienMoods.main.MoodOf(Selected));
+    }
+
+    private void RefreshHunger(bool instant = false)
+    {
+        if (bubble == null || Selected == null || AlienHunger.main == null) return;
+        bubble.SetHunger(AlienHunger.main.FullnessOf(Selected),
+                         AlienHunger.main.IsHungry(Selected),
+                         AlienHunger.main.IsStarving(Selected),
+                         instant);
     }
 
     private void HandleRoomChanged(int roomIndex)
@@ -196,5 +207,22 @@ public class AlienTapper : MonoBehaviour
         OwnedAlien alien = Selected;
         Deselect(); // Hides the bubble and lets go of the alien before it flies off
         ExplorationManager.main.Send(alien);
+    }
+
+    // Feeds the selected alien one pellet. Works even when it's full - the pellet is still eaten, the bar just can't go higher
+    public void OnFeedPressed()
+    {
+        if (Selected == null || AlienHunger.main == null) return;
+
+        if (PelletBank.main == null || !PelletBank.main.TryUse())
+        {
+            if (NoPelletsPopup.main != null) NoPelletsPopup.main.Show();
+            else Debug.Log("No pellets left!", this);
+            return;
+        }
+
+        // The pellet flies over and the alien gets fuller when it lands
+        if (PelletFeeder.main != null && bubble != null) PelletFeeder.main.Feed(Selected, bubble.FeedButtonRect);
+        else AlienHunger.main.Feed(Selected);
     }
 }

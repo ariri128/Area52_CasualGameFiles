@@ -107,6 +107,7 @@ public class CoinBank : MonoBehaviour
         chests[roomIndex] = 0;
         Wallet += amount;
         onChanged.Invoke();
+        AudioManager.PlayPurchase(); // Same sound as buying
         return amount;
     }
 
@@ -118,6 +119,7 @@ public class CoinBank : MonoBehaviour
         if (cost < 0 || Wallet < cost) return false;
         Wallet -= cost;
         onChanged.Invoke();
+        AudioManager.PlayPurchase(); // Every shop spends through here, so every purchase gets the sound
         return true;
     }
 }

@@ -57,12 +57,14 @@ public class CoinPopup : MonoBehaviour
     public void Open(int forRoom)
     {
         roomIndex = forRoom;
+        if (!IsOpen) AudioManager.PlayChestOpen(); // Not again if it's somehow already open
         root.SetActive(true);
         Refresh();
     }
 
     public void Close()
     {
+        if (IsOpen) AudioManager.PlayChestClose(); // Only if it was actually open
         root.SetActive(false);
     }
 

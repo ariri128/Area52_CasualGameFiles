@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d6739264b3d994690bef5ba03276194d, type: 3}
-  m_Name: FD_ExtraBookshelf
+  m_Name: FD_BrownCouch
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
-  displayName: Yellow BookShelf
+  displayName: Brown Couch
   icon: {fileID: 0}
-  category: 6
+  category: 0
   placement: 0
-  prefab: {fileID: 539142384023348113, guid: de4e23e2507f84937b10a4fc452f746f, type: 3}
+  prefab: {fileID: 0}

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /*
- * The thought bubble above a selected alien, showing its emotion, with the Sell and Explore buttons underneath it
+ * The thought bubble above a selected alien, showing its emotion, with the Sell, Explore, and Feed buttons underneath it
  * Follows the alien on screen and keeps the bubble AND its buttons inside the safe area
  * Tapping the bubble tells AlienTapper to open the file; Explore tells AlienTapper to send the alien exploring
 */
@@ -24,6 +24,30 @@ public class AlienThoughtBubble : MonoBehaviour
     [SerializeField] private Button sellButton;
     [SerializeField] private Button exploreButton;
 
+    [Header("Feeding")]
+    [Tooltip("Always clickable - uses one pellet each press. Needs a Mask component so the fill takes its shape.")]
+    [SerializeField] private Button feedButton;
+    [Tooltip("Plain white Image inside the Feed button, stretched to fill it, Raycast Target off. Its width shows how full the alien is.")]
+    [SerializeField] private Image hungerFill;
+
+    [Tooltip("Fill colors. Keep alpha low so the button shows through.")]
+    [SerializeField] private Color fullColor = new Color(0.35f, 0.85f, 0.35f, 0.45f); // green
+    [SerializeField] private Color hungryColor = new Color(1f, 0.7f, 0.2f, 0.45f); // orange - Sad
+    [SerializeField] private Color starvingColor = new Color(0.95f, 0.25f, 0.25f, 0.5f); // red - Angry
+
+    [Tooltip("How much the whole button takes on the hunger color (0 = its normal color, 1 = fully that color).")]
+    [Range(0f, 1f)] [SerializeField] private float buttonTint = 0.35f;
+    [Tooltip("How fast the bar slides to its new amount (full bars per second).")]
+    [SerializeField] private float fillSpeed = 1.5f;
+
+    private Image feedBackground; // The Feed button's own image
+    private Color feedBaseColor;
+    private float shownFullness = 1f; // What the bar shows right now
+    private float targetFullness = 1f; // What it's sliding towards
+
+    // Where the pellet flies from
+    public RectTransform FeedButtonRect => feedButton != null ? (RectTransform)feedButton.transform : null;
+
     private SpriteRenderer target;
     private Canvas canvas;
 
@@ -40,6 +64,21 @@ public class AlienThoughtBubble : MonoBehaviour
         if (sellButton != null) sellButton.interactable = false; //TODO: selling comes later
         if (exploreButton != null)
             exploreButton.onClick.AddListener(() => { if (AlienTapper.main != null) AlienTapper.main.OnExplorePressed(); });
+
+        if (feedButton != null)
+        {
+            feedButton.onClick.AddListener(() => { if (AlienTapper.main != null) AlienTapper.main.OnFeedPressed(); });
+            feedBackground = feedButton.GetComponent<Image>();
+            if (feedBackground != null) feedBaseColor = feedBackground.color;
+        }
+
+        if (hungerFill != null)
+        {
+            // Zero offsets, so moving its right anchor sets its width exactly
+            hungerFill.rectTransform.offsetMin = Vector2.zero;
+            hungerFill.rectTransform.offsetMax = Vector2.zero;
+            hungerFill.raycastTarget = false;
+        }
 
         Hide();
     }
@@ -65,6 +104,41 @@ public class AlienThoughtBubble : MonoBehaviour
         if (exploreButton != null) exploreButton.interactable = allowed;
     }
 
+    // 0 = empty, 1 = full. Instant = jump straight there (when the bubble first opens) instead of sliding
+    public void SetHunger(float fullness, bool hungry, bool starving, bool instant = false)
+    {
+        targetFullness = Mathf.Clamp01(fullness);
+        if (instant) shownFullness = targetFullness;
+
+        Color color = starving ? starvingColor : hungry ? hungryColor : fullColor;
+        if (hungerFill != null) hungerFill.color = color;
+
+        // The whole button leans towards the same color (solid, so it doesn't go see-through)
+        if (feedBackground != null)
+        {
+            Color solid = new Color(color.r, color.g, color.b, feedBaseColor.a);
+            feedBackground.color = Color.Lerp(feedBaseColor, solid, buttonTint);
+        }
+
+        ApplyFill();
+    }
+
+    private void AnimateHunger()
+    {
+        if (Mathf.Approximately(shownFullness, targetFullness)) return;
+        shownFullness = Mathf.MoveTowards(shownFullness, targetFullness, fillSpeed * Time.unscaledDeltaTime);
+        ApplyFill();
+    }
+
+    // Stretches the fill from the left edge to the fullness point; the Mask rounds it to the button's shape
+    private void ApplyFill()
+    {
+        if (hungerFill == null) return;
+        RectTransform fill = hungerFill.rectTransform;
+        fill.anchorMin = Vector2.zero;
+        fill.anchorMax = new Vector2(shownFullness, 1f);
+    }
+
     public void Hide()
     {
         target = null;
@@ -74,6 +148,7 @@ public class AlienThoughtBubble : MonoBehaviour
     private void LateUpdate()
     {
         if (!bubble.gameObject.activeSelf) return;
+        AnimateHunger();
         if (target == null) return; // AlienTapper re-attaches or hides it
         FollowTarget();
     }

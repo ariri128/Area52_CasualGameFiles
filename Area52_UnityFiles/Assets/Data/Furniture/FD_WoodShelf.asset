@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d6739264b3d994690bef5ba03276194d, type: 3}
-  m_Name: FD_ExtraGreenCouch
+  m_Name: FD_WoodShelf
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
-  displayName: Green Couch
+  displayName: Wood Shelf
   icon: {fileID: 0}
-  category: 0
+  category: 6
   placement: 0
-  prefab: {fileID: 8198131844587932387, guid: 289fff763d07e45b29f160032e98c640, type: 3}
+  prefab: {fileID: 0}

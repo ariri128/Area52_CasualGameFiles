@@ -39,6 +39,13 @@ public class FloatingAlien : MonoBehaviour
     [Tooltip("How far (meters) it flies up when it leaves, and drops from when it comes back. Big enough to be fully off screen.")]
     [SerializeField] private float flyHeight = 8f;
 
+    [Header("Eating")]
+    [Tooltip("How much bigger it gets for a moment when a pellet lands (0.12 = 12% bigger).")]
+    [SerializeField] private float chompAmount = 0.12f;
+    [SerializeField] private float chompSeconds = 0.2f;
+
+    private Coroutine chompRoutine;
+
     [Tooltip("How fast (meters per second) it starts flying up.")]
     [SerializeField] private float flyUpStartSpeed = 1f;
 
@@ -190,6 +197,27 @@ public class FloatingAlien : MonoBehaviour
         transform.localPosition = centerLocal;
         transform.localScale = normalScale;
         Flying = false;
+    }
+
+    // EATING
+
+    // A quick bump in size when a pellet lands - skipped while flying, since flying changes the size itself
+    public void Chomp()
+    {
+        if (Flying || !isActiveAndEnabled) return;
+        if (chompRoutine != null) StopCoroutine(chompRoutine);
+        chompRoutine = StartCoroutine(ChompRoutine());
+    }
+
+    private IEnumerator ChompRoutine()
+    {
+        for (float t = 0f; t < 1f; t += Time.deltaTime / chompSeconds)
+        {
+            transform.localScale = normalScale * (1f + chompAmount * Mathf.Sin(t * Mathf.PI));
+            yield return null;
+        }
+        transform.localScale = normalScale;
+        chompRoutine = null;
     }
 
     // Shows the path in the Scene view when the alien is selected

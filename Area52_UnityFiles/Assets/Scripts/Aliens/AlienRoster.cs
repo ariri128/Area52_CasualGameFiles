@@ -22,6 +22,9 @@ public class OwnedAlien
     [Tooltip("True while it's away exploring. Set by ExplorationManager - don't tick by hand.")]
     public bool isExploring;
 
+    [Tooltip("How full its belly is: 1 = full, 0 = empty. Starts full. Drag it during Play to test hunger.")]
+    [Range(0f, 1f)] public float fullness = 1f;
+
     [Tooltip("Name the player gave it. Empty = uses the species name.")]
     public string customName;
 

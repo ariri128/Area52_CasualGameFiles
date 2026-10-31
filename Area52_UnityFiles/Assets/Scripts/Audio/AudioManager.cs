@@ -20,6 +20,19 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)]
     [SerializeField] private float clickVolume = 1f;
 
+    [Header("Coins")]
+    [Tooltip("Plays whenever something is bought, and when coins are collected from a chest.")]
+    [SerializeField] private AudioClip purchaseSound;
+    [Range(0f, 1f)]
+    [SerializeField] private float purchaseVolume = 1f;
+
+    [Tooltip("Plays when the chest is opened (the coin popup opens).")]
+    [SerializeField] private AudioClip chestOpenSound;
+    [Tooltip("Plays when the coin popup is closed.")]
+    [SerializeField] private AudioClip chestCloseSound;
+    [Range(0f, 1f)]
+    [SerializeField] private float chestVolume = 1f;
+
     private AudioSource musicSource;
     private AudioSource clickSource;
     private AudioSource previewSource;
@@ -88,6 +101,21 @@ public class AudioManager : MonoBehaviour
     {
         if (main == null || clip == null) return;
         main.clickSource.PlayOneShot(clip, volume);
+    }
+
+    public static void PlayPurchase()
+    {
+        if (main != null) PlaySound(main.purchaseSound, main.purchaseVolume);
+    }
+
+    public static void PlayChestOpen()
+    {
+        if (main != null) PlaySound(main.chestOpenSound, main.chestVolume);
+    }
+
+    public static void PlayChestClose()
+    {
+        if (main != null) PlaySound(main.chestCloseSound, main.chestVolume);
     }
 
     // Changes the background track. Starts it from the beginning, unless a preview is playing, in which case it starts when the preview stops.
