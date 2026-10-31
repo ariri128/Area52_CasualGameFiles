@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6739264b3d994690bef5ba03276194d, type: 3}
   m_Name: FD_AlienChair
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
-  displayName: AlienChair
+  displayName: Alien Chair
   icon: {fileID: 0}
   category: 1
   placement: 0
-  prefab: {fileID: 6327699050705557273, guid: d108b05eee0a14a2297ccd79b713a7e4, type: 3}
+  prefab: {fileID: 0}
