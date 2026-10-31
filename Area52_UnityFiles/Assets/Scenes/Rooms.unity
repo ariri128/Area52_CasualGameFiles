@@ -5491,6 +5491,11 @@ MonoBehaviour:
   musicVolume: 0.35
   click: {fileID: 8300000, guid: e4e71a723e73641e8b9f31a4030ee9b5, type: 3}
   clickVolume: 1
+  purchaseSound: {fileID: 8300000, guid: b8c3ca7a36e624b5b8011aa551c890d3, type: 3}
+  purchaseVolume: 1
+  chestOpenSound: {fileID: 8300000, guid: 2671d0625da524e2793fe906872535ec, type: 3}
+  chestCloseSound: {fileID: 8300000, guid: 270d20b4eef3242bdb00102fcafe46e8, type: 3}
+  chestVolume: 1
 --- !u!81 &516521039
 AudioListener:
   m_ObjectHideFlags: 0
@@ -11144,7 +11149,6 @@ GameObject:
   - component: {fileID: 925497291}
   - component: {fileID: 925497290}
   - component: {fileID: 925497289}
-  - component: {fileID: 925497288}
   m_Layer: 5
   m_Name: ConfirmButton
   m_TagString: Untagged
@@ -11172,18 +11176,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -100.7}
   m_SizeDelta: {x: 426.5, y: 398.7}
   m_Pivot: {x: 0.5, y: 0}
---- !u!114 &925497288
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 925497286}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c5a9e55bc0084377b32ab760a1132d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ButtonClickSound
 --- !u!114 &925497289
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14551,7 +14543,6 @@ GameObject:
   - component: {fileID: 1146974278}
   - component: {fileID: 1146974277}
   - component: {fileID: 1146974276}
-  - component: {fileID: 1146974279}
   m_Layer: 5
   m_Name: CollectButton
   m_TagString: Untagged
@@ -14661,18 +14652,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1146974274}
   m_CullTransparentMesh: 1
---- !u!114 &1146974279
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1146974274}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c5a9e55bc0084377b32ab760a1132d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ButtonClickSound
 --- !u!1 &1149060144
 GameObject:
   m_ObjectHideFlags: 0
@@ -19880,7 +19859,6 @@ GameObject:
   - component: {fileID: 1499938513}
   - component: {fileID: 1499938512}
   - component: {fileID: 1499938511}
-  - component: {fileID: 1499938510}
   m_Layer: 5
   m_Name: PurchaseButton
   m_TagString: Untagged
@@ -19908,18 +19886,6 @@ RectTransform:
   m_AnchoredPosition: {x: 1597, y: 7.699951}
   m_SizeDelta: {x: 323.6, y: 329.5}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1499938510
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1499938508}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c5a9e55bc0084377b32ab760a1132d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ButtonClickSound
 --- !u!114 &1499938511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23903,7 +23869,6 @@ GameObject:
   - component: {fileID: 1762700934}
   - component: {fileID: 1762700933}
   - component: {fileID: 1762700932}
-  - component: {fileID: 1762700931}
   m_Layer: 5
   m_Name: BuyButton
   m_TagString: Untagged
@@ -23931,18 +23896,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -108}
   m_SizeDelta: {x: 408.9, y: 447.2}
   m_Pivot: {x: 0.5, y: 0}
---- !u!114 &1762700931
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1762700929}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c5a9e55bc0084377b32ab760a1132d9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ButtonClickSound
 --- !u!114 &1762700932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28311,7 +28264,8 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2259198262671009517, guid: 1a68e9019d5f64e76909ce76b691f599, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
