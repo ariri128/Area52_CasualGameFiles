@@ -8,6 +8,7 @@ using UnityEngine.UI;
  * One box per alien the player owns (duplicates get their own box) with its picture and name
  * Select one, then Open File shows its file, or Sell asks "Are you sure?" in its room
  * Sell is greyed out for aliens away breeding or exploring
+ * Buy opens the Common / Rare / Ultra Rare shop; the bought alien is shown big, then placed with the Room Picker
 */
 
 public class AlienFilesPopup : MonoBehaviour
@@ -31,6 +32,16 @@ public class AlienFilesPopup : MonoBehaviour
     [Tooltip("The \"Are you sure you want to sell this alien?\" popup. Leave empty to use the one in the scene.")]
     [SerializeField] private AlienSellPopup sellPopup;
 
+    [Header("Buying")]
+    [SerializeField] private Button buyButton;
+    [Tooltip("The Common / Rare / Ultra Rare popup (the same one the Artifacts page uses).")]
+    [SerializeField] private TierShopPopup shopPopup;
+    [Tooltip("Every alien that can exist - bought aliens are picked from here.")]
+    [SerializeField] private AlienCatalog catalog;
+    [Tooltip("Shows the bought alien big, with Place in Room.")]
+    [SerializeField] private NewAlienPopup newAlienPopup;
+    [SerializeField] private string shopTitle = "Buy an Alien";
+
     private readonly List<GameObject> slots = new List<GameObject>();
     private OwnedAlien selected;
     private bool listening;
@@ -43,6 +54,7 @@ public class AlienFilesPopup : MonoBehaviour
         closeButton.onClick.AddListener(Close);
         openFileButton.onClick.AddListener(OpenFile);
         sellButton.onClick.AddListener(Sell);
+        if (buyButton != null) buyButton.onClick.AddListener(OpenShop);
         slotTemplate.gameObject.SetActive(false);
         root.SetActive(false);
     }
@@ -157,5 +169,44 @@ public class AlienFilesPopup : MonoBehaviour
         OwnedAlien alien = selected;
         Close(); // Out of the way, so the room shows
         popup.Open(alien);
+    }
+
+
+    // BUYING
+
+    // The shop's options, in order
+    private static readonly TraitRarity[] ShopRarities = { TraitRarity.Common, TraitRarity.Rare, TraitRarity.UltraRare };
+
+    private void OpenShop()
+    {
+        if (shopPopup == null || catalog == null || newAlienPopup == null)
+        {
+            Debug.LogWarning("AlienFilesPopup: fill in Shop Popup, Catalog and New Alien Popup to buy aliens.", this);
+            return;
+        }
+        if (PriceList.main == null) { Debug.LogWarning("AlienFilesPopup: no PriceList in the scene.", this); return; }
+
+        ShopTier[] tiers = new ShopTier[ShopRarities.Length];
+        for (int i = 0; i < ShopRarities.Length; i++)
+        {
+            TraitRarity rarity = ShopRarities[i];
+            tiers[i] = new ShopTier(AlienSpecies.RarityName(rarity), PriceList.main.AlienBuyPrice(rarity), catalog.HasAny(rarity));
+        }
+
+        shopPopup.Open(shopTitle, tiers, index => Buy(ShopRarities[index]));
+    }
+
+    // Called by the shop's Purchase button - true = bought (the shop closes)
+    private bool Buy(TraitRarity rarity)
+    {
+        if (CoinBank.main == null) return false;
+
+        AlienSpecies pick = catalog.PickRandom(rarity); // Picked before paying, so nothing is spent on nothing
+        if (pick == null) return false;
+        if (!CoinBank.main.TrySpend(PriceList.main.AlienBuyPrice(rarity))) return false; // Plays the cha-ching
+
+        Close(); // Out of the way - the new alien gets the whole screen
+        newAlienPopup.Open(pick);
+        return true;
     }
 }

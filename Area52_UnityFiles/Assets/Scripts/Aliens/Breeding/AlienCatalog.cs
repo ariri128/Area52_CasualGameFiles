@@ -24,6 +24,25 @@ public class AlienCatalog : ScriptableObject
         return BreedingOdds.Calculate(parentA, parentB, species, weights);
     }
 
+    // Is there at least one alien of this rarity to buy?
+    public bool HasAny(TraitRarity rarity)
+    {
+        foreach (AlienSpecies alien in species)
+            if (alien != null && alien.OverallRarity == rarity) return true;
+        return false;
+    }
+
+    // For the shop: any alien of this rarity, originals and babies alike, each with an even chance
+    // Null if there isn't one
+    public AlienSpecies PickRandom(TraitRarity rarity)
+    {
+        List<AlienSpecies> matches = new List<AlienSpecies>();
+        foreach (AlienSpecies alien in species)
+            if (alien != null && alien.OverallRarity == rarity) matches.Add(alien);
+
+        return matches.Count > 0 ? matches[Random.Range(0, matches.Count)] : null;
+    }
+
     [ContextMenu("Print Breeding Odds")]
     private void PrintOdds()
     {
