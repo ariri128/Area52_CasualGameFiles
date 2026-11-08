@@ -56,6 +56,8 @@ public class ExplorationManager : MonoBehaviour
 
     private readonly List<Expedition> expeditions = new List<Expedition>();
 
+    private int shipsTakingAway; // Sold aliens' ships still on screen - returning ships wait for them
+
     private void Awake()
     {
         if (main != null && main != this)
@@ -154,12 +156,50 @@ public class ExplorationManager : MonoBehaviour
     }
 
 
+    // SELLING
+
+    public bool CanSendAway(OwnedAlien alien)
+    {
+        return alien != null && alien.species != null && !alien.IsAway && AlienRoster.main != null && shipPrefab != null;
+    }
+
+    // For selling: the ship comes down, takes the alien, and flies off - it never comes back
+    // The alien is taken out of the roster straight away; onGone runs once the ship is off screen
+    public bool SendAway(OwnedAlien alien, System.Action onGone)
+    {
+        if (!CanSendAway(alien)) return false;
+
+        GameObject room = RoomManager.main != null ? RoomManager.main.GetRoomObject(alien.roomIndex) : null;
+        if (room == null) return false;
+
+        // Taken out of the room's list FIRST, so the roster change below doesn't delete it - the ship does that
+        FloatingAlien visual = AlienRoomDisplay.main != null ? AlienRoomDisplay.main.Detach(alien) : null;
+        if (visual != null) visual.Paused = true;
+
+        Sprite sprite = alien.species.sprite;
+        AlienRoster.main.Remove(alien); // Gone straight away: it can't be picked for breeding, counted for moods, etc.
+
+        shipsTakingAway++;
+        ExplorationShip ship = Instantiate(shipPrefab, room.transform);
+        ship.PickUp(shipStop, visual, sprite,
+                    () => AudioManager.PlaySound(exploreSound, soundVolume), // Same sound as exploring, as it leaves
+                    () =>
+                    {
+                        shipsTakingAway--;
+                        onGone?.Invoke();
+                    });
+
+        Debug.Log($"The ship is taking {alien.DisplayName} away for good.", this);
+        return true;
+    }
+
+
     // COMING BACK
 
     // Replaces the old Update
     private void Update()
     {
-        bool uiOpen = IsAnyUIOpen();
+        bool uiOpen = IsAnyUIOpen() || shipsTakingAway > 0; // Never two ships on screen at once
 
         // Backwards, because bringing one back can remove it from the list
         for (int i = expeditions.Count - 1; i >= 0; i--)

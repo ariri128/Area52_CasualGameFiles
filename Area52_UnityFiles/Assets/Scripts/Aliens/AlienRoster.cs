@@ -72,7 +72,7 @@ public class AlienRoster : MonoBehaviour
     [Tooltip("How dates are written, e.g. \"MMM d, yyyy\" = Oct 18, 2026.")]
     [SerializeField] private string dateFormat = "MMM d, yyyy";
 
-    // Fires whenever an alien is added, renamed, moved, or goes to / comes back from breeding
+    // Fires whenever an alien is added, sold, renamed, moved, or goes to / comes back from breeding or exploring
     public UnityEvent onChanged = new UnityEvent();
 
     public IReadOnlyList<OwnedAlien> All => aliens;
@@ -205,6 +205,15 @@ public class AlienRoster : MonoBehaviour
         alien.roomIndex = roomIndex;
         alien.RefreshLabel();
         onChanged.Invoke();
+        return true;
+    }
+
+    // For selling - the alien is gone for good
+    // Babies it had still show it as a parent (they keep their own link to it)
+    public bool Remove(OwnedAlien alien)
+    {
+        if (alien == null || !aliens.Remove(alien)) return false;
+        onChanged.Invoke(); // Moods, coins, room counts, the Alien Files... all update
         return true;
     }
 

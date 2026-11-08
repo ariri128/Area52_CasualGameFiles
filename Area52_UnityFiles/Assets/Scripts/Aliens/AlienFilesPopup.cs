@@ -6,7 +6,8 @@ using UnityEngine.UI;
 /*
  * "Alien Files": opened by the folder button
  * One box per alien the player owns (duplicates get their own box) with its picture and name
- * Select one, then Open File shows its file; Sell isn't available yet
+ * Select one, then Open File shows its file, or Sell asks "Are you sure?" in its room
+ * Sell is greyed out for aliens away breeding or exploring
 */
 
 public class AlienFilesPopup : MonoBehaviour
@@ -27,6 +28,8 @@ public class AlienFilesPopup : MonoBehaviour
     [SerializeField] private ScrollRect scroll;
     [Tooltip("The alien file popup. Leave empty to use the one in the scene.")]
     [SerializeField] private AlienFilePopup filePopup;
+    [Tooltip("The \"Are you sure you want to sell this alien?\" popup. Leave empty to use the one in the scene.")]
+    [SerializeField] private AlienSellPopup sellPopup;
 
     private readonly List<GameObject> slots = new List<GameObject>();
     private OwnedAlien selected;
@@ -39,7 +42,7 @@ public class AlienFilesPopup : MonoBehaviour
         main = this;
         closeButton.onClick.AddListener(Close);
         openFileButton.onClick.AddListener(OpenFile);
-        sellButton.interactable = false; //TODO: selling comes later
+        sellButton.onClick.AddListener(Sell);
         slotTemplate.gameObject.SetActive(false);
         root.SetActive(false);
     }
@@ -66,9 +69,10 @@ public class AlienFilesPopup : MonoBehaviour
         listening = false;
     }
 
-    public void Open()
+    // Pass an alien to open with it already selected (e.g. coming back from "No")
+    public void Open(OwnedAlien select = null)
     {
-        selected = null;
+        selected = select;
         root.SetActive(true);
         Rebuild();
         if (scroll != null) scroll.verticalNormalizedPosition = 1f; // Back to the top
@@ -126,6 +130,7 @@ public class AlienFilesPopup : MonoBehaviour
 
         if (!selectedStillOwned) selected = null;
         openFileButton.interactable = selected != null;
+        sellButton.interactable = AlienSellPopup.CanSell(selected); // False for nothing selected, or away breeding / exploring
     }
 
     private void Select(OwnedAlien alien)
@@ -140,5 +145,17 @@ public class AlienFilesPopup : MonoBehaviour
         AlienFilePopup file = filePopup != null ? filePopup : AlienFilePopup.main;
         if (file != null) file.Open(selected); // Draws on top; closing it comes back here
         else Debug.LogWarning("AlienFilesPopup: no AlienFilePopup in the scene.", this);
+    }
+
+    private void Sell()
+    {
+        if (!AlienSellPopup.CanSell(selected)) return;
+
+        AlienSellPopup popup = sellPopup != null ? sellPopup : AlienSellPopup.main;
+        if (popup == null) { Debug.LogWarning("AlienFilesPopup: no AlienSellPopup in the scene.", this); return; }
+
+        OwnedAlien alien = selected;
+        Close(); // Out of the way, so the room shows
+        popup.Open(alien);
     }
 }
