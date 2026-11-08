@@ -31,6 +31,10 @@ public class OwnedAlien
     [Tooltip("Filled in automatically: the day the game started for starting aliens, the hatch day for babies.")]
     public string dateAcquired;
 
+    [Tooltip("Every artifact it has brought back from exploring, in the order it found them. " +
+             "Added by ExplorationManager. Kept even if the artifact is sold later.")]
+    public List<ArtifactDefinition> collectedArtifacts = new List<ArtifactDefinition>();
+
     // The two aliens that made this one (null for starting aliens)
     // NonSerialized: Unity can't save an alien inside another alien, and it doesn't need to
     [System.NonSerialized] public OwnedAlien parentA;
