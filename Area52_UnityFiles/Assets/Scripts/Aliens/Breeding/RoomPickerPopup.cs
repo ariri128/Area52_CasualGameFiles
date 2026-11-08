@@ -7,7 +7,9 @@ using UnityEngine.UI;
  * The "which room?" popup, used three ways:
  *   Open()                     - where to put the egg (breeding room)
  *   OpenForMove(alien)         - where to move an alien to (alien file)
- *   OpenForArtifact(artifact)  - where to place an artifact (artifacts page)
+ *   OpenForArtifact(artifact)  - where to place an artifact (artifacts page - no longer used, kept just in case)
+ *   OpenForNewAlien(species)   - where to put a newly bought alien; afterwards the player is taken to that room
+ * Buy New Room opens the room shop; a room bought while this is open shows up straight away, already selected
  * Full rooms are greyed out; when moving, the alien's / artifact's own room shows "Here" and can't be picked
  * Aliens and eggs count against the room's alien limit; artifacts have their own limit
 */
@@ -29,6 +31,10 @@ public class RoomPickerPopup : MonoBehaviour
     [SerializeField] private TMP_Text titleText;
     [Tooltip("Optional. The text on the confirm button.")]
     [SerializeField] private TMP_Text confirmLabel;
+    [Tooltip("Opens the room shop, for when every room is full.")]
+    [SerializeField] private Button buyRoomButton;
+    [Tooltip("The Rooms to Buy popup in THIS scene (the Breeding Room needs its own copy).")]
+    [SerializeField] private RoomShopPopup roomShop;
 
     [Header("Text")]
     [Tooltip("{0} is the room number.")]
@@ -51,10 +57,22 @@ public class RoomPickerPopup : MonoBehaviour
     [SerializeField] private string artifactMoveTitle = "Move {0} to which room?";
     [SerializeField] private string artifactMoveConfirm = "Move Here";
 
+    [Header("Text - new alien")]
+    [Tooltip("{0} is the alien's name.")]
+    [SerializeField] private string newAlienTitle = "Place {0} in which room?";
+    [SerializeField] private string newAlienConfirm = "Place Here";
+
+    [Header("Testing")]
+    [Tooltip("Only used by the Place Test Alien button.")]
+    [SerializeField] private AlienSpecies testSpecies;
+
     private readonly List<GameObject> slots = new List<GameObject>();
     private int selectedRoom = -1;
     private OwnedAlien moving; // null = placing an egg (or an artifact)
     private OwnedArtifact placingArtifact; // Null unless placing an artifact
+    private AlienSpecies newAlien; // Null unless placing a newly bought alien
+    private System.Action<OwnedAlien> newAlienPlaced;
+    private System.Action newAlienCancelled;
     private bool listening;
 
     public bool IsOpen => root != null && root.activeSelf;
@@ -64,6 +82,7 @@ public class RoomPickerPopup : MonoBehaviour
         closeButton.onClick.AddListener(Close);
         confirmButton.onClick.AddListener(Confirm);
         if (removeButton != null) removeButton.onClick.AddListener(RemoveArtifact);
+        if (buyRoomButton != null) buyRoomButton.onClick.AddListener(OpenRoomShop);
         slotTemplate.gameObject.SetActive(false);
         root.SetActive(false);
     }
@@ -78,6 +97,7 @@ public class RoomPickerPopup : MonoBehaviour
         BreedingManager.main.onChanged.AddListener(RefreshIfOpen);
         AlienRoster.main.onChanged.AddListener(RefreshIfOpen); // Moves and hatches change the counts
         if (ArtifactInventory.main != null) ArtifactInventory.main.onChanged.AddListener(RefreshIfOpen);
+        if (RoomManager.main != null) RoomManager.main.onRoomAdded.AddListener(OnRoomAdded);
         listening = true;
     }
 
@@ -87,12 +107,14 @@ public class RoomPickerPopup : MonoBehaviour
         if (BreedingManager.main != null) BreedingManager.main.onChanged.RemoveListener(RefreshIfOpen);
         if (AlienRoster.main != null) AlienRoster.main.onChanged.RemoveListener(RefreshIfOpen);
         if (ArtifactInventory.main != null) ArtifactInventory.main.onChanged.RemoveListener(RefreshIfOpen);
+        if (RoomManager.main != null) RoomManager.main.onRoomAdded.RemoveListener(OnRoomAdded);
         listening = false;
     }
 
     // Egg mode
     public void Open()
     {
+        ClearNewAlien();
         moving = null;
         placingArtifact = null;
         OpenPopup();
@@ -102,6 +124,7 @@ public class RoomPickerPopup : MonoBehaviour
     public void OpenForMove(OwnedAlien alien)
     {
         if (alien == null) return;
+        ClearNewAlien();
         moving = alien;
         placingArtifact = null;
         OpenPopup();
@@ -111,14 +134,28 @@ public class RoomPickerPopup : MonoBehaviour
     public void OpenForArtifact(OwnedArtifact artifact)
     {
         if (artifact == null) return;
+        ClearNewAlien();
         moving = null;
         placingArtifact = artifact;
+        OpenPopup();
+    }
+
+    // New alien mode: onPlaced gets the alien once it's in a room; onCancelled runs if the popup is closed without placing it
+    public void OpenForNewAlien(AlienSpecies species, System.Action<OwnedAlien> onPlaced, System.Action onCancelled)
+    {
+        if (species == null) return;
+        moving = null;
+        placingArtifact = null;
+        newAlien = species;
+        newAlienPlaced = onPlaced;
+        newAlienCancelled = onCancelled;
         OpenPopup();
     }
 
     private void OpenPopup()
     {
         selectedRoom = -1;
+        transform.SetAsLastSibling(); // In front of whatever opened it
         root.SetActive(true);
         Rebuild();
     }
@@ -128,6 +165,18 @@ public class RoomPickerPopup : MonoBehaviour
         root.SetActive(false);
         moving = null;
         placingArtifact = null;
+
+        // Closed without placing the bought alien (e.g. the X) - whoever opened it gets it back
+        System.Action cancelled = newAlienCancelled;
+        ClearNewAlien();
+        cancelled?.Invoke();
+    }
+
+    private void ClearNewAlien()
+    {
+        newAlien = null;
+        newAlienPlaced = null;
+        newAlienCancelled = null;
     }
 
     private void RefreshIfOpen()
@@ -147,7 +196,12 @@ public class RoomPickerPopup : MonoBehaviour
     private void RefreshTexts()
     {
         string title, confirm;
-        if (placingArtifact != null)
+        if (newAlien != null)
+        {
+            title = string.Format(newAlienTitle, newAlien.displayName);
+            confirm = newAlienConfirm;
+        }
+        else if (placingArtifact != null)
         {
             title = string.Format(placingArtifact.IsPlaced ? artifactMoveTitle : artifactPlaceTitle, placingArtifact.DisplayName);
             confirm = placingArtifact.IsPlaced ? artifactMoveConfirm : artifactPlaceConfirm;
@@ -221,6 +275,8 @@ public class RoomPickerPopup : MonoBehaviour
             removeButton.gameObject.SetActive(placingArtifact != null);
             removeButton.interactable = placingArtifact != null && placingArtifact.IsPlaced;
         }
+
+        if (buyRoomButton != null) buyRoomButton.gameObject.SetActive(roomShop != null && RoomShop.main != null);
     }
 
     private void Select(int roomIndex)
@@ -233,7 +289,20 @@ public class RoomPickerPopup : MonoBehaviour
     {
         if (selectedRoom < 0) return;
 
-        if (placingArtifact != null)
+        if (newAlien != null)
+        {
+            if (AlienRoster.main == null || (BreedingManager.main != null && BreedingManager.main.IsRoomFull(selectedRoom))) return;
+
+            int room = selectedRoom;
+            System.Action<OwnedAlien> placed = newAlienPlaced;
+            OwnedAlien alien = AlienRoster.main.Add(newAlien, room); // No parents - it was bought
+
+            ClearNewAlien(); // Cleared first, so Close doesn't think it was cancelled
+            Close();
+            if (RoomManager.main != null) RoomManager.main.GoToRoom(room); // Straight to its new home
+            placed?.Invoke(alien);
+        }
+        else if (placingArtifact != null)
         {
             if (ArtifactInventory.main != null && ArtifactInventory.main.PlaceInRoom(placingArtifact, selectedRoom)) Close();
         }
@@ -252,6 +321,37 @@ public class RoomPickerPopup : MonoBehaviour
     {
         if (placingArtifact == null || ArtifactInventory.main == null) return;
         if (ArtifactInventory.main.Unplace(placingArtifact)) Close();
+    }
+
+
+    // BUYING A ROOM
+
+    private void OpenRoomShop()
+    {
+        if (roomShop != null) roomShop.Open(); // The usual Rooms to Buy - draws in front of this
+        else Debug.LogWarning("RoomPickerPopup: no Room Shop set for this scene.", this);
+    }
+
+    // A room was just bought: show it, and select it if it can take what's being placed
+    private void OnRoomAdded(int roomIndex)
+    {
+        if (!IsOpen) return;
+        if (CanPick(roomIndex)) selectedRoom = roomIndex;
+        Rebuild();
+    }
+
+
+    // TESTING
+
+    // Try the new-alien mode before the alien shop exists (Step 9)
+    [ContextMenu("Testing: Place Test Alien")]
+    private void PlaceTestAlienForTesting()
+    {
+        if (!Application.isPlaying) { Debug.LogWarning("Press Play first.", this); return; }
+        if (testSpecies == null) { Debug.LogWarning("Drag an alien data file into Test Species first.", this); return; }
+        OpenForNewAlien(testSpecies,
+                        alien => Debug.Log($"Placed {alien.DisplayName} in Room {alien.roomIndex + 1}.", this),
+                        () => Debug.Log("Closed without placing the test alien.", this));
     }
 
     private static void SetText(Transform parent, string childName, string text)
