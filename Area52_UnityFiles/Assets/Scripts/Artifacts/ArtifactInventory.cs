@@ -44,7 +44,7 @@ public class ArtifactInventory : MonoBehaviour
     [Tooltip("Artifacts the player owns. Add some here to test before exploring works.")]
     [SerializeField] private List<OwnedArtifact> artifacts = new List<OwnedArtifact>();
 
-    // Fires whenever an artifact is added or moved to a room
+    // Fires whenever an artifact is added, sold, or moved to / taken out of a room
     public UnityEvent onChanged = new UnityEvent();
 
     public IReadOnlyList<OwnedArtifact> All => artifacts;
@@ -128,6 +128,17 @@ public class ArtifactInventory : MonoBehaviour
         artifacts.Add(artifact);
         onChanged.Invoke();
         return artifact;
+    }
+
+    // For selling - takes it out of the inventory completely
+    // Only unplaced artifacts can go: a placed one has to be removed from its room first
+    public bool Remove(OwnedArtifact artifact)
+    {
+        if (artifact == null || artifact.IsPlaced) return false;
+        if (!artifacts.Remove(artifact)) return false; // It wasn't ours
+
+        onChanged.Invoke();
+        return true;
     }
 
     // What an exploring alien brings back

@@ -111,6 +111,7 @@ public class ToastPopup : MonoBehaviour
         Show(string.Format(soldFormat, coins.ToString("N0")), onDone);
         AudioManager.PlayPurchase();
         if (coinBurst != null) coinBurst.Play();
+        else Debug.LogWarning("ToastPopup: this Sold toast has no Coin Burst set, so no coins fly out.", this);
     }
 
     private void Finish()

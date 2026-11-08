@@ -51,6 +51,11 @@ public class CoinBurst : MonoBehaviour
             coins.Add(coin);
             groups.Add(group);
         }
+
+        if (coinTemplate == transform)
+            Debug.LogWarning("CoinBurst: Coin Template is set to the CoinBurst object itself. Drag the Coin image child in instead.", this);
+        else if (coinTemplate.parent != transform)
+            Debug.LogWarning("CoinBurst: the Coin Template should be a direct child of this object.", this);
     }
 
     // Hidden partway (e.g. off to the breeding room): stop cleanly
@@ -63,7 +68,18 @@ public class CoinBurst : MonoBehaviour
 
     public void Play()
     {
-        if (!isActiveAndEnabled) return;
+        if (!isActiveAndEnabled)
+        {
+            Debug.LogWarning("CoinBurst: can't play - this object (or a parent) is switched off.", this);
+            return;
+        }
+        if (coins.Count == 0)
+        {
+            Debug.LogWarning("CoinBurst: no coins were made. Check Coin Count and Coin Template.", this);
+            return;
+        }
+
+        Debug.Log($"CoinBurst: playing {coins.Count} coins.", this);
         StopAllCoroutines(); // A new burst restarts every coin
         for (int i = 0; i < coins.Count; i++) StartCoroutine(Fly(coins[i], groups[i]));
     }
