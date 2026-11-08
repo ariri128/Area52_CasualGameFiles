@@ -209,6 +209,22 @@ public class AlienTapper : MonoBehaviour
         ExplorationManager.main.Send(alien);
     }
 
+    // Asks "Are you sure you want to sell this alien?" right here in its room
+    public void OnSellPressed()
+    {
+        if (Selected == null) return;
+        if (AlienSellPopup.main == null)
+        {
+            Debug.LogWarning("AlienTapper: no AlienSellPopup in the scene.", this);
+            return;
+        }
+        if (!AlienSellPopup.CanSell(Selected)) return;
+
+        OwnedAlien alien = Selected;
+        Deselect(); // Hides the bubble before the panel grows
+        AlienSellPopup.main.Open(alien, false); // false = No just closes, it doesn't open the Alien Files
+    }
+
     // Feeds the selected alien one pellet. Works even when it's full - the pellet is still eaten, the bar just can't go higher
     public void OnFeedPressed()
     {

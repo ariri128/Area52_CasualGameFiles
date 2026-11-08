@@ -35,6 +35,9 @@ public class OwnedAlien
              "Added by ExplorationManager. Kept even if the artifact is sold later.")]
     public List<ArtifactDefinition> collectedArtifacts = new List<ArtifactDefinition>();
 
+    [Tooltip("True if it was bought from the shop. Its file shows \"Bought\" as its parents.")]
+    public bool wasBought;
+
     // The two aliens that made this one (null for starting aliens)
     // NonSerialized: Unity can't save an alien inside another alien, and it doesn't need to
     [System.NonSerialized] public OwnedAlien parentA;
@@ -68,6 +71,9 @@ public class AlienRoster : MonoBehaviour
 
     [Tooltip("Shown as the parents of the starting aliens.")]
     [SerializeField] private string noParentsText = "Original";
+
+    [Tooltip("Shown as the parents of aliens bought from the shop.")]
+    [SerializeField] private string boughtText = "Bought";
 
     [Tooltip("How dates are written, e.g. \"MMM d, yyyy\" = Oct 18, 2026.")]
     [SerializeField] private string dateFormat = "MMM d, yyyy";
@@ -144,8 +150,8 @@ public class AlienRoster : MonoBehaviour
         onChanged.Invoke();
     }
 
-    // For new babies
-    public OwnedAlien Add(AlienSpecies species, int roomIndex, OwnedAlien parentA = null, OwnedAlien parentB = null)
+    // For new babies, and aliens bought from the shop (bought: true)
+    public OwnedAlien Add(AlienSpecies species, int roomIndex, OwnedAlien parentA = null, OwnedAlien parentB = null, bool bought = false)
     {
         OwnedAlien alien = new OwnedAlien
         {
@@ -154,6 +160,7 @@ public class AlienRoster : MonoBehaviour
             dateAcquired = Today(),
             parentA = parentA,
             parentB = parentB,
+            wasBought = bought,
         };
         alien.RefreshLabel();
         aliens.Add(alien);
@@ -184,6 +191,7 @@ public class AlienRoster : MonoBehaviour
     // "Parent 1 x Parent 2", or "Original" for starting aliens
     public string ParentsText(OwnedAlien alien)
     {
+        if (alien != null && alien.wasBought) return boughtText;
         if (alien == null || !alien.HasParents) return noParentsText;
         string a = alien.parentA != null ? alien.parentA.DisplayName : "?";
         string b = alien.parentB != null ? alien.parentB.DisplayName : "?";

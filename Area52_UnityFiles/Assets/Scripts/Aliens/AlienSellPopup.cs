@@ -43,6 +43,7 @@ public class AlienSellPopup : MonoBehaviour
 
     private OwnedAlien selling;
     private Coroutine opening;
+    private bool returnToFiles; // Opened from the Alien Files (No goes back there) or from the thought bubble (No just closes)
 
     public bool IsOpen => root != null && root.activeSelf;
 
@@ -74,10 +75,12 @@ public class AlienSellPopup : MonoBehaviour
         return alien != null && !alien.IsAway && ExplorationManager.main != null && ExplorationManager.main.CanSendAway(alien);
     }
 
-    public void Open(OwnedAlien alien)
+    // backToFiles: true from the Alien Files (No goes back to it), false from the thought bubble (No just closes)
+    public void Open(OwnedAlien alien, bool backToFiles = true)
     {
         if (!CanSell(alien)) return;
         selling = alien;
+        returnToFiles = backToFiles;
 
         if (AlienTapper.main != null) AlienTapper.main.Deselect(); // No thought bubble over the top
         if (RoomManager.main != null) RoomManager.main.GoToRoom(alien.roomIndex);
@@ -110,13 +113,15 @@ public class AlienSellPopup : MonoBehaviour
     private void No()
     {
         OwnedAlien alien = selling;
+        bool backToFiles = returnToFiles;
         Close();
-        if (Files != null) Files.Open(alien); // Back to the catalog, still selected
+        if (backToFiles && Files != null) Files.Open(alien); // Back to the catalog, still selected
     }
 
     private void Yes()
     {
         OwnedAlien alien = selling;
+        bool backToFiles = returnToFiles;
         Close();
         if (alien == null) return;
 
@@ -128,7 +133,7 @@ public class AlienSellPopup : MonoBehaviour
         if (!sent)
         {
             Debug.LogWarning($"AlienSellPopup: the ship couldn't take {alien.DisplayName}, so it wasn't sold.", this);
-            if (Files != null) Files.Open(alien);
+            if (backToFiles && Files != null) Files.Open(alien);
         }
     }
 

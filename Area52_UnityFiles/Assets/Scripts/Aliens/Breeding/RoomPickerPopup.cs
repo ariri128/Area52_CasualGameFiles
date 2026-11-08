@@ -295,7 +295,7 @@ public class RoomPickerPopup : MonoBehaviour
 
             int room = selectedRoom;
             System.Action<OwnedAlien> placed = newAlienPlaced;
-            OwnedAlien alien = AlienRoster.main.Add(newAlien, room); // No parents - it was bought
+            OwnedAlien alien = AlienRoster.main.Add(newAlien, room, bought: true); // No parents - it was bought
 
             ClearNewAlien(); // Cleared first, so Close doesn't think it was cancelled
             Close();
