@@ -16,6 +16,10 @@ public class FurnitureSlotUI : MonoBehaviour
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text countText;
     [SerializeField] private GameObject selectedBorder;
+    [Tooltip("Optional. Only used in the Furniture Catalog: the price text.")]
+    [SerializeField] private TMP_Text priceText;
+    [Tooltip("Optional. What's hidden when there's no price - usually the price text's parent (the price + a coin icon).")]
+    [SerializeField] private GameObject priceRoot;
 
     [Tooltip("How see-through a slot is when every copy of it is already in a room.")]
     [SerializeField, Range(0f, 1f)] private float unavailableAlpha = 0.4f;
@@ -48,6 +52,16 @@ public class FurnitureSlotUI : MonoBehaviour
         if (onClick != null) button.onClick.AddListener(onClick);
 
         SetSelected(false);
+        SetPrice(-1); // No price unless the catalog sets one
+    }
+
+    // -1 = no price (the Furniture Owned panel)
+    public void SetPrice(int price)
+    {
+        bool show = price >= 0;
+        if (priceText != null) priceText.text = show ? price.ToString("N0") : "";
+        if (priceRoot != null) priceRoot.SetActive(show);
+        else if (priceText != null) priceText.gameObject.SetActive(show);
     }
 
     public void SetSelected(bool selected)
