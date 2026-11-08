@@ -15,3 +15,4 @@ MonoBehaviour:
   displayName: Dream Catcher
   sprite: {fileID: 21300000, guid: 7b7dcfbed2cfd4513ab7b0fa5b838c85, type: 3}
   findWeight: 1
+  rarity: 1

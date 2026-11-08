@@ -97,4 +97,40 @@ public class AlienSpecies : ScriptableObject
         AlienSpecies origin = TraitOrigin(slot);
         return origin.rarities != null ? origin.rarities.Get(slot) : TraitRarity.Common;
     }
+
+    // The alien's overall rarity: whichever rarity most of its 5 traits have
+    // A tie goes to the rarer one (1 common, 2 rare, 2 ultra rare = Ultra Rare)
+    // Worked out from the traits, so it's the same for originals and babies and never changes
+    public TraitRarity OverallRarity
+    {
+        get
+        {
+            int common = 0, rare = 0, ultraRare = 0;
+            foreach (TraitSlot slot in System.Enum.GetValues(typeof(TraitSlot)))
+            {
+                switch (RarityOf(slot))
+                {
+                    case TraitRarity.Common: common++; break;
+                    case TraitRarity.Rare: rare++; break;
+                    default: ultraRare++; break;
+                }
+            }
+
+            // Checked rarest first, with >=, so ties go to the rarer one
+            if (ultraRare >= rare && ultraRare >= common) return TraitRarity.UltraRare;
+            if (rare >= common) return TraitRarity.Rare;
+            return TraitRarity.Common;
+        }
+    }
+
+    // "Common", "Rare", "Ultra Rare" - for the alien file and the shop
+    public static string RarityName(TraitRarity rarity)
+    {
+        switch (rarity)
+        {
+            case TraitRarity.Common: return "Common";
+            case TraitRarity.Rare: return "Rare";
+            default: return "Ultra Rare";
+        }
+    }
 }

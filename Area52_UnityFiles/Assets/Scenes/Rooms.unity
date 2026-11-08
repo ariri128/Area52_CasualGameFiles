@@ -5110,6 +5110,7 @@ GameObject:
   - component: {fileID: 516521049}
   - component: {fileID: 516521052}
   - component: {fileID: 516521053}
+  - component: {fileID: 516521054}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -5597,6 +5598,37 @@ MonoBehaviour:
   onChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &516521054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516521033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43c3d2c0ffb074ef39d1f9ffec1a57bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PriceList
+  alienBuyCommon: 500
+  alienBuyRare: 1000
+  alienBuyUltraRare: 1500
+  alienSellCommon:
+    min: 300
+    max: 500
+  alienSellRare:
+    min: 700
+    max: 1000
+  alienSellUltraRare:
+    min: 1200
+    max: 1500
+  artifactBuyCommon: 100
+  artifactBuyUncommon: 200
+  artifactBuyRare: 300
+  artifactSellCommon: 50
+  artifactSellUncommon: 100
+  artifactSellRare: 150
+  testCatalog: {fileID: 11400000, guid: e2c6af147c7dd4e35bb003900b7596d1, type: 2}
 --- !u!1 &546969138
 GameObject:
   m_ObjectHideFlags: 0

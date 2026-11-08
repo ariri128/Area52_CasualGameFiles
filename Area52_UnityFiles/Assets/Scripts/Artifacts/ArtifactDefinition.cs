@@ -4,6 +4,8 @@ using UnityEngine;
  * This is a data file for one kind of artifact, not something in the scene
 */
 
+public enum ArtifactRarity { Common, Uncommon, Rare }
+
 [CreateAssetMenu(menuName = "Alien Apartments/Artifact", fileName = "AR_NewArtifact")]
 public class ArtifactDefinition : ScriptableObject
 {
@@ -16,4 +18,8 @@ public class ArtifactDefinition : ScriptableObject
     [Tooltip("How likely an exploring alien is to bring this one back, compared to the others. " +
              "1 = normal, 2 = twice as likely, 0 = never. Leave them all at 1 for an even chance.")]
     [Min(0f)] public float findWeight = 1f;
+
+    [Tooltip("Decides what it sells for and which shop option (Common / Uncommon / Rare) it can be bought from. " +
+             "The prices themselves are on the Price List.")]
+    public ArtifactRarity rarity = ArtifactRarity.Common;
 }
