@@ -50,6 +50,8 @@ public class ArtifactInventory : MonoBehaviour
     public IReadOnlyList<OwnedArtifact> All => artifacts;
     public int MaxPerRoom => maxPerRoom;
 
+    public ArtifactCatalog Catalog => catalog;
+
     private void Awake()
     {
         if (main != null && main != this)
@@ -157,6 +159,19 @@ public class ArtifactInventory : MonoBehaviour
             return null;
         }
         return Add(found);
+    }
+
+    // For the shop: pays for a random artifact of this rarity and adds it (Unplaced, with its NEW tag)
+    // Returns null, and spends nothing, if there's nothing of that rarity or not enough coins
+    public OwnedArtifact Buy(ArtifactRarity rarity)
+    {
+        if (catalog == null || PriceList.main == null || CoinBank.main == null) return null;
+
+        ArtifactDefinition pick = catalog.PickRandom(rarity); // Picked before paying, so nothing is spent on nothing
+        if (pick == null) return null;
+
+        if (!CoinBank.main.TrySpend(PriceList.main.ArtifactBuyPrice(rarity))) return null; // Plays the cha-ching
+        return Add(pick);
     }
 
     // Called by the Artifacts page once the player has actually seen this one on screen
