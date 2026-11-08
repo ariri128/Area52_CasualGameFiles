@@ -44,11 +44,13 @@ public class ArtifactInventory : MonoBehaviour
     [Tooltip("Artifacts the player owns. Add some here to test before exploring works.")]
     [SerializeField] private List<OwnedArtifact> artifacts = new List<OwnedArtifact>();
 
-    // Fires whenever an artifact is added or moved to a room
+    // Fires whenever an artifact is added, sold, or moved to / taken out of a room
     public UnityEvent onChanged = new UnityEvent();
 
     public IReadOnlyList<OwnedArtifact> All => artifacts;
     public int MaxPerRoom => maxPerRoom;
+
+    public ArtifactCatalog Catalog => catalog;
 
     private void Awake()
     {
@@ -130,6 +132,17 @@ public class ArtifactInventory : MonoBehaviour
         return artifact;
     }
 
+    // For selling - takes it out of the inventory completely
+    // Only unplaced artifacts can go: a placed one has to be removed from its room first
+    public bool Remove(OwnedArtifact artifact)
+    {
+        if (artifact == null || artifact.IsPlaced) return false;
+        if (!artifacts.Remove(artifact)) return false; // It wasn't ours
+
+        onChanged.Invoke();
+        return true;
+    }
+
     // What an exploring alien brings back
     public OwnedArtifact AddRandom()
     {
@@ -146,6 +159,19 @@ public class ArtifactInventory : MonoBehaviour
             return null;
         }
         return Add(found);
+    }
+
+    // For the shop: pays for a random artifact of this rarity and adds it (Unplaced, with its NEW tag)
+    // Returns null, and spends nothing, if there's nothing of that rarity or not enough coins
+    public OwnedArtifact Buy(ArtifactRarity rarity)
+    {
+        if (catalog == null || PriceList.main == null || CoinBank.main == null) return null;
+
+        ArtifactDefinition pick = catalog.PickRandom(rarity); // Picked before paying, so nothing is spent on nothing
+        if (pick == null) return null;
+
+        if (!CoinBank.main.TrySpend(PriceList.main.ArtifactBuyPrice(rarity))) return null; // Plays the cha-ching
+        return Add(pick);
     }
 
     // Called by the Artifacts page once the player has actually seen this one on screen

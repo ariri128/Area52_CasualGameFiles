@@ -15,3 +15,4 @@ MonoBehaviour:
   displayName: Orb
   sprite: {fileID: 21300000, guid: 58b7f8740098b4bff84545541ba5580b, type: 3}
   findWeight: 1
+  rarity: 2

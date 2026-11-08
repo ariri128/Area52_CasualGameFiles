@@ -123,6 +123,19 @@ public class FurnitureInventory : MonoBehaviour
         return Mathf.Max(0, GetOwnedCount(definition) - GetPlacedCount(definition));
     }
 
+    // For the Furniture Catalog: pays for one more of this piece
+    // It counts as owned straight away and is made from its prefab the first time it's used with Replace
+    public bool Buy(FurnitureDefinition definition)
+    {
+        if (definition == null || CoinBank.main == null) return false;
+        CountStartingPieces(); // Make sure the starting count is in before adding to it
+
+        if (!CoinBank.main.TrySpend(definition.price)) return false; // Plays the cha-ching
+        AddOwned(definition, 1);
+        onChanged.Invoke();
+        return true;
+    }
+
 
     // STORAGE
 

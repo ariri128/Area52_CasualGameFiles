@@ -111,6 +111,14 @@ public class CoinBank : MonoBehaviour
         return amount;
     }
 
+    // For selling - puts coins straight into the wallet
+    public void Earn(int amount)
+    {
+        if (amount <= 0) return;
+        Wallet += amount;
+        onChanged.Invoke();
+    }
+
     public bool CanAfford(int cost) => Wallet >= cost;
 
     // For the shops - returns false (and spends nothing) if there isn't enough

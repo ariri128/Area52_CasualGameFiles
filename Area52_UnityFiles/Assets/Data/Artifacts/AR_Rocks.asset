@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e03b58224080040eab331cb65c2c71fa, type: 3}
   m_Name: AR_Rocks
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactDefinition
-  displayName: Rocks
+  displayName: Rock Collection
   sprite: {fileID: 21300000, guid: cb00203d6abb446579de64504d33bb26, type: 3}
   findWeight: 1
+  rarity: 1

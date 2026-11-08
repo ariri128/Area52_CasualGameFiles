@@ -35,6 +35,8 @@ public class ArtifactReveal : MonoBehaviour
     [Tooltip("Pause after the pulses, before it flies off.")]
     [SerializeField] private float holdSeconds = 0.15f;
     [SerializeField] private float flySeconds = 0.5f;
+    [Tooltip("When bought from the shop: how long it takes to fly into its box on the Artifacts page.")]
+    [SerializeField] private float flyIntoSlotSeconds = 0.45f;
 
     [Header("Look")]
     [Tooltip("How much bigger it gets on each pulse (0.12 = 12% bigger).")]
@@ -51,6 +53,7 @@ public class ArtifactReveal : MonoBehaviour
     private Vector3 buttonScale;
     private bool playing;
     private bool listening;
+    private bool purchasePlaying; // A bought artifact is being revealed - found ones wait until it's done
 
     private void Awake()
     {
@@ -90,6 +93,7 @@ public class ArtifactReveal : MonoBehaviour
 
         StopAllCoroutines();
         playing = false;
+        purchasePlaying = false;
         card.gameObject.SetActive(false);
         if (artifactsButton != null) artifactsButton.localScale = buttonScale;
 
@@ -109,6 +113,20 @@ public class ArtifactReveal : MonoBehaviour
         if (!playing && isActiveAndEnabled) StartCoroutine(PlayWaiting());
     }
 
+    // For a bought artifact: plays straight away (no waiting), then flies into its box on the Artifacts page
+    // openPageAndFindSlot is called once the pulsing is done: it should open the page and return the new artifact's box
+    public void ShowPurchase(OwnedArtifact artifact, System.Func<RectTransform> openPageAndFindSlot)
+    {
+        if (artifact == null || artifact.definition == null) return;
+
+        if (!isActiveAndEnabled)
+        {
+            openPageAndFindSlot?.Invoke(); // Can't animate - just open the page
+            return;
+        }
+        StartCoroutine(RevealInto(artifact, openPageAndFindSlot));
+    }
+
     private IEnumerator PlayWaiting()
     {
         playing = true;
@@ -118,7 +136,7 @@ public class ArtifactReveal : MonoBehaviour
             yield return new WaitForSecondsRealtime(delayAfterReturn);
 
             // Waits until nothing is open (a popup, the alien's bubble, the circles...)
-            while (ExplorationManager.main != null && ExplorationManager.main.IsAnyUIOpen()) yield return null;
+            while ((ExplorationManager.main != null && ExplorationManager.main.IsAnyUIOpen()) || purchasePlaying) yield return null;
 
             yield return Reveal(waiting.Dequeue());
         }
@@ -129,42 +147,12 @@ public class ArtifactReveal : MonoBehaviour
 
     // THE ANIMATION
 
+    // A found artifact: pops up, pulses, then flies into the artifacts button
     private IEnumerator Reveal(OwnedArtifact artifact)
     {
         ScreenBlocker.SetBlocked(this, true);
 
-        // Fill in the box
-        picture.sprite = artifact.definition.sprite;
-        picture.enabled = artifact.definition.sprite != null;
-        picture.preserveAspect = true;
-        if (nameText != null) nameText.text = artifact.DisplayName;
-        if (selectedBorder != null) selectedBorder.SetActive(true);
-
-        card.anchoredPosition = cardHome;
-        card.localScale = Vector3.zero;
-        cardGroup.alpha = 1f;
-        card.gameObject.SetActive(true);
-
-        // Grow, with a little overshoot
-        for (float t = 0f; t < 1f; t += Time.unscaledDeltaTime / growSeconds)
-        {
-            card.localScale = Vector3.one * EaseOutBack(t);
-            yield return null;
-        }
-        card.localScale = Vector3.one;
-
-        // Pulse: half a sine wave each time, so it swells and settles smoothly
-        for (int pulse = 0; pulse < pulseCount; pulse++)
-        {
-            for (float t = 0f; t < 1f; t += Time.unscaledDeltaTime / pulseSeconds)
-            {
-                card.localScale = Vector3.one * (1f + pulseAmount * Mathf.Sin(t * Mathf.PI));
-                yield return null;
-            }
-            card.localScale = Vector3.one;
-        }
-
-        yield return new WaitForSecondsRealtime(holdSeconds);
+        yield return GrowAndPulse(artifact);
 
         // Fly into the button: speeds up, shrinks, and fades out at the very end
         Vector3 from = card.position;
@@ -193,6 +181,93 @@ public class ArtifactReveal : MonoBehaviour
         }
 
         ScreenBlocker.SetBlocked(this, false);
+    }
+
+    // The part both versions share: fill in the box, pop it up in the middle, pulse, short pause
+    private IEnumerator GrowAndPulse(OwnedArtifact artifact)
+    {
+        picture.sprite = artifact.definition.sprite;
+        picture.enabled = artifact.definition.sprite != null;
+        picture.preserveAspect = true;
+        if (nameText != null) nameText.text = artifact.DisplayName;
+        if (selectedBorder != null) selectedBorder.SetActive(true);
+
+        card.SetAsLastSibling(); // In front of any popup
+        card.anchoredPosition = cardHome;
+        card.localScale = Vector3.zero;
+        cardGroup.alpha = 1f;
+        card.gameObject.SetActive(true);
+
+        // Grow, with a little overshoot
+        for (float t = 0f; t < 1f; t += Time.unscaledDeltaTime / growSeconds)
+        {
+            card.localScale = Vector3.one * EaseOutBack(t);
+            yield return null;
+        }
+        card.localScale = Vector3.one;
+
+        // Pulse: half a sine wave each time, so it swells and settles smoothly
+        for (int pulse = 0; pulse < pulseCount; pulse++)
+        {
+            for (float t = 0f; t < 1f; t += Time.unscaledDeltaTime / pulseSeconds)
+            {
+                card.localScale = Vector3.one * (1f + pulseAmount * Mathf.Sin(t * Mathf.PI));
+                yield return null;
+            }
+            card.localScale = Vector3.one;
+        }
+
+        yield return new WaitForSecondsRealtime(holdSeconds);
+    }
+
+    // A bought artifact: pops up, pulses, then the Artifacts page opens and the box flies into its new slot
+    private IEnumerator RevealInto(OwnedArtifact artifact, System.Func<RectTransform> openPageAndFindSlot)
+    {
+        purchasePlaying = true;
+        ScreenBlocker.SetBlocked(this, true);
+
+        yield return GrowAndPulse(artifact);
+
+        RectTransform slot = openPageAndFindSlot != null ? openPageAndFindSlot() : null;
+        card.SetAsLastSibling(); // The page just opened on top - get back in front of it
+
+        // The real box stays invisible until the card lands on it, so it looks like the card becomes the box
+        CanvasGroup slotGroup = null;
+        float slotAlpha = 1f;
+        if (slot != null)
+        {
+            slotGroup = slot.GetComponent<CanvasGroup>();
+            if (slotGroup == null) slotGroup = slot.gameObject.AddComponent<CanvasGroup>();
+            slotAlpha = slotGroup.alpha;
+            slotGroup.alpha = 0f;
+        }
+
+        Vector3 from = card.position;
+        Vector3 to = slot != null ? slot.TransformPoint(slot.rect.center) : from;
+        float toScale = slot != null ? ScaleToMatch(slot) : endScale;
+
+        for (float t = 0f; t < 1f; t += Time.unscaledDeltaTime / flyIntoSlotSeconds)
+        {
+            float eased = t * t * (3f - 2f * t); // Smooth start and smooth landing
+            card.position = Vector3.LerpUnclamped(from, to, eased);
+            card.localScale = Vector3.one * Mathf.Lerp(1f, toScale, eased);
+            yield return null;
+        }
+
+        card.gameObject.SetActive(false);
+        if (slot != null && slotGroup != null) slotGroup.alpha = slotAlpha; // "slot != null" also catches it being rebuilt mid-flight
+
+        ScreenBlocker.SetBlocked(this, false);
+        purchasePlaying = false;
+    }
+
+    // The scale that makes the card exactly as wide as the target box
+    private float ScaleToMatch(RectTransform target)
+    {
+        float parentScale = card.parent != null ? card.parent.lossyScale.x : 1f;
+        float cardWidth = card.rect.width * parentScale;     // Card's width on screen at scale 1
+        float targetWidth = target.rect.width * target.lossyScale.x;
+        return cardWidth > 0f ? targetWidth / cardWidth : endScale;
     }
 
     // Goes a bit past 1 then settles back - the "pop"

@@ -56,6 +56,7 @@ public class RoomShopPopup : MonoBehaviour
     public void Open()
     {
         selected = null;
+        transform.SetAsLastSibling(); // In front of whatever opened it (Rooms Owned or the Room Picker)
         root.SetActive(true);
         Rebuild();
     }

@@ -50,10 +50,10 @@ public class ExplorationShip : MonoBehaviour
     }
 
     // Comes down, takes the alien (its sprite in the room is deleted), then leaves
-    // onLeaving runs as it starts flying off with the alien
-    public void PickUp(Vector3 stop, FloatingAlien alienInRoom, Sprite alienSprite, Action onLeaving)
+    // onLeaving runs as it starts flying off with the alien; onGone (optional) runs once it's off screen
+    public void PickUp(Vector3 stop, FloatingAlien alienInRoom, Sprite alienSprite, Action onLeaving, Action onGone = null)
     {
-        StartCoroutine(PickUpRoutine(stop, alienInRoom, alienSprite, onLeaving));
+        StartCoroutine(PickUpRoutine(stop, alienInRoom, alienSprite, onLeaving, onGone));
     }
 
     // Comes down with the alien, lets it out, then leaves
@@ -63,7 +63,7 @@ public class ExplorationShip : MonoBehaviour
         StartCoroutine(DropOffRoutine(stop, alienSprite, onDroppedOff, onGone));
     }
 
-    private IEnumerator PickUpRoutine(Vector3 stop, FloatingAlien alienInRoom, Sprite alienSprite, Action onLeaving)
+    private IEnumerator PickUpRoutine(Vector3 stop, FloatingAlien alienInRoom, Sprite alienSprite, Action onLeaving, Action onGone)
     {
         SetPassenger(null);
         yield return Arrive(stop);
@@ -76,6 +76,7 @@ public class ExplorationShip : MonoBehaviour
 
         onLeaving?.Invoke();
         yield return Leave(stop);
+        onGone?.Invoke();
         Destroy(gameObject);
     }
 

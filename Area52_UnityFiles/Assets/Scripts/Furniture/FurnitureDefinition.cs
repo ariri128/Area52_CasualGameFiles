@@ -51,6 +51,9 @@ public class FurnitureDefinition : ScriptableObject
     [Tooltip("The furniture's prefab, used when it's added to a room. Filled in during step 2.")]
     public GameObject prefab;
 
+    [Tooltip("Coins it costs in the Furniture Catalog.")]
+    [Min(0)] public int price = 100;
+
     // Only standing floor furniture counts toward the room's limit
     public bool CountsTowardLimit => placement == FurniturePlacement.Floor;
 

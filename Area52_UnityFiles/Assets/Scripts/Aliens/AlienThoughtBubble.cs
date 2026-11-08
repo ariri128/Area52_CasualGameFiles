@@ -61,7 +61,9 @@ public class AlienThoughtBubble : MonoBehaviour
         if (button != null)
             button.onClick.AddListener(() => { if (AlienTapper.main != null) AlienTapper.main.OnBubblePressed(); });
 
-        if (sellButton != null) sellButton.interactable = false; //TODO: selling comes later
+        if (sellButton != null)
+            sellButton.onClick.AddListener(() => { if (AlienTapper.main != null) AlienTapper.main.OnSellPressed(); });
+
         if (exploreButton != null)
             exploreButton.onClick.AddListener(() => { if (AlienTapper.main != null) AlienTapper.main.OnExplorePressed(); });
 

@@ -5,7 +5,9 @@ using UnityEngine.UI;
 
 /*
  * The UI for the "Furniture Owned" panel
- * Includes the title, exit (X) button, a tab per furniture type, a scrolling grid of owned pieces, and a confirm button at the bottom that only shows once a piece is selected
+ * Includes the title, exit (X) button, a tab per furniture type, a scrolling grid of owned pieces,
+ * a Replace button (greyed out until a piece is selected) and Buy Furniture (opens the Furniture Catalog)
+ * The catalog counts as part of this panel to the Furniture Editor: hiding this hides it too
 */
 
 public class FurnitureOwnedPanel : MonoBehaviour
@@ -29,17 +31,24 @@ public class FurnitureOwnedPanel : MonoBehaviour
     [Header("Confirm")]
     [SerializeField] private Button confirmButton;
 
+    [Header("Buying")]
+    [SerializeField] private Button buyButton;
+    [SerializeField] private FurnitureCatalogPanel catalogPanel;
+
     private FurnitureDefinition replacing;
     private FurnitureDefinition selected;
+    private FurnitureCategory currentCategory;
     private readonly List<FurnitureTabUI> tabs = new List<FurnitureTabUI>();
     private readonly List<FurnitureSlotUI> slots = new List<FurnitureSlotUI>();
 
-    public bool IsOpen => root.activeSelf;
+    public bool IsOpen => root.activeSelf || (catalogPanel != null && catalogPanel.IsOpen);
 
     private void Awake()
     {
         closeButton.onClick.AddListener(Close);
         confirmButton.onClick.AddListener(Confirm);
+        confirmButton.gameObject.SetActive(true); // Always there now - greyed out until something's selected
+        if (buyButton != null) buyButton.onClick.AddListener(OpenCatalog);
 
         // The templates are only for copying
         tabTemplate.gameObject.SetActive(false);
@@ -73,6 +82,7 @@ public class FurnitureOwnedPanel : MonoBehaviour
     public void Hide()
     {
         root.SetActive(false);
+        if (catalogPanel != null && catalogPanel.IsOpen) catalogPanel.Hide();
     }
 
     private void Confirm()
@@ -124,6 +134,7 @@ public class FurnitureOwnedPanel : MonoBehaviour
 
     private void ShowTab(FurnitureCategory category)
     {
+        currentCategory = category;
         foreach (FurnitureTabUI tab in tabs) tab.SetSelected(tab.Category == category);
 
         foreach (FurnitureSlotUI slot in slots)
@@ -162,6 +173,32 @@ public class FurnitureOwnedPanel : MonoBehaviour
     {
         selected = definition;
         foreach (FurnitureSlotUI slot in slots) slot.SetSelected(slot.Definition == definition);
-        confirmButton.gameObject.SetActive(definition != null);
+        confirmButton.interactable = definition != null;
+    }
+
+
+    // THE FURNITURE CATALOG
+
+    private void OpenCatalog()
+    {
+        if (catalogPanel == null) { Debug.LogWarning("FurnitureOwnedPanel: no Catalog Panel set.", this); return; }
+        root.SetActive(false); // Just this panel - not Hide(), which would close the catalog too
+        catalogPanel.Open(currentCategory);
+    }
+
+    // Back from the catalog: bought = what was just bought, or null for Cancel
+    public void ReturnFromCatalog(FurnitureDefinition bought)
+    {
+        root.SetActive(true);
+        List<FurnitureCategory> categories = BuildTabs(); // Rebuilt - the new piece may need a new tab
+
+        // Only selected if it can actually replace the piece the player tapped
+        bool canPick = bought != null && GetChoices().Contains(bought)
+                       && FurnitureInventory.main != null && FurnitureInventory.main.GetAvailableCount(bought) > 0;
+
+        FurnitureCategory tab = canPick ? bought.category
+                              : (categories.Contains(currentCategory) ? currentCategory : categories[0]);
+        ShowTab(tab);
+        if (canPick) Select(bought);
     }
 }
