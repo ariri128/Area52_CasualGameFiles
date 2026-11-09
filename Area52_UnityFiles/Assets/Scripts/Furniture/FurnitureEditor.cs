@@ -118,6 +118,13 @@ public class FurnitureEditor : MonoBehaviour
 
     private void HandleTap(Vector2 screenPos)
     {
+        // While moving, any tap away from the gizmo means "I'm done"
+        if (FurnitureMover.main != null && FurnitureMover.main.IsMoving)
+        {
+            FurnitureMover.main.TryFinish();
+            return;
+        }
+
         // Makes sure the colliders are where their pieces are right now
         Physics.SyncTransforms();
 
@@ -157,8 +164,15 @@ public class FurnitureEditor : MonoBehaviour
         return outlineMaterial;
     }
 
+    // Outlines a piece in any color, with the right outline for its type (used by the mover's red pulse)
+    public void ShowOutline(FurnitureItem item, Color color)
+    {
+        if (item != null) item.ShowHighlight(OutlineMaterialFor(item), color);
+    }
+
     public void Deselect()
     {
+        if (FurnitureMover.main != null && FurnitureMover.main.IsMoving) FurnitureMover.main.ForceStop(); // E.g. leaving for the breeding room
         if (Selected != null) Selected.ClearHighlight();
         Selected = null;
         if (popup != null) popup.Hide();
@@ -170,8 +184,11 @@ public class FurnitureEditor : MonoBehaviour
 
     public void OnMovePressed()
     {
-        if (Selected == null) return;
-        Debug.Log($"Move pressed on {Selected.Definition.displayName}");
+        if (Selected == null || Selected.Definition == null || Selected.Definition.IsDecor) return;
+        if (FurnitureMover.main == null) { Debug.LogWarning("FurnitureEditor: no FurnitureMover in the scene.", this); return; }
+
+        popup.Hide(); // The gizmo takes over
+        FurnitureMover.main.Begin(Selected, false, placed => Deselect()); // Either way, it's done once it's let go
     }
 
     public void OnRemovePressed()

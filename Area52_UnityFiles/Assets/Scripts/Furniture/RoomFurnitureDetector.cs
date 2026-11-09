@@ -66,6 +66,10 @@ public class RoomFurnitureDetector : MonoBehaviour
     // World height of the top of the floor
     public float FloorY => transform.position.y + floorHeight;
 
+    // The room's directions along the floor: across (left to right) and back (away from the front edge)
+    public Vector3 AcrossDirection => FlatRotation * Vector3.right;
+    public Vector3 BackDirection => FlatRotation * Vector3.forward;
+
     // Counts how many standing pieces are in the room - rugs and decor aren't count
     public int FloorItemCount
     {
@@ -307,6 +311,22 @@ public class RoomFurnitureDetector : MonoBehaviour
             if (Mathf.Abs(local.x) > HalfWidthAt(local.z) - gap) return false; // Follows angled side walls too
         }
         return true;
+    }
+
+    // The closest point to "world" that's on this room's floor (its height is left as it is)
+    // Used while dragging, so the middle of a piece can't be dragged out of the room
+    public Vector3 ClampToFloor(Vector3 world)
+    {
+        Quaternion toRoom = Quaternion.Inverse(FlatRotation);
+        Vector3 local = toRoom * (world - transform.position);
+
+        local.z = Mathf.Clamp(local.z, 0f, floorDepth);
+        float halfWidth = HalfWidthAt(local.z);
+        local.x = Mathf.Clamp(local.x, -halfWidth, halfWidth);
+
+        Vector3 result = transform.position + FlatRotation * local;
+        result.y = world.y;
+        return result;
     }
 
     // The closest spot to "near" where the piece fits, keeping the turn of "start" and standing on the floor

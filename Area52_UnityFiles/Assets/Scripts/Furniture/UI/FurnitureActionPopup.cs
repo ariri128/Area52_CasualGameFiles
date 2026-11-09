@@ -43,6 +43,7 @@ public class FurnitureActionPopup : MonoBehaviour
     public void Show(FurnitureItem item)
     {
         target = item;
+        moveButton.interactable = item.Definition == null || !item.Definition.IsDecor; // Decor sits on other furniture - it can't slide along the floor
         bubble.gameObject.SetActive(true);
         LayoutRebuilder.ForceRebuildLayoutImmediate(bubble);
         FollowTarget();
