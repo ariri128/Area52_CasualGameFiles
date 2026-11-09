@@ -67,6 +67,8 @@ MonoBehaviour:
   wallThickness: 0.1
   maxFloorItems: 6
   gap: 0.02
+  sittingTolerance: 0.05
+  searchStep: 0.1
   logSummary: 1
 --- !u!1001 &3017191933743759937
 PrefabInstance:
@@ -82,7 +84,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -9194821165396451556, guid: 26961d0763ab045fc897714d46b42822, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.79
+      value: 0.682
       objectReference: {fileID: 0}
     - target: {fileID: -9194821165396451556, guid: 26961d0763ab045fc897714d46b42822, type: 3}
       propertyPath: m_LocalPosition.z

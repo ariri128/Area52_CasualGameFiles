@@ -236,4 +236,39 @@ public class FurnitureEditor : MonoBehaviour
     {
         if (Selected != null && Selected.Room != CurrentRoom) Deselect();
     }
+
+
+    // TESTING (select a piece during Play first)
+
+    [ContextMenu("Testing: Check Selected Spot")]
+    private void CheckSelectedForTesting()
+    {
+        if (Selected == null || Selected.Room == null) { Debug.LogWarning("Tap a piece of furniture during Play first.", this); return; }
+
+        FurnitureBox box = Selected.GetBox();
+        RoomFurnitureDetector.SpotProblem problem = Selected.Room.CheckSpot(Selected, box, out FurnitureItem blocker);
+
+        string detail = blocker != null ? $" (touching {blocker.Definition.displayName})" : "";
+        Debug.Log($"{Selected.Definition.displayName}: {problem}{detail}", Selected);
+        box.DebugDraw(problem == RoomFurnitureDetector.SpotProblem.None ? Color.green : Color.red, 5f);
+    }
+
+    [ContextMenu("Testing: Find Free Spot Near Room Middle")]
+    private void FindSpotForTesting()
+    {
+        if (Selected == null || Selected.Room == null) { Debug.LogWarning("Tap a piece of furniture during Play first.", this); return; }
+
+        RoomFurnitureDetector room = Selected.Room;
+        Vector3 middle = room.FloorPoint(0f, room.FloorDepth * 0.5f);
+
+        if (room.FindFreeSpot(Selected, Selected.GetBox(), middle, 0f, out FurnitureBox spot))
+        {
+            Debug.Log($"{Selected.Definition.displayName} would fit {Vector3.Distance(spot.BottomCenter, middle):0.00} m from the middle (cyan box in the Scene view).", Selected);
+            spot.DebugDraw(Color.cyan, 5f);
+        }
+        else
+        {
+            Debug.Log($"There's nowhere in this room {Selected.Definition.displayName} fits.", Selected);
+        }
+    }
 }

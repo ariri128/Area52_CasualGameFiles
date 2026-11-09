@@ -133,4 +133,21 @@ public struct FurnitureBox
         Gizmos.DrawWireCube(Vector3.zero, halfExtents * 2f);
         Gizmos.matrix = old;
     }
+
+    // Draws the box's 12 edges in the Scene view for a few seconds (works during Play, for testing)
+    public void DebugDraw(Color color, float seconds)
+    {
+        Vector3[] c = new Vector3[8];
+        GetCorners(c);
+
+        // Corners are numbered x*4 + y*2 + z (each 0 or 1), so two corners share an edge when they differ in one of those
+        int[,] edges =
+        {
+            { 0, 1 }, { 2, 3 }, { 4, 5 }, { 6, 7 }, // Along z
+            { 0, 2 }, { 1, 3 }, { 4, 6 }, { 5, 7 }, // Along y
+            { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 }, // Along x
+        };
+        for (int i = 0; i < edges.GetLength(0); i++)
+            Debug.DrawLine(c[edges[i, 0]], c[edges[i, 1]], color, seconds);
+    }
 }

@@ -48,6 +48,9 @@ public class RoomFurnitureDetector : MonoBehaviour
     [Tooltip("How far (meters) a decor piece's underside can be from a surface and still count as sitting on it.")]
     [SerializeField] private float sittingTolerance = 0.05f;
 
+    [Tooltip("How far apart (meters) the spots tried by the free-spot search are. Smaller = finds tighter gaps, but slower.")]
+    [SerializeField] private float searchStep = 0.1f;
+
     [Tooltip("Print how many pieces this room found when it spawns.")]
     [SerializeField] private bool logSummary = true;
 
@@ -243,6 +246,106 @@ public class RoomFurnitureDetector : MonoBehaviour
         }
         min = FlatRotation * localMin;
         max = FlatRotation * localMax;
+    }
+
+
+    // PLACEMENT RULES
+
+    public enum SpotProblem { None, OutsideRoom, Overlapping }
+
+    // Would "piece" fit if its box were at "box"? The piece itself never gets in its own way
+    //   Floor pieces - inside the walls, not touching other floor pieces (rugs are fine to stand on)
+    //   Rugs         - inside the walls, not touching other rugs (floor pieces can stand on them)
+    //   Decor        - always fine here (it sits on other furniture)
+    // blockedBy = the piece it's touching (null if it isn't touching anything)
+    public SpotProblem CheckSpot(FurnitureItem piece, FurnitureBox box, out FurnitureItem blockedBy)
+    {
+        blockedBy = null;
+        if (piece == null || piece.Definition == null || piece.Definition.IsDecor) return SpotProblem.None;
+
+        if (!IsInsideWalls(box)) return SpotProblem.OutsideRoom;
+
+        FurnitureBox padded = box.Inflated(gap); // Closer than the gap counts as touching
+        foreach (FurnitureItem other in items)
+        {
+            if (other == null || other == piece || other.Definition == null) continue;
+            if (!GetsInTheWay(piece.Definition, other.Definition)) continue;
+
+            if (FurnitureBox.Intersects(padded, other.GetBox()))
+            {
+                blockedBy = other;
+                return SpotProblem.Overlapping;
+            }
+        }
+        return SpotProblem.None;
+    }
+
+    // Is the piece fine where it is right now?
+    public SpotProblem CheckSpot(FurnitureItem piece) => CheckSpot(piece, piece.GetBox(), out _);
+
+    // Floor pieces only bump into floor pieces, rugs only into rugs, and decor never gets in the way
+    private static bool GetsInTheWay(FurnitureDefinition moving, FurnitureDefinition other)
+    {
+        if (other.IsDecor) return false;
+        bool movingIsRug = moving.placement == FurniturePlacement.Rug;
+        bool otherIsRug = other.placement == FurniturePlacement.Rug;
+        return movingIsRug == otherIsRug;
+    }
+
+    // Every corner of the box is on the floor, at least Gap away from every wall
+    public bool IsInsideWalls(FurnitureBox box)
+    {
+        Vector3[] corners = new Vector3[8];
+        box.GetCorners(corners);
+        Quaternion toRoom = Quaternion.Inverse(FlatRotation);
+
+        foreach (Vector3 corner in corners)
+        {
+            // x = across the room (0 = middle), z = back from the front edge
+            Vector3 local = toRoom * (corner - transform.position);
+            if (local.z < gap || local.z > floorDepth - gap) return false;
+            if (Mathf.Abs(local.x) > HalfWidthAt(local.z) - gap) return false; // Follows angled side walls too
+        }
+        return true;
+    }
+
+    // The closest spot to "near" where the piece fits, keeping the turn of "start" and standing on the floor
+    // maxDistance: how far from "near" to look (0 or less = anywhere in the room). False if nowhere fits
+    public bool FindFreeSpot(FurnitureItem piece, FurnitureBox start, Vector3 near, float maxDistance, out FurnitureBox spot)
+    {
+        spot = start;
+
+        // Every point on a grid across the floor, plus "near" itself
+        List<Vector3> points = new List<Vector3> { new Vector3(near.x, FloorY, near.z) };
+        float step = Mathf.Max(0.02f, searchStep);
+        for (float z = 0f; z <= floorDepth; z += step)
+        {
+            float halfWidth = HalfWidthAt(z);
+            for (float x = -halfWidth; x <= halfWidth; x += step)
+                points.Add(FloorPoint(x, z));
+        }
+
+        // Closest first (measured flat along the floor)
+        points.Sort((a, b) => FlatDistance(a, near).CompareTo(FlatDistance(b, near)));
+
+        foreach (Vector3 point in points)
+        {
+            if (maxDistance > 0f && FlatDistance(point, near) > maxDistance) break; // The rest are even further
+
+            FurnitureBox candidate = start.Moved(point - start.BottomCenter); // Its underside on that point
+            if (CheckSpot(piece, candidate, out _) == SpotProblem.None)
+            {
+                spot = candidate;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static float FlatDistance(Vector3 a, Vector3 b)
+    {
+        float dx = a.x - b.x, dz = a.z - b.z;
+        return Mathf.Sqrt(dx * dx + dz * dz);
     }
 
 
