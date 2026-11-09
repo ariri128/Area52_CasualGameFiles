@@ -211,6 +211,16 @@ public class FurnitureEditor : MonoBehaviour
         RoomCameraController.SetSwipeBlocked(this, true); // No sliding between rooms when the panel is open
     }
 
+    public void OnAddPressed()
+    {
+        if (Selected == null || ownedPanel == null) return;
+        if (Selected.Room != null && Selected.Room.IsFull) return; // The button's greyed out anyway
+
+        popup.Hide();
+        ownedPanel.OpenForAdd();
+        RoomCameraController.SetSwipeBlocked(this, true); // No sliding between rooms when the panel is open
+    }
+
 
     // FURNITURE OWNED PANEL
 
@@ -252,6 +262,43 @@ public class FurnitureEditor : MonoBehaviour
                 room.UndoReplace(result);
                 Select(result.oldPiece); // Back to how it was, with the old piece selected
             }
+        });
+    }
+
+    // The panel's Add to Room button: puts the piece near the tapped one, then opens the Move gizmo so it can be placed
+    public void OnPanelAddConfirmed(FurnitureDefinition definition)
+    {
+        if (Selected == null || Selected.Room == null)
+        {
+            CloseOwnedPanel();
+            return;
+        }
+
+        RoomFurnitureDetector room = Selected.Room;
+        Vector3 near = Selected.GetBox().BottomCenter; // Starts looking right next to the piece that was tapped
+
+        FurnitureItem piece = room.AddPiece(definition, near, out string reason);
+        if (piece == null)
+        {
+            Debug.Log(reason);
+            return;
+        }
+
+        Selected.ClearHighlight();
+        Selected = null;
+        CloseOwnedPanel();
+
+        if (FurnitureMover.main == null)
+        {
+            Select(piece);
+            return;
+        }
+
+        // Always opens the gizmo for a new piece. Cancel puts it back in storage
+        FurnitureMover.main.Begin(piece, true, placed =>
+        {
+            if (placed) Select(piece);
+            else room.UndoAdd(piece);
         });
     }
 

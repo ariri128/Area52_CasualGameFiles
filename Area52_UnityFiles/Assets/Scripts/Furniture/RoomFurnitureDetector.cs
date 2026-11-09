@@ -250,6 +250,50 @@ public class RoomFurnitureDetector : MonoBehaviour
         Register(item);
     }
 
+    // Brings a piece out of storage into this room, facing the camera, in the nearest free spot to "near"
+    // If there's nowhere free, it's put at "near" anyway (the player will have to move it)
+    // Returns null (and changes nothing) if it can't be added - reason says why
+    public FurnitureItem AddPiece(FurnitureDefinition definition, Vector3 near, out string reason)
+    {
+        reason = null;
+        FurnitureInventory inventory = FurnitureInventory.main;
+
+        if (inventory == null) { reason = "There's no FurnitureInventory in the scene."; return null; }
+        if (definition == null || definition.IsDecor) { reason = "Decor can only be put in a room by replacing other decor."; return null; }
+        if (definition.CountsTowardLimit && IsFull) { reason = $"This room already has its {maxFloorItems} standing pieces."; return null; }
+
+        FurnitureItem piece = inventory.Take(definition);
+        if (piece == null) { reason = $"No {definition.displayName} available."; return null; }
+
+        // Into this room, turned (around straight up only) to face the camera - the room's open side
+        piece.transform.SetParent(transform, true);
+        float facingCamera = transform.eulerAngles.y + 180f;
+        float turnBy = Mathf.DeltaAngle(piece.FacingYaw, facingCamera);
+        piece.transform.rotation = Quaternion.AngleAxis(turnBy, Vector3.up) * piece.transform.rotation;
+
+        // The nearest free spot to "near" - or right at "near" if nowhere in the room is free
+        FurnitureBox box = piece.GetBox();
+        if (FindFreeSpot(piece, box, near, 0f, out FurnitureBox spot))
+            piece.MoveBoxTo(spot);
+        else
+            piece.MoveBoxTo(box.Moved(new Vector3(near.x, FloorY, near.z) - box.BottomCenter));
+
+        Register(piece);
+        inventory.NotifyChanged();
+        return piece;
+    }
+
+    // Takes a just-added piece back out (the player pressed Cancel)
+    public void UndoAdd(FurnitureItem piece)
+    {
+        FurnitureInventory inventory = FurnitureInventory.main;
+        if (piece == null || piece.Room != this || inventory == null) return;
+
+        Unregister(piece);
+        inventory.Store(piece);
+        inventory.NotifyChanged();
+    }
+
     // Takes a piece out of the room and into storage - it shows as available in Furniture Owned again
     // Decor sitting on it goes too, so nothing is left floating. Returns how many pieces were put away in total
     public int Remove(FurnitureItem item)
