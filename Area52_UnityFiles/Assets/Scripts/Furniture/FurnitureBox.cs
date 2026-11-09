@@ -62,6 +62,15 @@ public struct FurnitureBox
         return new FurnitureBox(center, halfExtents + Vector3.one * amount, rotation);
     }
 
+    // Is this world point inside the box? Works however the box is turned
+    public bool Contains(Vector3 point)
+    {
+        Vector3 local = Quaternion.Inverse(rotation) * (point - center); // The point, as if the box weren't turned
+        return Mathf.Abs(local.x) <= halfExtents.x
+            && Mathf.Abs(local.y) <= halfExtents.y
+            && Mathf.Abs(local.z) <= halfExtents.z;
+    }
+
     public FurnitureBox CarryAlong(FurnitureBox child, FurnitureBox to)
     {
         Quaternion delta = to.rotation * Quaternion.Inverse(rotation);

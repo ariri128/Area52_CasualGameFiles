@@ -45,6 +45,9 @@ public class RoomFurnitureDetector : MonoBehaviour
     [Tooltip("Smallest gap (meters) kept between pieces, and between pieces and the walls, so they never touch.")]
     [SerializeField] private float gap = 0.02f;
 
+    [Tooltip("How far (meters) a decor piece's underside can be from a surface and still count as sitting on it.")]
+    [SerializeField] private float sittingTolerance = 0.05f;
+
     [Tooltip("Print how many pieces this room found when it spawns.")]
     [SerializeField] private bool logSummary = true;
 
@@ -185,6 +188,43 @@ public class RoomFurnitureDetector : MonoBehaviour
         Register(piece);
         inventory.NotifyChanged();
         return piece;
+    }
+
+    // Takes a piece out of the room and into storage - it shows as available in Furniture Owned again
+    // Decor sitting on it goes too, so nothing is left floating. Returns how many pieces were put away in total
+    public int Remove(FurnitureItem item)
+    {
+        FurnitureInventory inventory = FurnitureInventory.main;
+        if (inventory == null || item == null || item.Room != this) return 0;
+
+        List<FurnitureItem> goingAway = ItemsSittingOn(item); // Found BEFORE anything moves
+        goingAway.Add(item);
+
+        foreach (FurnitureItem piece in goingAway)
+        {
+            Unregister(piece);
+            inventory.Store(piece);
+        }
+
+        inventory.NotifyChanged(); // Furniture Owned updates its counts
+        return goingAway.Count;
+    }
+
+    // Decor resting on this piece: on its top, or on one of its shelves
+    // (the middle of the decor's underside is inside the piece's box)
+    public List<FurnitureItem> ItemsSittingOn(FurnitureItem host)
+    {
+        List<FurnitureItem> result = new List<FurnitureItem>();
+        if (host == null || host.Definition == null || host.Definition.IsDecor) return result; // Nothing sits on decor
+
+        FurnitureBox hostBox = host.GetBox().Inflated(sittingTolerance); // A little bigger, so things resting right on top count
+
+        foreach (FurnitureItem other in items)
+        {
+            if (other == null || other == host || other.Definition == null || !other.Definition.IsDecor) continue;
+            if (hostBox.Contains(other.GetBox().BottomCenter)) result.Add(other);
+        }
+        return result;
     }
 
     private void GetFlatExtents(FurnitureBox box, out Vector3 min, out Vector3 max)

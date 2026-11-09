@@ -176,8 +176,13 @@ public class FurnitureEditor : MonoBehaviour
 
     public void OnRemovePressed()
     {
-        if (Selected == null) return;
-        Debug.Log($"Remove pressed on {Selected.Definition.displayName}");
+        if (Selected == null || Selected.Room == null) return;
+
+        FurnitureItem removing = Selected;
+        Deselect(); // Hides the popup and outline first
+        int count = removing.Room.Remove(removing);
+
+        if (count > 1) Debug.Log($"Removed {removing.Definition.displayName} and the {count - 1} decor piece(s) on it.", this);
     }
 
     public void OnReplacePressed()
