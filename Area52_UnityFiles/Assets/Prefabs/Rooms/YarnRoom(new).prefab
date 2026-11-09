@@ -67,6 +67,9 @@ MonoBehaviour:
   wallThickness: 0.1
   maxFloorItems: 6
   gap: 0.02
+  sittingTolerance: 0.05
+  searchStep: 0.1
+  replaceNudgeDistance: 0.4
   logSummary: 1
 --- !u!1001 &7513029770389564360
 PrefabInstance:
@@ -339,6 +342,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: 15cae2f39a6a7469e8f9433c7080a419, type: 2}
   attachedParts: []
+  facingCorrection: 0
 --- !u!4 &2703597782536098567 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5604376925512939727, guid: 0d1c6383beb824816bc66a357ee210c2, type: 3}
@@ -384,6 +388,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: e522db65cfb4f445e84d9908a92274a3, type: 2}
   attachedParts: []
+  facingCorrection: 0
 --- !u!1 &6913085664370736108 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -5209659755552272348, guid: 0d1c6383beb824816bc66a357ee210c2, type: 3}
@@ -424,6 +429,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: fb826a33898494ab29179b043003713f, type: 2}
   attachedParts: []
+  facingCorrection: -90
 --- !u!23 &7125809842975704505 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -8457669349949460879, guid: 0d1c6383beb824816bc66a357ee210c2, type: 3}
@@ -469,6 +475,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: f3c3c3c34679a47dabdaca820776ecca, type: 2}
   attachedParts: []
+  facingCorrection: 0
 --- !u!4 &8055002085809998883 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0d1c6383beb824816bc66a357ee210c2, type: 3}
@@ -515,3 +522,4 @@ MonoBehaviour:
   definition: {fileID: 11400000, guid: 8adae55e52d734501b8cd3411140a5f2, type: 2}
   attachedParts:
   - {fileID: 2703597782536098567}
+  facingCorrection: 0

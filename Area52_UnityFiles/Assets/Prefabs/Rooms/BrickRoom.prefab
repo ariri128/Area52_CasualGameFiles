@@ -70,6 +70,9 @@ MonoBehaviour:
   wallThickness: 0.1
   maxFloorItems: 6
   gap: 0.02
+  sittingTolerance: 0.05
+  searchStep: 0.1
+  replaceNudgeDistance: 0.4
   logSummary: 1
 --- !u!1001 &2309475360076445217
 PrefabInstance:
@@ -191,6 +194,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: 46b64f29954624e2b9cf2f94bba07cbe, type: 2}
   attachedParts: []
+  facingCorrection: 0
 --- !u!1001 &6297633324248803423
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -299,6 +303,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: e9ce1b33c9d0a4411881ee2b27857cce, type: 2}
   attachedParts: []
+  facingCorrection: 0
 --- !u!1001 &7720662314481184794
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -402,6 +407,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: 1f5c475046d26439898384b20b5bee51, type: 2}
   attachedParts: []
+  facingCorrection: 90
 --- !u!4 &7831746581007702001 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ff93a05c8d2033e47af070c3516be06b, type: 3}

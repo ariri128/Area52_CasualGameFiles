@@ -16,6 +16,10 @@ public class FurnitureItem : MonoBehaviour
              "They move, turn and get removed along with it.")]
     [SerializeField] private List<Transform> attachedParts = new List<Transform>();
 
+    [Tooltip("Only if this object's model faces a different way than the room pieces do: degrees to correct it by. " +
+             "The furniture PREFABS need 180 (their models are turned around compared with the rooms'). Room pieces stay 0.")]
+    [SerializeField] private float facingCorrection = 0f;
+
     private BoxCollider boxCollider;
     // private RoomFurnitureDetector room;
 
@@ -57,6 +61,41 @@ public class FurnitureItem : MonoBehaviour
         {
             if (boxCollider == null) boxCollider = GetComponent<BoxCollider>();
             return boxCollider;
+        }
+    }
+
+    // Which way the piece faces along the floor, in degrees - works whatever its model's tilt is (e.g. -90 on X from Blender)
+    // Measured on the MODEL (its biggest mesh), not the root, since some prefabs have the model as a turned child
+    // Uses directions instead of the rotation numbers, which get muddled when a model is tipped exactly 90 degrees
+    public float FacingYaw
+    {
+        get
+        {
+            Quaternion modelRotation = ModelTransform.rotation;
+            Vector3 upInModel = Quaternion.Inverse(modelRotation) * Vector3.up; // Which of the model's own directions points up
+            Vector3 frontInModel = Quaternion.FromToRotation(Vector3.up, upInModel) * Vector3.forward; // Its front, going by that
+            Vector3 front = modelRotation * frontInModel; // That front, in the world
+            return Mathf.Atan2(front.x, front.z) * Mathf.Rad2Deg + facingCorrection;
+        }
+    }
+
+    // This piece's biggest mesh - the model itself, whether it's on this object or a child of it
+    private Transform ModelTransform
+    {
+        get
+        {
+            Transform best = transform;
+            float bestSize = -1f;
+            foreach (MeshFilter filter in GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (filter.sharedMesh == null || filter.name == "Outline") continue;     // Skips the outline copies
+                if (filter.GetComponentInParent<FurnitureItem>() != this) continue;     // Skips decor sitting on it
+
+                Vector3 size = Vector3.Scale(filter.sharedMesh.bounds.size, filter.transform.lossyScale);
+                float volume = Mathf.Abs(size.x * size.y * size.z);
+                if (volume > bestSize) { best = filter.transform; bestSize = volume; }
+            }
+            return best;
         }
     }
 
@@ -245,5 +284,50 @@ public class FurnitureItem : MonoBehaviour
         if (!hasBounds) return;
         Collider.center = localBounds.center;
         Collider.size = localBounds.size;
+    }
+
+    [ContextMenu("Print Facing")]
+    private void PrintFacing()
+    {
+        Transform model = ModelTransform;
+        string modelOn = model == transform ? "on this object" : $"on child \"{model.name}\"";
+        string placement = definition != null ? definition.placement.ToString() : "NO DATA FILE";
+        Debug.Log($"{name} faces {FacingYaw:0} degrees (model {modelOn}, correction {facingCorrection}). " +
+                  $"Placement: {placement}. Collider: {GetBox().halfExtents * 2f:F2} m.", this);
+    }
+
+    // CALIBRATING (fixes models that were built sideways or backwards)
+    // Look at the piece, pick which way its FRONT roughly points, and it sets Facing Correction for you
+    // "Roughly" is fine: a couch angled 40 degrees toward the camera still counts as Faces Camera
+
+    [ContextMenu("Calibrate Facing/Front Faces Camera")]
+    private void CalibrateCamera() => Calibrate(180f, "the camera");
+
+    [ContextMenu("Calibrate Facing/Front Faces Back Wall")]
+    private void CalibrateBackWall() => Calibrate(0f, "the back wall");
+
+    [ContextMenu("Calibrate Facing/Front Faces Left Wall")]
+    private void CalibrateLeftWall() => Calibrate(-90f, "the left wall");
+
+    [ContextMenu("Calibrate Facing/Front Faces Right Wall")]
+    private void CalibrateRightWall() => Calibrate(90f, "the right wall");
+
+    private void Calibrate(float realFacing, string description)
+    {
+#if UNITY_EDITOR
+        UnityEditor.Undo.RecordObject(this, "Calibrate Facing"); // So Ctrl/Cmd+Z works
+#endif
+        float measured = FacingYaw - facingCorrection; // What the model says, with no correction
+
+        // Models are only ever built off by a quarter or half turn, so round to the nearest 90
+        // That's also why "roughly" is fine - an angled piece doesn't throw it off
+        facingCorrection = Mathf.Round(Mathf.DeltaAngle(measured, realFacing) / 90f) * 90f;
+        if (facingCorrection <= -180f) facingCorrection += 360f; // Keeps it between -90 and 180
+
+#if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(this); // Saves it on the prefab / in the room
+        UnityEditor.PrefabUtility.RecordPrefabInstancePropertyModifications(this);
+#endif
+        Debug.Log($"{name}: front faces {description} - Facing Correction set to {facingCorrection}. Now faces {FacingYaw:0} degrees.", this);
     }
 }

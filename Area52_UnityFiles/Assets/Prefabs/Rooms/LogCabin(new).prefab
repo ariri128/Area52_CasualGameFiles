@@ -69,6 +69,7 @@ MonoBehaviour:
   gap: 0.02
   sittingTolerance: 0.05
   searchStep: 0.1
+  replaceNudgeDistance: 0.4
   logSummary: 1
 --- !u!1001 &6508608617444987582
 PrefabInstance:
@@ -291,6 +292,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: 88d25671db19a4cc99b225a4d3cdd186, type: 2}
   attachedParts: []
+  facingCorrection: 90
 --- !u!1 &4400053106708552368 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -1782552503507924978, guid: f8acb50aeff384ae1b2d60a24ee12866, type: 3}
@@ -331,6 +333,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: ca709d9b01c2149fab1b367fdf91bf85, type: 2}
   attachedParts: []
+  facingCorrection: 0
 --- !u!1 &4992927456051563475 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2240901578983037293, guid: f8acb50aeff384ae1b2d60a24ee12866, type: 3}
@@ -371,6 +374,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: bde2e1eac3bdb4d32b615a56a97c82c9, type: 2}
   attachedParts: []
+  facingCorrection: 0
 --- !u!1 &5866233050102657373 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 809015077928477667, guid: f8acb50aeff384ae1b2d60a24ee12866, type: 3}
@@ -411,6 +415,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: 1579fe6ef6dd24c948eab3c0631dd7fb, type: 2}
   attachedParts: []
+  facingCorrection: 0
 --- !u!23 &6743354136589220567 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -8663221638900914071, guid: f8acb50aeff384ae1b2d60a24ee12866, type: 3}
@@ -461,6 +466,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: 0532ff8b5628047cc9f182bee59388cd, type: 2}
   attachedParts: []
+  facingCorrection: -90
 --- !u!1 &7917516162839233178 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -5209659755552272348, guid: f8acb50aeff384ae1b2d60a24ee12866, type: 3}
@@ -501,3 +507,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: 9cba2e906812f497785de60b6870b1e4, type: 2}
   attachedParts: []
+  facingCorrection: 90

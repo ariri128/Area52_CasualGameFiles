@@ -223,16 +223,36 @@ public class FurnitureEditor : MonoBehaviour
             return;
         }
 
-        FurnitureItem newPiece = Selected.Room.Replace(Selected, definition, out string reason);
-        if (newPiece == null)
+        RoomFurnitureDetector room = Selected.Room;
+        RoomFurnitureDetector.ReplaceResult result = room.Replace(Selected, definition, out string reason);
+        if (result == null)
         {
             Debug.Log(reason);
             return;
         }
 
-        Selected = null; // Puts the old piece in storage
+        Selected = null; // The old piece is in storage now
         CloseOwnedPanel();
-        Select(newPiece); // Shows the popup on the new piece
+
+        if (!result.needsMoving || FurnitureMover.main == null)
+        {
+            Select(result.newPiece); // Fits - shows the popup on the new piece
+            return;
+        }
+
+        // Doesn't fit even nudged: the player has to move it somewhere valid. Cancel undoes the whole replace
+        FurnitureMover.main.Begin(result.newPiece, true, placed =>
+        {
+            if (placed)
+            {
+                Select(result.newPiece);
+            }
+            else
+            {
+                room.UndoReplace(result);
+                Select(result.oldPiece); // Back to how it was, with the old piece selected
+            }
+        });
     }
 
     // The panel's X button: back to the popup on the same piece

@@ -180,6 +180,13 @@ public class FurnitureInventory : MonoBehaviour
         stored[item.Definition].Add(item);
     }
 
+    // Takes this exact piece back out of storage (for undoing a replace) - false if it isn't stored
+    public bool TakeBack(FurnitureItem item)
+    {
+        if (item == null || item.Definition == null) return false;
+        return stored.TryGetValue(item.Definition, out List<FurnitureItem> list) && list.Remove(item);
+    }
+
     public void NotifyChanged()
     {
         onChanged.Invoke();

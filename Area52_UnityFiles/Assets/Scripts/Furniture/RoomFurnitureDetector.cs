@@ -51,6 +51,10 @@ public class RoomFurnitureDetector : MonoBehaviour
     [Tooltip("How far apart (meters) the spots tried by the free-spot search are. Smaller = finds tighter gaps, but slower.")]
     [SerializeField] private float searchStep = 0.1f;
 
+    [Tooltip("When a replacement doesn't fit where the old piece was, how far (meters) it can be nudged to fit " +
+             "before the player has to move it themselves.")]
+    [SerializeField] private float replaceNudgeDistance = 0.4f;
+
     [Tooltip("Print how many pieces this room found when it spawns.")]
     [SerializeField] private bool logSummary = true;
 
@@ -157,7 +161,18 @@ public class RoomFurnitureDetector : MonoBehaviour
         if (item.Room == this) item.Room = null;
     }
 
-    public FurnitureItem Replace(FurnitureItem old, FurnitureDefinition definition, out string reason)
+    // What a replace did, so it can be undone if the new piece can't be placed
+    public class ReplaceResult
+    {
+        public FurnitureItem newPiece;
+        public FurnitureItem oldPiece;
+        public readonly List<FurnitureItem> storedDecor = new List<FurnitureItem>(); // Decor that was on the old piece
+        public bool needsMoving; // True = it doesn't fit, even nudged - the player has to move it
+    }
+
+    // Swaps "old" for a piece of "definition": same spot, facing the same way
+    // Returns null (and changes nothing) if it can't be done - reason says why
+    public ReplaceResult Replace(FurnitureItem old, FurnitureDefinition definition, out string reason)
     {
         reason = null;
         FurnitureInventory inventory = FurnitureInventory.main;
@@ -169,32 +184,70 @@ public class RoomFurnitureDetector : MonoBehaviour
         FurnitureItem piece = inventory.Take(definition);
         if (piece == null) { reason = $"No {definition.displayName} available."; return null; }
 
-        // Measures the old piece before anything moves
+        ReplaceResult result = new ReplaceResult { newPiece = piece, oldPiece = old };
+
+        // Measured before anything moves (this is wherever the old piece is NOW - including if the player moved / turned it)
         FurnitureBox oldBox = old.GetBox();
-        GetFlatExtents(oldBox, out Vector3 oldMin, out Vector3 oldMax);
+        List<FurnitureItem> decorOnOld = ItemsSittingOn(old);
 
-        // Brings the new piece into this room, facing the way its prefab / its last room had it
+        // Into this room, then turned (around straight up only) to face the same way as the old piece, plus any Facing Offset
+        // Its own tilt (e.g. -90 on X from the model import) is never touched
         piece.transform.SetParent(transform, true);
+        float turnBy = Mathf.DeltaAngle(piece.FacingYaw, old.FacingYaw) + definition.facingOffset - old.Definition.facingOffset;
+        piece.transform.rotation = Quaternion.AngleAxis(turnBy, Vector3.up) * piece.transform.rotation;
 
+        // Same spot: its underside centered where the old one's was
         FurnitureBox newBox = piece.GetBox();
-        GetFlatExtents(newBox, out Vector3 newMin, out Vector3 newMax);
+        piece.MoveBoxTo(newBox.Moved(oldBox.BottomCenter - newBox.BottomCenter));
 
-        Vector3 back = FlatRotation * Vector3.forward;
-        float oldBackDistance = Vector3.Dot(oldMax, back);
-        float newHalfDepth = (Vector3.Dot(newMax, back) - Vector3.Dot(newMin, back)) * 0.5f;
-
-        // Calculates where the new piece's underside should end up
-        Vector3 target = oldBox.BottomCenter;
-        target += back * ((oldBackDistance - newHalfDepth) - Vector3.Dot(target, back));
-
-        piece.MoveBoxTo(newBox.Moved(target - newBox.BottomCenter));
-
-        // Swaps them over
+        // The swap: the old piece (and decor that was on it) go into storage
+        foreach (FurnitureItem decor in decorOnOld)
+        {
+            Unregister(decor);
+            inventory.Store(decor);
+            result.storedDecor.Add(decor);
+        }
         Unregister(old);
         inventory.Store(old);
         Register(piece);
+
+        // Doesn't fit? Try a small nudge first (e.g. a deeper couch away from the wall)
+        if (CheckSpot(piece) != SpotProblem.None)
+        {
+            if (FindFreeSpot(piece, piece.GetBox(), oldBox.BottomCenter, replaceNudgeDistance, out FurnitureBox spot))
+                piece.MoveBoxTo(spot);
+            else
+                result.needsMoving = true; // The player will have to move it
+        }
+
         inventory.NotifyChanged();
-        return piece;
+        return result;
+    }
+
+    // Puts everything back the way it was before the replace - the new piece goes back into storage
+    public void UndoReplace(ReplaceResult result)
+    {
+        FurnitureInventory inventory = FurnitureInventory.main;
+        if (result == null || inventory == null) return;
+
+        if (result.newPiece != null)
+        {
+            Unregister(result.newPiece);
+            inventory.Store(result.newPiece);
+        }
+
+        BringBack(result.oldPiece);
+        foreach (FurnitureItem decor in result.storedDecor) BringBack(decor);
+
+        inventory.NotifyChanged();
+    }
+
+    // Storage kept the piece exactly where it was, so putting it back in the room puts it back in its old spot
+    private void BringBack(FurnitureItem item)
+    {
+        if (item == null || FurnitureInventory.main == null || !FurnitureInventory.main.TakeBack(item)) return;
+        item.transform.SetParent(transform, true);
+        Register(item);
     }
 
     // Takes a piece out of the room and into storage - it shows as available in Furniture Owned again
