@@ -15,6 +15,8 @@ public class FurnitureActionPopup : MonoBehaviour
     [SerializeField] private Button replaceButton;
     [SerializeField] private Button moveButton;
     [SerializeField] private Button removeButton;
+    [Tooltip("Greyed out when the room already has its maximum standing pieces.")]
+    [SerializeField] private Button addButton;
 
     [Tooltip("Gap between the top of the piece and the bottom of the bubble's tail, in UI units.")]
     [SerializeField] private float gapAbovePiece = 20f;
@@ -36,6 +38,7 @@ public class FurnitureActionPopup : MonoBehaviour
         replaceButton.onClick.AddListener(() => { if (FurnitureEditor.main != null) FurnitureEditor.main.OnReplacePressed(); });
         moveButton.onClick.AddListener(() => { if (FurnitureEditor.main != null) FurnitureEditor.main.OnMovePressed(); });
         removeButton.onClick.AddListener(() => { if (FurnitureEditor.main != null) FurnitureEditor.main.OnRemovePressed(); });
+        if (addButton != null) addButton.onClick.AddListener(() => { if (FurnitureEditor.main != null) FurnitureEditor.main.OnAddPressed(); });
 
         Hide();
     }
@@ -43,6 +46,9 @@ public class FurnitureActionPopup : MonoBehaviour
     public void Show(FurnitureItem item)
     {
         target = item;
+        moveButton.interactable = item.Definition == null || !item.Definition.IsDecor; // Decor sits on other furniture - it can't slide along the floor
+        if (addButton != null) addButton.interactable = item.Room != null && !item.Room.IsFull; // Room already has its 6 standing pieces
+        removeButton.interactable = item.Room == null || item.Room.Items.Count > 1; // Keeps one piece, so there's always something to tap for Add
         bubble.gameObject.SetActive(true);
         LayoutRebuilder.ForceRebuildLayoutImmediate(bubble);
         FollowTarget();

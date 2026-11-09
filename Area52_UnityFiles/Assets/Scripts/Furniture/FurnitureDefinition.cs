@@ -54,6 +54,10 @@ public class FurnitureDefinition : ScriptableObject
     [Tooltip("Coins it costs in the Furniture Catalog.")]
     [Min(0)] public int price = 100;
 
+    [Tooltip("Only if this piece comes out facing the wrong way when it replaces another one: " +
+             "turns it by this many degrees (e.g. 180 if it's backwards, 90 or -90 if it's sideways). Usually 0.")]
+    public float facingOffset = 0f;
+
     // Only standing floor furniture counts toward the room's limit
     public bool CountsTowardLimit => placement == FurniturePlacement.Floor;
 

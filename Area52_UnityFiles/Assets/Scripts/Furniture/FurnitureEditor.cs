@@ -118,6 +118,13 @@ public class FurnitureEditor : MonoBehaviour
 
     private void HandleTap(Vector2 screenPos)
     {
+        // While moving, any tap away from the gizmo means "I'm done"
+        if (FurnitureMover.main != null && FurnitureMover.main.IsMoving)
+        {
+            FurnitureMover.main.TryFinish();
+            return;
+        }
+
         // Makes sure the colliders are where their pieces are right now
         Physics.SyncTransforms();
 
@@ -157,8 +164,15 @@ public class FurnitureEditor : MonoBehaviour
         return outlineMaterial;
     }
 
+    // Outlines a piece in any color, with the right outline for its type (used by the mover's red pulse)
+    public void ShowOutline(FurnitureItem item, Color color)
+    {
+        if (item != null) item.ShowHighlight(OutlineMaterialFor(item), color);
+    }
+
     public void Deselect()
     {
+        if (FurnitureMover.main != null && FurnitureMover.main.IsMoving) FurnitureMover.main.ForceStop(); // E.g. leaving for the breeding room
         if (Selected != null) Selected.ClearHighlight();
         Selected = null;
         if (popup != null) popup.Hide();
@@ -170,14 +184,22 @@ public class FurnitureEditor : MonoBehaviour
 
     public void OnMovePressed()
     {
-        if (Selected == null) return;
-        Debug.Log($"Move pressed on {Selected.Definition.displayName}");
+        if (Selected == null || Selected.Definition == null || Selected.Definition.IsDecor) return;
+        if (FurnitureMover.main == null) { Debug.LogWarning("FurnitureEditor: no FurnitureMover in the scene.", this); return; }
+
+        popup.Hide(); // The gizmo takes over
+        FurnitureMover.main.Begin(Selected, false, placed => Deselect()); // Either way, it's done once it's let go
     }
 
     public void OnRemovePressed()
     {
-        if (Selected == null) return;
-        Debug.Log($"Remove pressed on {Selected.Definition.displayName}");
+        if (Selected == null || Selected.Room == null) return;
+
+        FurnitureItem removing = Selected;
+        Deselect(); // Hides the popup and outline first
+        int count = removing.Room.Remove(removing);
+
+        if (count > 1) Debug.Log($"Removed {removing.Definition.displayName} and the {count - 1} decor piece(s) on it.", this);
     }
 
     public void OnReplacePressed()
@@ -186,6 +208,16 @@ public class FurnitureEditor : MonoBehaviour
 
         popup.Hide();
         ownedPanel.OpenForReplace(Selected.Definition);
+        RoomCameraController.SetSwipeBlocked(this, true); // No sliding between rooms when the panel is open
+    }
+
+    public void OnAddPressed()
+    {
+        if (Selected == null || ownedPanel == null) return;
+        if (Selected.Room != null && Selected.Room.IsFull) return; // The button's greyed out anyway
+
+        popup.Hide();
+        ownedPanel.OpenForAdd();
         RoomCameraController.SetSwipeBlocked(this, true); // No sliding between rooms when the panel is open
     }
 
@@ -201,16 +233,73 @@ public class FurnitureEditor : MonoBehaviour
             return;
         }
 
-        FurnitureItem newPiece = Selected.Room.Replace(Selected, definition, out string reason);
-        if (newPiece == null)
+        RoomFurnitureDetector room = Selected.Room;
+        RoomFurnitureDetector.ReplaceResult result = room.Replace(Selected, definition, out string reason);
+        if (result == null)
         {
             Debug.Log(reason);
             return;
         }
 
-        Selected = null; // Puts the old piece in storage
+        Selected = null; // The old piece is in storage now
         CloseOwnedPanel();
-        Select(newPiece); // Shows the popup on the new piece
+
+        if (!result.needsMoving || FurnitureMover.main == null)
+        {
+            Select(result.newPiece); // Fits - shows the popup on the new piece
+            return;
+        }
+
+        // Doesn't fit even nudged: the player has to move it somewhere valid. Cancel undoes the whole replace
+        FurnitureMover.main.Begin(result.newPiece, true, placed =>
+        {
+            if (placed)
+            {
+                Select(result.newPiece);
+            }
+            else
+            {
+                room.UndoReplace(result);
+                Select(result.oldPiece); // Back to how it was, with the old piece selected
+            }
+        });
+    }
+
+    // The panel's Add to Room button: puts the piece near the tapped one, then opens the Move gizmo so it can be placed
+    public void OnPanelAddConfirmed(FurnitureDefinition definition)
+    {
+        if (Selected == null || Selected.Room == null)
+        {
+            CloseOwnedPanel();
+            return;
+        }
+
+        RoomFurnitureDetector room = Selected.Room;
+        Vector3 near = Selected.GetBox().BottomCenter; // Starts looking right next to the piece that was tapped
+
+        FurnitureItem piece = room.AddPiece(definition, near, out string reason);
+        if (piece == null)
+        {
+            Debug.Log(reason);
+            return;
+        }
+
+        Selected.ClearHighlight();
+        Selected = null;
+        CloseOwnedPanel();
+
+        if (FurnitureMover.main == null)
+        {
+            Select(piece);
+            return;
+        }
+
+        // Always opens the gizmo for a new piece. Cancel puts it back in storage
+        FurnitureMover.main.Begin(piece, true, placed =>
+        {
+            if (placed) Select(piece);
+            else room.UndoAdd(piece);
+        });
     }
 
     // The panel's X button: back to the popup on the same piece
@@ -230,5 +319,40 @@ public class FurnitureEditor : MonoBehaviour
     private void HandleRoomChanged(int roomIndex)
     {
         if (Selected != null && Selected.Room != CurrentRoom) Deselect();
+    }
+
+
+    // TESTING (select a piece during Play first)
+
+    [ContextMenu("Testing: Check Selected Spot")]
+    private void CheckSelectedForTesting()
+    {
+        if (Selected == null || Selected.Room == null) { Debug.LogWarning("Tap a piece of furniture during Play first.", this); return; }
+
+        FurnitureBox box = Selected.GetBox();
+        RoomFurnitureDetector.SpotProblem problem = Selected.Room.CheckSpot(Selected, box, out FurnitureItem blocker);
+
+        string detail = blocker != null ? $" (touching {blocker.Definition.displayName})" : "";
+        Debug.Log($"{Selected.Definition.displayName}: {problem}{detail}", Selected);
+        box.DebugDraw(problem == RoomFurnitureDetector.SpotProblem.None ? Color.green : Color.red, 5f);
+    }
+
+    [ContextMenu("Testing: Find Free Spot Near Room Middle")]
+    private void FindSpotForTesting()
+    {
+        if (Selected == null || Selected.Room == null) { Debug.LogWarning("Tap a piece of furniture during Play first.", this); return; }
+
+        RoomFurnitureDetector room = Selected.Room;
+        Vector3 middle = room.FloorPoint(0f, room.FloorDepth * 0.5f);
+
+        if (room.FindFreeSpot(Selected, Selected.GetBox(), middle, 0f, out FurnitureBox spot))
+        {
+            Debug.Log($"{Selected.Definition.displayName} would fit {Vector3.Distance(spot.BottomCenter, middle):0.00} m from the middle (cyan box in the Scene view).", Selected);
+            spot.DebugDraw(Color.cyan, 5f);
+        }
+        else
+        {
+            Debug.Log($"There's nowhere in this room {Selected.Definition.displayName} fits.", Selected);
+        }
     }
 }

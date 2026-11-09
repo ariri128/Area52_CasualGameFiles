@@ -69,6 +69,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: d35022efe49d44c368cc199f5a8038e5, type: 2}
   attachedParts: []
+  facingCorrection: 0
 --- !u!1 &3511713298033873016
 GameObject:
   m_ObjectHideFlags: 0

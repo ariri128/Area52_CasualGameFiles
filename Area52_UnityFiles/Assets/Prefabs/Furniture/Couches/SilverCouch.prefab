@@ -71,6 +71,7 @@ MonoBehaviour:
   definition: {fileID: 11400000, guid: c18ca25c78478458b869b5c2cfc691c1, type: 2}
   attachedParts:
   - {fileID: 1302735295631529120}
+  facingCorrection: 0
 --- !u!1 &4650978731153448180
 GameObject:
   m_ObjectHideFlags: 0

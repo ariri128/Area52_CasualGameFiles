@@ -251,3 +251,4 @@ MonoBehaviour:
   definition: {fileID: 11400000, guid: f775d540d2f444844b9a2bf44e3d2e5d, type: 2}
   attachedParts:
   - {fileID: 8836970941434531200}
+  facingCorrection: 0

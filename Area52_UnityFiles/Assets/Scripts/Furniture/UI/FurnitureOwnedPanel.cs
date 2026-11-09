@@ -4,9 +4,12 @@ using TMPro;
 using UnityEngine.UI;
 
 /*
- * The UI for the "Furniture Owned" panel
+ * The UI for the "Furniture Owned" panel, used two ways:
+ *   OpenForReplace(current) - pieces that could replace the tapped one; the button says Replace
+ *   OpenForAdd()            - floor pieces and rugs to add to the room; the button says Add to Room
+ *                             (decor isn't listed: it has to sit on something, so it only goes in by replacing decor)
  * Includes the title, exit (X) button, a tab per furniture type, a scrolling grid of owned pieces,
- * a Replace button (greyed out until a piece is selected) and Buy Furniture (opens the Furniture Catalog)
+ * the Replace / Add to Room button (greyed out until a piece is selected) and Buy Furniture (opens the Furniture Catalog)
  * The catalog counts as part of this panel to the Furniture Editor: hiding this hides it too
 */
 
@@ -30,12 +33,17 @@ public class FurnitureOwnedPanel : MonoBehaviour
 
     [Header("Confirm")]
     [SerializeField] private Button confirmButton;
+    [Tooltip("Optional. The text on the confirm button - says Replace or Add to Room.")]
+    [SerializeField] private TMP_Text confirmLabel;
+    [SerializeField] private string replaceText = "Replace";
+    [SerializeField] private string addText = "Add to Room";
 
     [Header("Buying")]
     [SerializeField] private Button buyButton;
     [SerializeField] private FurnitureCatalogPanel catalogPanel;
 
-    private FurnitureDefinition replacing;
+    private bool adding;                    // True = Add mode, false = Replace mode
+    private FurnitureDefinition replacing;  // The tapped piece's type (Replace mode only)
     private FurnitureDefinition selected;
     private FurnitureCategory currentCategory;
     private readonly List<FurnitureTabUI> tabs = new List<FurnitureTabUI>();
@@ -47,7 +55,7 @@ public class FurnitureOwnedPanel : MonoBehaviour
     {
         closeButton.onClick.AddListener(Close);
         confirmButton.onClick.AddListener(Confirm);
-        confirmButton.gameObject.SetActive(true); // Always there now - greyed out until something's selected
+        confirmButton.gameObject.SetActive(true); // Always there - greyed out until something's selected
         if (buyButton != null) buyButton.onClick.AddListener(OpenCatalog);
 
         // The templates are only for copying
@@ -63,12 +71,27 @@ public class FurnitureOwnedPanel : MonoBehaviour
     // Opens the panel to pick something to replace a piece of type "current"
     public void OpenForReplace(FurnitureDefinition current)
     {
+        adding = false;
         replacing = current;
+        Open(current.category);
+    }
+
+    // Opens the panel to pick a floor piece or rug to add to the room
+    public void OpenForAdd()
+    {
+        adding = true;
+        replacing = null;
+        Open(currentCategory);
+    }
+
+    private void Open(FurnitureCategory startTab)
+    {
         selected = null;
+        if (confirmLabel != null) confirmLabel.text = adding ? addText : replaceText;
         root.SetActive(true);
 
         List<FurnitureCategory> categories = BuildTabs();
-        ShowTab(categories.Contains(current.category) ? current.category : categories[0]);
+        ShowTab(categories.Contains(startTab) ? startTab : categories[0]);
     }
 
     // If the player clicks the X button to close it
@@ -78,7 +101,7 @@ public class FurnitureOwnedPanel : MonoBehaviour
         if (FurnitureEditor.main != null) FurnitureEditor.main.OnPanelClosed();
     }
 
-    // If it's closed by the editor after a successful furniture replacement
+    // If it's closed by the editor after a successful replace / add
     public void Hide()
     {
         root.SetActive(false);
@@ -87,13 +110,16 @@ public class FurnitureOwnedPanel : MonoBehaviour
 
     private void Confirm()
     {
-        if (selected != null && FurnitureEditor.main != null) FurnitureEditor.main.OnPanelConfirmed(selected);
+        if (selected == null || FurnitureEditor.main == null) return;
+        if (adding) FurnitureEditor.main.OnPanelAddConfirmed(selected);
+        else FurnitureEditor.main.OnPanelConfirmed(selected);
     }
 
 
     // BUILDING THE TABS AND GRID
 
-    // Owned pieces that could replace the current one
+    // Replace mode: owned pieces that could replace the tapped one
+    // Add mode: owned floor pieces and rugs
     private List<FurnitureDefinition> GetChoices()
     {
         List<FurnitureDefinition> choices = new List<FurnitureDefinition>();
@@ -101,24 +127,33 @@ public class FurnitureOwnedPanel : MonoBehaviour
 
         foreach (FurnitureDefinition definition in FurnitureInventory.main.GetOwnedDefinitions())
         {
-            if (definition == replacing) continue; // Has swapping for the same thing do nothing
-            if (!definition.CanReplace(replacing)) continue; // Defines that decor swaps for decor, floor pieces swap for floor pieces
+            if (adding)
+            {
+                if (definition.IsDecor) continue; // Decor needs something to sit on
+            }
+            else
+            {
+                if (definition == replacing) continue; // Has swapping for the same thing do nothing
+                if (!definition.CanReplace(replacing)) continue; // Decor swaps for decor, floor pieces swap for floor pieces
+            }
             choices.Add(definition);
         }
         return choices;
     }
 
-    // Sets one tab per category that has something in it plus the current piece's own category
+    // One tab per category that has something in it (plus the tapped piece's own category, when replacing)
     private List<FurnitureCategory> BuildTabs()
     {
         foreach (FurnitureTabUI tab in tabs) Destroy(tab.gameObject);
         tabs.Clear();
 
-        List<FurnitureCategory> categories = new List<FurnitureCategory> { replacing.category };
+        List<FurnitureCategory> categories = new List<FurnitureCategory>();
+        if (!adding && replacing != null) categories.Add(replacing.category);
         foreach (FurnitureDefinition definition in GetChoices())
         {
             if (!categories.Contains(definition.category)) categories.Add(definition.category);
         }
+        if (categories.Count == 0) categories.Add(FurnitureCategory.Couches); // Nothing owned to add - still needs one tab
         categories.Sort();
 
         foreach (FurnitureCategory category in categories)
@@ -168,7 +203,7 @@ public class FurnitureOwnedPanel : MonoBehaviour
         slots.Add(slot);
     }
 
-    // Highlights the chosen box - the confirm button only shows when a real piece is chosen
+    // Highlights the chosen box - the confirm button only works once a real piece is chosen
     private void Select(FurnitureDefinition definition)
     {
         selected = definition;
@@ -192,7 +227,7 @@ public class FurnitureOwnedPanel : MonoBehaviour
         root.SetActive(true);
         List<FurnitureCategory> categories = BuildTabs(); // Rebuilt - the new piece may need a new tab
 
-        // Only selected if it can actually replace the piece the player tapped
+        // Only selected if it fits this mode (can replace the tapped piece / can be added)
         bool canPick = bought != null && GetChoices().Contains(bought)
                        && FurnitureInventory.main != null && FurnitureInventory.main.GetAvailableCount(bought) > 0;
 

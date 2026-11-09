@@ -4,10 +4,10 @@ using TMPro;
 using UnityEngine.UI;
 
 /*
- * "Are you sure you want to sell this alien?" - opened by Sell in the Alien Files
- *   Takes the player to the alien's room, then the panel (a big copy of the alien's box, the question, Yes / No) grows in the middle
- *   No  - back to the Alien Files, with the alien still selected
- *   Yes - the popup closes, the spaceship takes the alien away for good, and once the ship is off screen:
+ * "Selling for 300 - 500 coins" - opened by Sell in the Alien Files (or the thought bubble)
+ *   Takes the player to the alien's room, then the panel (a big copy of the alien's box, the price range, Sell / Cancel) grows in the middle
+ *   Cancel - back to the Alien Files, with the alien still selected (or just closes, from the thought bubble)
+ *   Sell   - the popup closes, the spaceship takes the alien away for good, and once the ship is off screen:
  *         "Sold for ___ coins!" + coins + cha-ching, and the coins go in the wallet
  * The price is a random number in the alien's rarity range (Price List), picked when Yes is pressed
  * Aliens away breeding or exploring can't be sold - they're not in their room
@@ -34,7 +34,8 @@ public class AlienSellPopup : MonoBehaviour
     [SerializeField] private AlienFilesPopup filesPopup;
 
     [Header("Text")]
-    [SerializeField] private string message = "Are you sure you want to sell this alien?";
+    [Tooltip("{0} = lowest price, {1} = highest price (the alien's rarity range on the Price List).")]
+    [SerializeField] private string messageFormat = "Selling for {0} - {1} coins";
 
     [Header("Timing (seconds)")]
     [Tooltip("Wait for the camera to reach the alien's room before the panel grows.")]
@@ -88,7 +89,7 @@ public class AlienSellPopup : MonoBehaviour
         picture.sprite = alien.species.sprite;
         picture.preserveAspect = true;
         if (nameText != null) nameText.text = alien.DisplayName;
-        if (messageText != null) messageText.text = message;
+        if (messageText != null) messageText.text = PriceRangeText(alien);
 
         transform.SetAsLastSibling(); // In front of everything
         root.SetActive(true);
@@ -106,6 +107,15 @@ public class AlienSellPopup : MonoBehaviour
     }
 
     private AlienFilesPopup Files => filesPopup != null ? filesPopup : AlienFilesPopup.main;
+
+    // "Selling for 300 - 500 coins" - the same range as page 2 of the alien's file
+    private string PriceRangeText(OwnedAlien alien)
+    {
+        if (PriceList.main == null) return string.Format(messageFormat, "?", "?");
+
+        PriceList.PriceRange range = PriceList.main.AlienSellRange(alien.species.OverallRarity);
+        return string.Format(messageFormat, range.min.ToString("N0"), range.max.ToString("N0"));
+    }
 
 
     // THE BUTTONS

@@ -69,6 +69,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureItem
   definition: {fileID: 11400000, guid: 05a567557be27477bbb6a7153f0c7e06, type: 2}
   attachedParts: []
+  facingCorrection: 0
 --- !u!1001 &8920036494449085687
 PrefabInstance:
   m_ObjectHideFlags: 0
