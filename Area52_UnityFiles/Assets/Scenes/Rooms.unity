@@ -3552,7 +3552,7 @@ MonoBehaviour:
   root: {fileID: 232552337}
   countdownText: {fileID: 1157925519}
   countdownFormat: Ad Playing... {0}
-  adSeconds: 5
+  adSeconds: 20
 --- !u!1 &154532008
 GameObject:
   m_ObjectHideFlags: 0
@@ -10878,7 +10878,7 @@ MonoBehaviour:
   fileName: alien_apartments_save.json
   autoSaveSeconds: 10
   useSaveInEditor: 1
-  testHoursAhead: 1
+  testHoursAhead: 0
   logSaves: 1
   onLoaded:
     m_PersistentCalls:
@@ -28960,7 +28960,7 @@ MonoBehaviour:
   m_text: Out of Pellets!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
