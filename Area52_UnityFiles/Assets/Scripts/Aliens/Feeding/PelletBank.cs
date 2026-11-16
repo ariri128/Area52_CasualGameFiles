@@ -58,6 +58,9 @@ public class PelletBank : MonoBehaviour
         main = this;
 
         Pellets = Mathf.Max(0, startingPellets);
+
+        // Switched on after the game loaded (it's inside the wallet panel)? Read the saved part now
+        if (SaveSystem.TryGetLoaded(out SaveData saved)) ReadFrom(saved);
     }
 
     private void OnDestroy()
@@ -141,5 +144,16 @@ public class PelletBank : MonoBehaviour
     {
         foreach (PelletPack pack in packs)
             if (pack != null) pack.RefreshLabel();
+    }
+
+
+    // SAVING
+
+    public void WriteTo(SaveData data) => data.pellets.pellets = Pellets;
+
+    public void ReadFrom(SaveData data)
+    {
+        Pellets = Mathf.Max(0, data.pellets.pellets);
+        onChanged.Invoke();
     }
 }

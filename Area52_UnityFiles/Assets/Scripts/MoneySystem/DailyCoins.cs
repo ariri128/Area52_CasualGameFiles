@@ -17,8 +17,9 @@ public class DailyCoins : MonoBehaviour
     [SerializeField] private int adAmount = 150;
     [SerializeField] private int adsPerDay = 5;
 
-    [Tooltip("For now (no saving yet): how long after the last ad is used until it all resets. 120 = 2 minutes.")]
-    [SerializeField] private float newDaySeconds = 120f;
+    [Tooltip("How long after the last ad is watched until it all resets, in real-world seconds. 43200 = 12 hours. " +
+             "Keeps counting while the game is closed.")]
+    [SerializeField] private float newDaySeconds = 43200f;
 
     // Fires whenever the free collect is used, an ad starts or finishes, or a new day starts
     public UnityEvent onChanged = new UnityEvent();
@@ -35,10 +36,10 @@ public class DailyCoins : MonoBehaviour
     public bool CanWatchAd => FreeCollected && AdsLeft > 0 && !AdPlaying && RewardedAdPlayer.main != null;
 
     // Counting down to a new day (all of today's ads are used up)
-    public bool WaitingForNewDay => newDayAt >= 0f;
-    public float SecondsUntilNewDay => WaitingForNewDay ? Mathf.Max(0f, newDayAt - Time.realtimeSinceStartup) : 0f;
+    public bool WaitingForNewDay => newDayAt >= 0;
+    public float SecondsUntilNewDay => WaitingForNewDay ? (float)System.Math.Max(0.0, newDayAt - SaveSystem.Now) : 0f;
 
-    private float newDayAt = -1f; // Real time the new day starts (-1 = not waiting)
+    private double newDayAt = -1; // Real-world clock time the new day starts (-1 = not waiting)
 
     private void Awake()
     {
@@ -49,7 +50,9 @@ public class DailyCoins : MonoBehaviour
             return;
         }
         main = this;
-        //TODO (once there's a save system): only reset if the saved date isn't today, and swap the short wait for real days
+
+        // Switched on after the game loaded (it's inside the wallet panel)? Read the saved part now
+        if (SaveSystem.TryGetLoaded(out SaveData saved)) ReadFrom(saved);
     }
 
     private void OnDestroy()
@@ -59,7 +62,7 @@ public class DailyCoins : MonoBehaviour
 
     private void Update()
     {
-        if (WaitingForNewDay && Time.realtimeSinceStartup >= newDayAt) StartNewDay();
+        if (WaitingForNewDay && SaveSystem.Now >= newDayAt) StartNewDay();
     }
 
 
@@ -94,7 +97,7 @@ public class DailyCoins : MonoBehaviour
                 CoinBank.main.Earn(adAmount);
                 AudioManager.PlayPurchase();
 
-                if (AdsLeft == 0) newDayAt = Time.realtimeSinceStartup + newDaySeconds; // Start the countdown
+                if (AdsLeft == 0) newDayAt = SaveSystem.Now + newDaySeconds; // Start the countdown
             }
             onChanged.Invoke();
         });
@@ -118,5 +121,24 @@ public class DailyCoins : MonoBehaviour
     {
         StartNewDay();
         Debug.Log("Daily coins reset - it's a new day.", this);
+    }
+
+
+    // SAVING
+
+    public void WriteTo(SaveData data)
+    {
+        data.dailyCoins.freeCollected = FreeCollected;
+        data.dailyCoins.adsWatched = AdsWatched;
+        data.dailyCoins.newDayAt = newDayAt;
+    }
+
+    // If the 12 hours ran out while the game was closed, Update starts the new day on the first frame
+    public void ReadFrom(SaveData data)
+    {
+        FreeCollected = data.dailyCoins.freeCollected;
+        AdsWatched = data.dailyCoins.adsWatched;
+        newDayAt = data.dailyCoins.newDayAt;
+        onChanged.Invoke();
     }
 }

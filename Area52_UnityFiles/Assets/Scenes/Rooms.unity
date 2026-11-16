@@ -3432,7 +3432,7 @@ MonoBehaviour:
   root: {fileID: 232552337}
   countdownText: {fileID: 1157925519}
   countdownFormat: Ad Playing... {0}
-  adSeconds: 30
+  adSeconds: 5
 --- !u!1 &154532008
 GameObject:
   m_ObjectHideFlags: 0
@@ -10206,6 +10206,7 @@ GameObject:
   - component: {fileID: 516521052}
   - component: {fileID: 516521053}
   - component: {fileID: 516521054}
+  - component: {fileID: 516521056}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -10764,8 +10765,28 @@ MonoBehaviour:
   freeAmount: 100
   adAmount: 150
   adsPerDay: 5
-  newDaySeconds: 120
+  newDaySeconds: 43200
   onChanged:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &516521056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516521033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 951b0f1d72ea64161864049ba9b8e5b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SaveSystem
+  fileName: alien_apartments_save.json
+  autoSaveSeconds: 10
+  useSaveInEditor: 1
+  testHoursAhead: 0
+  logSaves: 1
+  onLoaded:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &526500541
@@ -36941,7 +36962,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -22, y: -132}
+  m_AnchoredPosition: {x: -22, y: -128}
   m_SizeDelta: {x: 241, y: 314.2}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1722007119

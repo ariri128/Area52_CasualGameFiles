@@ -48,6 +48,9 @@ public class CoinBank : MonoBehaviour
 
         Wallet = startingCoins;
         nextDropAt = Time.time + dropInterval;
+
+        // Switched on after the game loaded (it's inside the wallet panel)? Read the saved part now
+        if (SaveSystem.TryGetLoaded(out SaveData saved)) ReadFrom(saved);
     }
 
     private void OnDestroy()
@@ -129,5 +132,25 @@ public class CoinBank : MonoBehaviour
         onChanged.Invoke();
         AudioManager.PlayPurchase(); // Every shop spends through here, so every purchase gets the sound
         return true;
+    }
+
+
+    // SAVING
+
+    public void WriteTo(SaveData data)
+    {
+        data.coins.wallet = Wallet;
+        data.coins.chests.Clear();
+        foreach (KeyValuePair<int, int> chest in chests)
+            data.coins.chests.Add(new ChestSave { roomIndex = chest.Key, coins = chest.Value });
+    }
+
+    public void ReadFrom(SaveData data)
+    {
+        Wallet = data.coins.wallet;
+        chests.Clear();
+        foreach (ChestSave chest in data.coins.chests)
+            chests[chest.roomIndex] = Mathf.Min(chestCapacity, chest.coins);
+        onChanged.Invoke();
     }
 }
