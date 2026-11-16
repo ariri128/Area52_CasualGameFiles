@@ -78,6 +78,9 @@ public class AlienRoster : MonoBehaviour
     [Tooltip("How dates are written, e.g. \"MMM d, yyyy\" = Oct 18, 2026.")]
     [SerializeField] private string dateFormat = "MMM d, yyyy";
 
+    [Tooltip("The Alien Catalog. Needed to find each saved alien's species again when loading.")]
+    [SerializeField] private AlienCatalog catalog;
+
     // Fires whenever an alien is added, sold, renamed, moved, or goes to / comes back from breeding or exploring
     public UnityEvent onChanged = new UnityEvent();
 
@@ -246,5 +249,165 @@ public class AlienRoster : MonoBehaviour
             if (alien != null) alien.RefreshLabel();
 
         if (Application.isPlaying && main == this) onChanged.Invoke();
+    }
+
+
+    // For saving things that point at an alien (breeding parents, eggs): its place in the saved aliens list (-1 if none)
+    public int SaveIndexOf(OwnedAlien alien)
+    {
+        if (alien == null) return -1;
+        int index = 0;
+        foreach (OwnedAlien other in aliens)
+        {
+            if (other == null || other.species == null) continue;
+            if (other == alien) return index;
+            index++;
+        }
+        return -1;
+    }
+
+    // The alien at that place once the save is loaded (null if there isn't one)
+    public OwnedAlien FromSaveIndex(int index) => index >= 0 && index < aliens.Count ? aliens[index] : null;
+
+
+    // SAVING
+
+    public void WriteTo(SaveData data)
+    {
+        AliensSave save = data.aliens;
+        save.saved = true;
+        save.aliens.Clear();
+
+        List<OwnedAlien> saving = new List<OwnedAlien>();
+        foreach (OwnedAlien alien in aliens)
+            if (alien != null && alien.species != null) saving.Add(alien);
+
+        foreach (OwnedAlien alien in saving)
+        {
+            AlienSave entry = new AlienSave
+            {
+                species = alien.species.name,
+                roomIndex = alien.roomIndex,
+                inBreedingRoom = alien.inBreedingRoom,
+                isExploring = alien.isExploring,
+                fullness = alien.fullness,
+                customName = alien.customName,
+                dateAcquired = alien.dateAcquired,
+                wasBought = alien.wasBought,
+                parentA = SaveParent(alien.parentA, saving),
+                parentB = SaveParent(alien.parentB, saving),
+            };
+            foreach (ArtifactDefinition artifact in alien.collectedArtifacts)
+                if (artifact != null) entry.collectedArtifacts.Add(artifact.name);
+            save.aliens.Add(entry);
+        }
+    }
+
+    public void ReadFrom(SaveData data)
+    {
+        AliensSave save = data.aliens;
+        if (!save.saved) return; // A save from before aliens were saved - keep the starting aliens
+
+        int roomCount = RoomManager.main != null ? RoomManager.main.RoomCount : int.MaxValue;
+        List<OwnedAlien> loaded = new List<OwnedAlien>();
+
+        foreach (AlienSave entry in save.aliens)
+        {
+            OwnedAlien alien = new OwnedAlien
+            {
+                species = FindSpecies(entry.species),
+                roomIndex = entry.roomIndex >= 0 && entry.roomIndex < roomCount ? entry.roomIndex : 0,
+                // Breeding and exploring get their own save steps - until then, aliens that were away come home
+                inBreedingRoom = entry.inBreedingRoom, // BreedingManager sends them home if breeding isn't really going on
+                isExploring = false,
+                fullness = Mathf.Clamp01(entry.fullness),
+                customName = entry.customName,
+                dateAcquired = entry.dateAcquired,
+                wasBought = entry.wasBought,
+            };
+            foreach (string id in entry.collectedArtifacts)
+            {
+                ArtifactDefinition artifact = FindArtifact(id);
+                if (artifact != null) alien.collectedArtifacts.Add(artifact);
+            }
+            loaded.Add(alien); // Added even if its species is missing, so the parent numbers still line up
+        }
+
+        // Parents, now that every alien exists
+        for (int i = 0; i < loaded.Count; i++)
+        {
+            loaded[i].parentA = LoadParent(save.aliens[i].parentA, loaded);
+            loaded[i].parentB = LoadParent(save.aliens[i].parentB, loaded);
+        }
+
+        aliens.Clear();
+        for (int i = 0; i < loaded.Count; i++)
+        {
+            if (loaded[i].species == null)
+            {
+                Debug.LogWarning($"Saved alien \"{save.aliens[i].species}\" isn't in the Alien Catalog, so it was skipped.", this);
+                continue;
+            }
+            loaded[i].RefreshLabel();
+            aliens.Add(loaded[i]);
+        }
+        onChanged.Invoke();
+    }
+
+    private static ParentSave SaveParent(OwnedAlien parent, List<OwnedAlien> saving)
+    {
+        if (parent == null) return new ParentSave();
+        return new ParentSave
+        {
+            index = saving.IndexOf(parent), // -1 if it was sold
+            species = parent.species != null ? parent.species.name : "",
+            customName = parent.customName,
+        };
+    }
+
+    private OwnedAlien LoadParent(ParentSave saved, List<OwnedAlien> loaded)
+    {
+        if (saved == null || string.IsNullOrEmpty(saved.species)) return null; // No parent (bought or original)
+        if (saved.index >= 0 && saved.index < loaded.Count) return loaded[saved.index];
+
+        // Sold since: a stand-in that isn't in the roster, just so the file still shows the parent's name
+        return new OwnedAlien { species = FindSpecies(saved.species), customName = saved.customName };
+    }
+
+    // Finds a species by its data file's name: in the catalog, among the starting aliens, or as an original that a baby's traits came from - so an original missing from the catalog still loads
+    private AlienSpecies FindSpecies(string id)
+    {
+        if (string.IsNullOrEmpty(id)) return null;
+
+        if (catalog != null)
+        {
+            foreach (AlienSpecies species in catalog.species)
+            {
+                if (species == null) continue;
+                if (species.name == id) return species;
+
+                // The originals each baby was made from
+                foreach (TraitSlot slot in System.Enum.GetValues(typeof(TraitSlot)))
+                {
+                    AlienSpecies origin = species.TraitOrigin(slot);
+                    if (origin != null && origin.name == id) return origin;
+                }
+            }
+        }
+
+        // The starting aliens set in the Inspector (still in the list while loading)
+        foreach (OwnedAlien alien in aliens)
+            if (alien != null && alien.species != null && alien.species.name == id) return alien.species;
+
+        return null;
+    }
+
+    private static ArtifactDefinition FindArtifact(string id)
+    {
+        ArtifactCatalog artifacts = ArtifactInventory.main != null ? ArtifactInventory.main.Catalog : null;
+        if (artifacts != null)
+            foreach (ArtifactDefinition artifact in artifacts.artifacts)
+                if (artifact != null && artifact.name == id) return artifact;
+        return null;
     }
 }

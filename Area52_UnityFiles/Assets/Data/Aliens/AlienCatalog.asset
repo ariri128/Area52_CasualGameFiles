@@ -529,5 +529,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 39c3627cd20a146c09285da8dd359e71, type: 2}
   - {fileID: 11400000, guid: a2282be47a09543d2b1d2631e8a6a064, type: 2}
   - {fileID: 11400000, guid: 94b6f04569ed646c68dd46935dc82032, type: 2}
+  - {fileID: 11400000, guid: b53999fbf53f14f63928aa63be600404, type: 2}
+  - {fileID: 11400000, guid: 4558e5a194047409a92808241dd3d6b8, type: 2}
   testParentA: {fileID: 0}
   testParentB: {fileID: 0}

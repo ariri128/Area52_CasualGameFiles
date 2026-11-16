@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Niangaa x Bloobus 13
   sprite: {fileID: 922472814, guid: 1608a6ca453354fa3a6e783af0126de3, type: 3}
-  spriteEyesClosed: {fileID: 922472814, guid: 1608a6ca453354fa3a6e783af0126de3, type: 3}
+  spriteEyesClosed: {fileID: 2105921658, guid: 78d289c90ee61476f92e561e64b470b2, type: 3}
   rarities:
     body: 0
     antenna: 0

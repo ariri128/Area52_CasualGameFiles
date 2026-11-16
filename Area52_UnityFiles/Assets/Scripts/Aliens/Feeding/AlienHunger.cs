@@ -134,6 +134,34 @@ public class AlienHunger : MonoBehaviour
     }
 
 
+    // WHILE THE GAME WAS CLOSED
+
+    // Drains what the aliens would have lost while the game was closed - but never past Sad
+    // An alien that was already Sad or hungrier stays as it was, and rooms with an auto-feeder stay full
+    public void CatchUp(double secondsAway)
+    {
+        if (AlienRoster.main == null || drainInterval <= 0f) return;
+        float drained = (float)(System.Math.Floor(secondsAway / drainInterval) * drainAmount);
+        if (drained <= 0f) return;
+
+        foreach (OwnedAlien alien in AlienRoster.main.All)
+        {
+            if (alien == null || alien.species == null) continue;
+            if (alien.IsAway && !drainWhileAway) continue;
+
+            if (!alien.IsAway && ArtifactInventory.main != null && ArtifactInventory.main.KeepsRoomFed(alien.roomIndex))
+            {
+                alien.fullness = 1f;
+                continue;
+            }
+
+            if (alien.fullness <= sadAt) continue; // Already hungry - being away doesn't make it worse
+            alien.fullness = Mathf.Max(sadAt, alien.fullness - drained);
+        }
+        onChanged.Invoke();
+    }
+
+
     // TESTING
 
     [ContextMenu("Testing: Make All Hungry (Sad)")]

@@ -10418,6 +10418,7 @@ MonoBehaviour:
   noParentsText: Original
   boughtText: Bought
   dateFormat: MMM d, yyyy
+  catalog: {fileID: 11400000, guid: e2c6af147c7dd4e35bb003900b7596d1, type: 2}
   onChanged:
     m_PersistentCalls:
       m_Calls: []

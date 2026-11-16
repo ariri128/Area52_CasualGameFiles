@@ -135,6 +135,35 @@ public class CoinBank : MonoBehaviour
     }
 
 
+    // WHILE THE GAME WAS CLOSED
+
+    // Every drop that would have happened while the game was closed, all at once - chests still stop at their cap
+    public void CatchUp(double secondsAway)
+    {
+        if (AlienRoster.main == null || dropInterval <= 0f) return;
+        long drops = (long)(secondsAway / dropInterval);
+        if (drops <= 0) return;
+
+        bool changed = false;
+        foreach (OwnedAlien alien in AlienRoster.main.All)
+        {
+            if (alien == null || alien.species == null || alien.IsAway) continue;
+
+            int coins = AlienMoods.main != null ? AlienMoods.main.CoinsPerDrop(alien) : alien.species.CoinsPerDrop;
+            if (coins <= 0) continue;
+
+            int before = ChestAmount(alien.roomIndex);
+            int after = (int)System.Math.Min(chestCapacity, before + coins * drops);
+            if (after == before) continue;
+
+            chests[alien.roomIndex] = after;
+            changed = true;
+        }
+
+        if (changed) onChanged.Invoke();
+    }
+
+
     // SAVING
 
     public void WriteTo(SaveData data)
