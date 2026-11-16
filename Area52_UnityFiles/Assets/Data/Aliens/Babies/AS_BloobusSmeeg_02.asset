@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Bloobus x Smeeg 2
   sprite: {fileID: -2083687655, guid: 6546188c8765f4dd6aead20469c7cb67, type: 3}
+  spriteEyesClosed: {fileID: 1792260611, guid: 8a5766b0865fa407cb1b04de70e96e1c, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: 45165f7e4984c4f9f86ff1fa1c63534c, type: 2}
     antenna: {fileID: 11400000, guid: beaf08a0607ca469895c92344f40a4dd, type: 2}

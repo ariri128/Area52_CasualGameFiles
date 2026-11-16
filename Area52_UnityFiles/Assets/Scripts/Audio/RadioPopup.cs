@@ -12,6 +12,10 @@ using UnityEngine.UI;
  *   - Owned rows are tinted, locked rows are grey
  * Tap a row to select it
  * Confirm makes the selected (owned) track the background music
+ * New UI:
+ *   Each row has a black waveform ("Wave") that fills with the white one ("Wave/Fill") as that track plays,
+ *   resets when the track loops, and stops where it is when the track is paused
+ *   Pause now pauses the preview where it is (play carries on from there) instead of stopping it
 */
 
 public class RadioPopup : MonoBehaviour
@@ -39,6 +43,10 @@ public class RadioPopup : MonoBehaviour
     private readonly List<GameObject> rows = new List<GameObject>();
     private MusicShop.Track selected;
     private MusicShop.Track previewing;
+    private bool previewPaused;
+
+    // Each row's white waveform and the track it belongs to, filled in every frame while the radio is open
+    private readonly List<(Image fill, MusicShop.Track track)> fills = new List<(Image, MusicShop.Track)>();
     private bool listening;
 
     public bool IsOpen => root != null && root.activeSelf;
@@ -101,6 +109,7 @@ public class RadioPopup : MonoBehaviour
     {
         foreach (GameObject row in rows) Destroy(row);
         rows.Clear();
+        fills.Clear();
 
         MusicShop shop = MusicShop.main;
         if (shop == null) return;
@@ -132,8 +141,20 @@ public class RadioPopup : MonoBehaviour
             {
                 Button playButton = play.GetComponent<Button>();
                 Image playImage = play.GetComponent<Image>();
-                if (playImage != null) playImage.sprite = track == previewing ? pauseSprite : playSprite;
+                bool playingNow = track == previewing && !previewPaused;
+                if (playImage != null) playImage.sprite = playingNow ? pauseSprite : playSprite;
                 if (playButton != null) playButton.onClick.AddListener(() => TogglePreview(thisTrack));
+            }
+
+            // The white waveform on top of the black one: Image Type = Filled, Horizontal, from the Left
+            Transform fill = row.transform.Find("Wave/Fill");
+            Image fillImage = fill != null ? fill.GetComponent<Image>() : null;
+            if (fillImage != null)
+            {
+                fillImage.type = Image.Type.Filled;
+                fillImage.fillMethod = Image.FillMethod.Horizontal;
+                fillImage.fillOrigin = (int)Image.OriginHorizontal.Left;
+                fills.Add((fillImage, thisTrack));
             }
 
             rows.Add(row.gameObject);
@@ -142,6 +163,14 @@ public class RadioPopup : MonoBehaviour
         bool selectedOwned = shop.IsOwned(selected);
         confirmButton.interactable = selected != null && selectedOwned && selected != shop.CurrentTrack;
         purchaseButton.interactable = selected != null && !selectedOwned && shop.CanAfford(selected);
+    }
+
+    // How far through each track is: moves while it plays, stays put while paused, goes back to empty when it loops
+    private void Update()
+    {
+        if (!IsOpen || AudioManager.main == null) return;
+        foreach ((Image fill, MusicShop.Track track) in fills)
+            if (fill != null) fill.fillAmount = AudioManager.main.ProgressOf(track.clip);
     }
 
     private void Select(MusicShop.Track track)
@@ -154,13 +183,23 @@ public class RadioPopup : MonoBehaviour
     {
         if (AudioManager.main == null || track.clip == null) return;
 
-        if (previewing == track)
+        if (previewing == track && !previewPaused)
         {
-            StopPreview(); // Pause button: back to the background music
+            // Pause button: the preview stops where it is, and the background music carries on
+            previewPaused = true;
+            AudioManager.main.PausePreview();
+        }
+        else if (previewing == track)
+        {
+            // Play on the paused one: carries on from where it was paused
+            previewPaused = false;
+            AudioManager.main.ResumePreview();
         }
         else
         {
-            previewing = track; // Play button: starts this one (stops any other preview)
+            // Play on a different track: starts it from the beginning (any other preview is dropped)
+            previewing = track;
+            previewPaused = false;
             AudioManager.main.PlayPreview(track.clip);
         }
         Rebuild();
@@ -170,6 +209,7 @@ public class RadioPopup : MonoBehaviour
     {
         if (previewing == null) return;
         previewing = null;
+        previewPaused = false;
         if (AudioManager.main != null) AudioManager.main.StopPreview();
     }
 

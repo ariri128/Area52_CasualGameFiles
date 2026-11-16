@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8385676347633002345}
   - component: {fileID: 8210046101862684104}
   - component: {fileID: 6345081348314583449}
+  - component: {fileID: -722451110840062970}
   m_Layer: 0
   m_Name: YarnRoom(new)
   m_TagString: Untagged
@@ -71,6 +72,19 @@ MonoBehaviour:
   searchStep: 0.1
   replaceNudgeDistance: 0.4
   logSummary: 1
+--- !u!114 &-722451110840062970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8997759054515737655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 559dd800a8be44e4f918ce765658bd81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoomPicture
+  picture: {fileID: 21300000, guid: 98006c302e5b542cea33a404def709e6, type: 3}
 --- !u!1001 &7513029770389564360
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Felt Chair
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 43d017ca38f3e4963a5433a3c908dbdb, type: 3}
   category: 1
   placement: 0
   prefab: {fileID: 5736965516973182296, guid: deb218b6174cf4378be78155eb14c4a2, type: 3}
   price: 100
+  facingOffset: 0

@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Yellow Side Table
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 2eae81e7c6a8b44928cf41015bb58e8a, type: 3}
   category: 3
   placement: 0
   prefab: {fileID: 2206259578316418690, guid: c637b5f033dd84f6097a2eafadc4e560, type: 3}
   price: 100
+  facingOffset: 0

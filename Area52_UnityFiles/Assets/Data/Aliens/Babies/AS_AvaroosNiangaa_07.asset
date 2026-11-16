@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Avaroos x Niangaa 7
   sprite: {fileID: -2083203779, guid: 2a846fe809c2f4892b01fad50ab1ec02, type: 3}
+  spriteEyesClosed: {fileID: -1433103683, guid: a9eaab75fe77a4172a66a971232fa8f8, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: b2e657727e6f547799de8e1426403e0b, type: 2}
     antenna: {fileID: 11400000, guid: 4558e5a194047409a92808241dd3d6b8, type: 2}

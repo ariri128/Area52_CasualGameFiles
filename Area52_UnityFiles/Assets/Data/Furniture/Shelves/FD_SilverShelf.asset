@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Silver Shelf
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 7dc85dd0a5490496691eae4f84762167, type: 3}
   category: 6
   placement: 0
   prefab: {fileID: 6782362501184489974, guid: c860fdd0e121e4d3c82c48a69d557f63, type: 3}
   price: 100
+  facingOffset: 0

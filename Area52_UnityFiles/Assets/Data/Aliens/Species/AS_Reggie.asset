@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Reggie
   sprite: {fileID: 1873837427, guid: a28c1a8ed0763495da8e07e9489ec0d7, type: 3}
+  spriteEyesClosed: {fileID: 476983357, guid: a28c1a8ed0763495da8e07e9489ec0d7, type: 3}
   rarities:
     body: 0
     antenna: 0

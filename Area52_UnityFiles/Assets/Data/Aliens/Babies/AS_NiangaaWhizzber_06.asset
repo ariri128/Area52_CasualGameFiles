@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Niangaa x Whizzber 6
   sprite: {fileID: -1654310130, guid: a779f9954a0e94e739202b7c8a86e8ca, type: 3}
+  spriteEyesClosed: {fileID: 1320342229, guid: c3a4924b7e7f7443381ff729fd82fd7e, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: 4558e5a194047409a92808241dd3d6b8, type: 2}
     antenna: {fileID: 11400000, guid: 84ea2c2d5b3f04e8bbd1300f0da4d951, type: 2}

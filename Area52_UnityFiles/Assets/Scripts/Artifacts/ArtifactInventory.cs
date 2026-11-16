@@ -88,11 +88,28 @@ public class ArtifactInventory : MonoBehaviour
 
     public bool IsRoomFull(int roomIndex) => CountInRoom(roomIndex) >= maxPerRoom;
 
+    // True if this is a one-per-room artifact and another copy is already in that room
+    public bool IsAlreadyInRoom(OwnedArtifact artifact, int roomIndex)
+    {
+        if (artifact == null || artifact.definition == null || !artifact.definition.onlyOnePerRoom) return false;
+        foreach (OwnedArtifact other in InRoom(roomIndex))
+            if (other != artifact && other.definition == artifact.definition) return true;
+        return false;
+    }
+
+    // Does this room have an artifact that keeps its aliens fed?
+    public bool KeepsRoomFed(int roomIndex)
+    {
+        foreach (OwnedArtifact artifact in InRoom(roomIndex))
+            if (artifact.definition.keepsRoomFed) return true;
+        return false;
+    }
+
     public bool CanPlace(OwnedArtifact artifact, int roomIndex)
     {
         if (artifact == null || artifact.roomIndex == roomIndex) return false;
         if (RoomManager.main != null && (roomIndex < 0 || roomIndex >= RoomManager.main.RoomCount)) return false;
-        return !IsRoomFull(roomIndex);
+        return !IsRoomFull(roomIndex) && !IsAlreadyInRoom(artifact, roomIndex);
     }
 
     // Puts an artifact in a room (or moves it there from another room) - returns false (and changes nothing) if it can't
@@ -179,6 +196,70 @@ public class ArtifactInventory : MonoBehaviour
     public void MarkSeen(OwnedArtifact artifact)
     {
         if (artifact != null) artifact.isNew = false;
+    }
+
+
+    // SAVING
+
+    public void WriteTo(SaveData data)
+    {
+        ArtifactsSave save = data.artifacts;
+        save.saved = true;
+        save.artifacts.Clear();
+
+        foreach (OwnedArtifact artifact in artifacts)
+        {
+            if (artifact == null || artifact.definition == null) continue;
+            save.artifacts.Add(new ArtifactSave
+            {
+                id = artifact.definition.name,
+                roomIndex = artifact.roomIndex,
+                isNew = artifact.isNew,
+            });
+        }
+    }
+
+    public void ReadFrom(SaveData data)
+    {
+        ArtifactsSave save = data.artifacts;
+        if (!save.saved) return; // A save from before artifacts were saved - keep the starting ones
+
+        int roomCount = RoomManager.main != null ? RoomManager.main.RoomCount : int.MaxValue;
+        artifacts.Clear();
+
+        foreach (ArtifactSave saved in save.artifacts)
+        {
+            ArtifactDefinition definition = FindDefinition(saved.id);
+            if (definition == null)
+            {
+                Debug.LogWarning($"Saved artifact \"{saved.id}\" isn't in the Artifact Catalog, so it was skipped.", this);
+                continue;
+            }
+
+            OwnedArtifact artifact = new OwnedArtifact
+            {
+                definition = definition,
+                roomIndex = saved.roomIndex < roomCount ? saved.roomIndex : -1, // A room that's gone = Unplaced
+                isNew = saved.isNew,
+            };
+            artifact.RefreshLabel();
+            artifacts.Add(artifact);
+        }
+
+        onChanged.Invoke(); // The room circles, the auto-feeder and moods all update
+    }
+
+    private ArtifactDefinition FindDefinition(string id)
+    {
+        if (catalog != null)
+            foreach (ArtifactDefinition definition in catalog.artifacts)
+                if (definition != null && definition.name == id) return definition;
+
+        // Starting artifacts set in the Inspector (still in the list while loading)
+        foreach (OwnedArtifact artifact in artifacts)
+            if (artifact != null && artifact.definition != null && artifact.definition.name == id) return artifact.definition;
+
+        return null;
     }
 
 

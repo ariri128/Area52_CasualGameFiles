@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Whizzber x Smeeeg 14
   sprite: {fileID: 294535205, guid: 1a3e015bca94a4c43a669df3208b4c9a, type: 3}
+  spriteEyesClosed: {fileID: 448490893, guid: 63ec3ce60c4b741bea73f37416849cf6, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: 84ea2c2d5b3f04e8bbd1300f0da4d951, type: 2}
     antenna: {fileID: 11400000, guid: 84ea2c2d5b3f04e8bbd1300f0da4d951, type: 2}

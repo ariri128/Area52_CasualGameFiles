@@ -105,10 +105,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9bc6c99d71e7b429d86ccbde4d87f674, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FloatingAlien
-  travelDistance: 2
   speed: 0.4
+  waitSeconds: {x: 0.5, y: 2.5}
+  clearance: 0.05
+  bodyWidth: 0.7
+  frontMargin: 0.3
+  minTrip: 0.5
   bobHeight: 0.06
   bobSpeed: 0.8
+  secondsBetweenBlinks: {x: 5, y: 6}
+  blinkSeconds: 0.2
   flipWhenTurning: 1
   artFacesLeft: 1
   tapBoxDepth: 0.2

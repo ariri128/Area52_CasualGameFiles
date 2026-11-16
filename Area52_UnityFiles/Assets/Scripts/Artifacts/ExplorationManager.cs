@@ -8,6 +8,11 @@ using UnityEngine.Events;
  *   After Explore Seconds, the ship brings it back and drops it off in its room, and a random artifact is added (Unplaced)
  * Only one alien per room can be out at a time: from the moment the ship is called until it has dropped the alien off and left
  * The sound also plays when the ship brings an alien back, wherever the player is
+ * For the save system:
+ *   The artifact is picked when the alien LEAVES (kept secret), and its rarity decides how long the trip takes:
+ *   Common 15 min, Uncommon 30 min, Rare 45 min (Inspector)
+ *   Timers use the real-world clock (SaveSystem.Now) and are saved, so trips keep going while the game is closed.
+ *   Once the time's up, the alien still only comes back when the player goes to its room
 */
 
 public class ExplorationManager : MonoBehaviour
@@ -21,12 +26,18 @@ public class ExplorationManager : MonoBehaviour
     {
         public OwnedAlien alien;
         public Phase phase;
-        public float returnAt;
+        public ArtifactDefinition found;   // Picked when it leaves - the player sees it when it comes back
+        public double returnAt;            // Real-world clock time it can come back
         public float readySince = -1f; // When the player started looking at its room with nothing open (-1 = not right now)
     }
 
-    [Tooltip("How long an alien is away, in seconds, counted from when the ship leaves the room.")]
-    [SerializeField] private float exploreSeconds = 15f;
+    [Header("Trip length (real-world seconds, from when the ship leaves) - the rarer the artifact, the longer")]
+    [Tooltip("900 = 15 minutes.")]
+    [SerializeField] private float commonExploreSeconds = 900f;
+    [Tooltip("1800 = 30 minutes.")]
+    [SerializeField] private float uncommonExploreSeconds = 1800f;
+    [Tooltip("2700 = 45 minutes.")]
+    [SerializeField] private float rareExploreSeconds = 2700f;
 
     [Header("Coming back")]
     [Tooltip("Once the time's up, the alien only comes back while the player is looking at its room with nothing open. " +
@@ -85,7 +96,32 @@ public class ExplorationManager : MonoBehaviour
     public float SecondsLeft(OwnedAlien alien)
     {
         Expedition expedition = FindExpedition(alien);
-        return expedition != null && expedition.phase == Phase.Away ? Mathf.Max(0f, expedition.returnAt - Time.time) : 0f;
+        return expedition != null && expedition.phase == Phase.Away ? (float)System.Math.Max(0.0, expedition.returnAt - SaveSystem.Now) : 0f;
+    }
+
+    // For the "Exploration Timer" text: true if an alien from this room is out exploring, with the seconds until it can come back
+    public bool TryGetRoomTimer(int roomIndex, out float secondsLeft)
+    {
+        foreach (Expedition expedition in expeditions)
+        {
+            if (expedition.alien.roomIndex != roomIndex || expedition.phase != Phase.Away) continue;
+            secondsLeft = (float)System.Math.Max(0.0, expedition.returnAt - SaveSystem.Now);
+            return true;
+        }
+        secondsLeft = 0f;
+        return false;
+    }
+
+    // Common 15 min, Uncommon 30 min, Rare 45 min (set in the Inspector)
+    private float ExploreSecondsFor(ArtifactDefinition artifact)
+    {
+        if (artifact == null) return commonExploreSeconds;
+        switch (artifact.rarity)
+        {
+            case ArtifactRarity.Uncommon: return uncommonExploreSeconds;
+            case ArtifactRarity.Rare: return rareExploreSeconds;
+            default: return commonExploreSeconds;
+        }
     }
 
     // Is an alien from this room already out (or the ship still coming / going)?
@@ -135,7 +171,11 @@ public class ExplorationManager : MonoBehaviour
         FloatingAlien visual = AlienRoomDisplay.main != null ? AlienRoomDisplay.main.Detach(alien) : null;
         if (visual != null) visual.Paused = true;
 
-        Expedition expedition = new Expedition { alien = alien, phase = Phase.PickingUp };
+        // What it'll find is decided now, so the trip can take longer for rarer artifacts
+        ArtifactDefinition found = ArtifactInventory.main != null && ArtifactInventory.main.Catalog != null
+            ? ArtifactInventory.main.Catalog.PickRandom() : null;
+
+        Expedition expedition = new Expedition { alien = alien, phase = Phase.PickingUp, found = found };
         expeditions.Add(expedition);
         AlienRoster.main.SetExploring(alien, true); // Counts as gone straight away: moods, coins and breeding all update
 
@@ -150,9 +190,10 @@ public class ExplorationManager : MonoBehaviour
     private void OnShipLeaving(Expedition expedition)
     {
         expedition.phase = Phase.Away;
-        expedition.returnAt = Time.time + exploreSeconds;
+        float seconds = ExploreSecondsFor(expedition.found);
+        expedition.returnAt = SaveSystem.Now + seconds;
         AudioManager.PlaySound(exploreSound, soundVolume);
-        Debug.Log($"{expedition.alien.DisplayName} went exploring ({exploreSeconds}s).", this);
+        Debug.Log($"{expedition.alien.DisplayName} went exploring ({seconds / 60f:0} minutes).", this);
     }
 
 
@@ -216,7 +257,7 @@ public class ExplorationManager : MonoBehaviour
             }
             if (expedition.readySince < 0f) expedition.readySince = Time.time;
 
-            bool timeUp = Time.time >= expedition.returnAt;
+            bool timeUp = SaveSystem.Now >= expedition.returnAt;
             bool readyLongEnough = Time.time - expedition.readySince >= returnDelay;
             if (timeUp && readyLongEnough) BringBack(expedition);
         }
@@ -250,7 +291,10 @@ public class ExplorationManager : MonoBehaviour
         // Picked BEFORE the alien is marked as back, so the roster's onChanged (from SetExploring) also
         // refreshes its file with the new artifact - no second onChanged, which would respawn the room's
         // aliens and cut off the fly-in below
-        OwnedArtifact found = ArtifactInventory.main != null ? ArtifactInventory.main.AddRandom() : null;
+        // The artifact picked when it left (a random one if that's missing, e.g. it was removed from the catalog)
+        OwnedArtifact found = null;
+        if (ArtifactInventory.main != null)
+            found = expedition.found != null ? ArtifactInventory.main.Add(expedition.found) : ArtifactInventory.main.AddRandom();
         if (found != null && found.definition != null) alien.collectedArtifacts.Add(found.definition);
 
         // Back in the roster -> the room spawns it again, then it comes out of the glass to its spot
@@ -272,6 +316,76 @@ public class ExplorationManager : MonoBehaviour
     }
 
 
+    // SAVING
+
+    public void WriteTo(SaveData data)
+    {
+        ExplorationSave save = data.exploration;
+        save.saved = true;
+        save.trips.Clear();
+        if (AlienRoster.main == null) return;
+
+        foreach (Expedition expedition in expeditions)
+        {
+            int alienIndex = AlienRoster.main.SaveIndexOf(expedition.alien);
+            if (alienIndex < 0) continue;
+
+            // Still being picked up: its time starts as if the ship left now. Being dropped off: time's already up
+            double returnAt = expedition.phase == Phase.PickingUp ? SaveSystem.Now + ExploreSecondsFor(expedition.found)
+                            : expedition.phase == Phase.Returning ? SaveSystem.Now
+                            : expedition.returnAt;
+
+            save.trips.Add(new TripSave
+            {
+                alien = alienIndex,
+                found = expedition.found != null ? expedition.found.name : "",
+                returnAt = returnAt,
+            });
+        }
+    }
+
+    // Runs after the aliens and artifacts are loaded. Every trip is "away": the alien comes back once its
+    // time is up AND the player goes to its room (Update handles that, like normal)
+    public void ReadFrom(SaveData data)
+    {
+        ExplorationSave save = data.exploration;
+        AlienRoster roster = AlienRoster.main;
+        if (roster == null) return;
+
+        expeditions.Clear();
+        if (save.saved)
+        {
+            foreach (TripSave trip in save.trips)
+            {
+                OwnedAlien alien = roster.FromSaveIndex(trip.alien);
+                if (alien == null || FindExpedition(alien) != null) continue;
+
+                expeditions.Add(new Expedition
+                {
+                    alien = alien,
+                    phase = Phase.Away,
+                    found = FindArtifact(trip.found),
+                    returnAt = trip.returnAt,
+                });
+                if (!alien.isExploring) roster.SetExploring(alien, true);
+            }
+        }
+
+        // Anyone marked as exploring without a trip comes home
+        foreach (OwnedAlien alien in roster.All)
+            if (alien != null && alien.isExploring && FindExpedition(alien) == null) roster.SetExploring(alien, false);
+    }
+
+    private static ArtifactDefinition FindArtifact(string id)
+    {
+        ArtifactCatalog catalog = ArtifactInventory.main != null ? ArtifactInventory.main.Catalog : null;
+        if (string.IsNullOrEmpty(id) || catalog == null) return null;
+        foreach (ArtifactDefinition artifact in catalog.artifacts)
+            if (artifact != null && artifact.name == id) return artifact;
+        return null;
+    }
+
+
     // TESTING
 
     // Only skips the time - it still waits for the player to be in the room with nothing open
@@ -279,7 +393,7 @@ public class ExplorationManager : MonoBehaviour
     private void ReturnAllForTesting()
     {
         foreach (Expedition expedition in expeditions)
-            if (expedition.phase == Phase.Away) expedition.returnAt = Time.time;
+            if (expedition.phase == Phase.Away) expedition.returnAt = SaveSystem.Now;
     }
 
     [ContextMenu("Testing: Print Expeditions")]
@@ -292,7 +406,7 @@ public class ExplorationManager : MonoBehaviour
             string status = expedition.phase.ToString();
             if (expedition.phase == Phase.Away)
             {
-                float left = expedition.returnAt - Time.time;
+                float left = (float)(expedition.returnAt - SaveSystem.Now);
                 if (left > 0f) status += $", {left:0.0}s left";
                 else if (!IsPlayerLookingAt(expedition.alien.roomIndex)) status += ", time's up - waiting for the player to go to its room";
                 else if (IsAnyUIOpen()) status += ", time's up - waiting for the UI to close";

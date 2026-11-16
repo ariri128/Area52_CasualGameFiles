@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Orb Lamp
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: f1e26937daf1646e6ad628eed3901779, type: 3}
   category: 7
   placement: 0
   prefab: {fileID: 3604733134676964204, guid: 1e2b1227fffa24d4d9f6f82643037e10, type: 3}
   price: 100
+  facingOffset: 0

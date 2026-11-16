@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactDefinition
   displayName: Sheath of Shoes
   sprite: {fileID: 21300000, guid: dd712cb9236454d8092156d3b2104938, type: 3}
-  findWeight: 1
+  findWeight: 0.6
   rarity: 2
+  keepsRoomFed: 0
+  onlyOnePerRoom: 0

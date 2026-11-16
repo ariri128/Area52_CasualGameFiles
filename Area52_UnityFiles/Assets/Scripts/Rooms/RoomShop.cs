@@ -58,4 +58,12 @@ public class RoomShop : MonoBehaviour
         Debug.Log($"Bought {offer.displayName} for {offer.cost} coins. It's Room {roomNumber}.", this);
         return index;
     }
+
+    // For loading saves: the room prefab with this name, from the offers (null if none)
+    public GameObject FindPrefab(string prefabName)
+    {
+        foreach (Offer offer in offers)
+            if (offer.roomPrefab != null && offer.roomPrefab.name == prefabName) return offer.roomPrefab;
+        return null;
+    }
 }

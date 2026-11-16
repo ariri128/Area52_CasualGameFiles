@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Wood Shelf
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: d62e8657348ed4bd5bb78ff1eb7f77bd, type: 3}
   category: 6
   placement: 0
   prefab: {fileID: 4418721317910301365, guid: a227582c1059f47edb1f652c26dd2216, type: 3}
   price: 100
+  facingOffset: 0

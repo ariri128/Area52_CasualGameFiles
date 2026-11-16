@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8340678673268907968}
   - component: {fileID: 6835860348721670427}
   - component: {fileID: 1752084936183319458}
+  - component: {fileID: -4756086491925554774}
   m_Layer: 0
   m_Name: BrickRoom
   m_TagString: Untagged
@@ -74,6 +75,19 @@ MonoBehaviour:
   searchStep: 0.1
   replaceNudgeDistance: 0.4
   logSummary: 1
+--- !u!114 &-4756086491925554774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5949723114828645183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 559dd800a8be44e4f918ce765658bd81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoomPicture
+  picture: {fileID: 21300000, guid: ec33e2adb85624a60b68098385321ae4, type: 3}
 --- !u!1001 &2309475360076445217
 PrefabInstance:
   m_ObjectHideFlags: 0

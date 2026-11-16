@@ -4,6 +4,8 @@ using System.Collections.Generic;
 /*
  * Shows each owned alien floating in its room, using the AlienRoster
  * Each spawned alien is told which owned alien it is, so tapping it can open the right file
+ * The spots are where each alien STARTS - from there they roam the room (see FloatingAlien)
+ * Aliens keep their place when the room is refreshed
 */
 
 public class AlienRoomDisplay : MonoBehaviour
@@ -65,10 +67,18 @@ public class AlienRoomDisplay : MonoBehaviour
     }
 
     // Clears every room's aliens and spawns them again
+    // Aliens that stay in the same room carry on from where they were instead of jumping back to their starting spot
     private void Refresh()
     {
+        Dictionary<OwnedAlien, (RoomFurnitureDetector room, Vector3 floor)> wereAt =
+            new Dictionary<OwnedAlien, (RoomFurnitureDetector, Vector3)>();
+
         foreach (FloatingAlien alien in spawned)
-            if (alien != null) Destroy(alien.gameObject);
+        {
+            if (alien == null) continue;
+            if (alien.Owner != null && alien.Room != null && !alien.Flying) wereAt[alien.Owner] = (alien.Room, alien.FloorPosition);
+            Destroy(alien.gameObject);
+        }
         spawned.Clear();
 
         for (int roomIndex = 0; roomIndex < RoomManager.main.RoomCount; roomIndex++)
@@ -86,6 +96,8 @@ public class AlienRoomDisplay : MonoBehaviour
                 FloatingAlien alien = Instantiate(alienPrefab, worldSpot, Quaternion.identity, room.transform);
                 alien.name = $"Alien_{aliensHere[i].DisplayName}";
                 alien.Setup(aliensHere[i]);
+                if (wereAt.TryGetValue(aliensHere[i], out var before) && before.room == alien.Room)
+                    alien.ContinueFrom(before.floor);
 
                 spawned.Add(alien);
             }

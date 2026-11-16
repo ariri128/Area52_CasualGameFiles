@@ -128,6 +128,7 @@ public class RoomFurnitureDetector : MonoBehaviour
     private void CollectStartingPieces()
     {
         items.Clear();
+        Dictionary<string, int> seen = new Dictionary<string, int>();
         foreach (FurnitureItem item in GetComponentsInChildren<FurnitureItem>(true))
         {
             if (item.Definition == null)
@@ -135,6 +136,13 @@ public class RoomFurnitureDetector : MonoBehaviour
                 Debug.LogWarning($"{name}: {item.name} has a FurnitureItem but no Definition, so it'll be ignored.", item);
                 continue;
             }
+
+            // Remembers which starting piece this is, so a save can put this exact piece back
+            string path = PathTo(item.transform);
+            seen[path] = seen.TryGetValue(path, out int count) ? count + 1 : 0;
+            item.OriginRoom = this;
+            item.OriginPath = seen[path] == 0 ? path : $"{path}#{seen[path]}";
+
             Register(item);
         }
 
@@ -144,6 +152,15 @@ public class RoomFurnitureDetector : MonoBehaviour
         if (FloorItemCount > maxFloorItems)
             Debug.LogWarning($"{name} starts with {FloorItemCount} standing pieces, more than its limit of {maxFloorItems}. " +
                              "It'll work, but the player can't add more until some are removed.", this);
+    }
+
+    // "Furniture/Couch" - the names from this room down to the piece
+    private string PathTo(Transform piece)
+    {
+        string path = piece.name;
+        for (Transform t = piece.parent; t != null && t != transform; t = t.parent)
+            path = t.name + "/" + path;
+        return path;
     }
 
 
@@ -463,6 +480,32 @@ public class RoomFurnitureDetector : MonoBehaviour
     {
         float dx = a.x - b.x, dz = a.z - b.z;
         return Mathf.Sqrt(dx * dx + dz * dz);
+    }
+
+
+    // SAVING
+
+    // Puts every piece in this room into storage - the saved layout is put back right after
+    public void ClearForLoad()
+    {
+        FurnitureInventory inventory = FurnitureInventory.main;
+        if (inventory == null) return;
+
+        foreach (FurnitureItem item in new List<FurnitureItem>(items))
+        {
+            Unregister(item);
+            if (item != null) inventory.Store(item);
+        }
+    }
+
+    // Puts a piece back exactly where it was saved
+    // Parented the same way as adding a piece during play, so its size stays exactly what it was
+    public void PlaceForLoad(FurnitureItem piece, Vector3 localPosition, Quaternion localRotation)
+    {
+        piece.transform.SetParent(transform, true);
+        piece.transform.position = transform.TransformPoint(localPosition);
+        piece.transform.rotation = transform.rotation * localRotation;
+        Register(piece);
     }
 
 

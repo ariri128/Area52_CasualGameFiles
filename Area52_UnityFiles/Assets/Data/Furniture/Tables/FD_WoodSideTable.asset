@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Wood Side Table
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 1dc907f14b25c44f79023e56e02152ff, type: 3}
   category: 3
   placement: 0
   prefab: {fileID: 2701533773988707423, guid: 2ce65e27d57f743f79ee2ca32fdad86e, type: 3}
   price: 100
+  facingOffset: 0

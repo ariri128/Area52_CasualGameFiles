@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactDefinition
   displayName: Teal Space Dirt
   sprite: {fileID: 21300000, guid: 4b35e6c1d63204748b567ab2137a1c6d, type: 3}
-  findWeight: 1
+  findWeight: 1.5
   rarity: 0
+  keepsRoomFed: 0
+  onlyOnePerRoom: 0

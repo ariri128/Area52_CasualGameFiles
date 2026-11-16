@@ -70,7 +70,10 @@ public class BreedingSelectionUI : MonoBehaviour
         if (seconds != lastSecondShown)
         {
             lastSecondShown = seconds;
-            SetButtonText(string.Format(breedingText, seconds));
+            string time = seconds >= 3600
+                ? $"{seconds / 3600}:{seconds / 60 % 60:00}:{seconds % 60:00}"   // 1:29:59
+                : $"{seconds / 60:00}:{seconds % 60:00}";                       // 29:59
+            SetButtonText(string.Format(breedingText, time));
         }
     }
 

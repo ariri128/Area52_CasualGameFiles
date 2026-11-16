@@ -7,6 +7,7 @@ using UnityEditor.U2D.Sprites;
 
 /*
  * Adds a "Cut Sheet and Make Babies" button to Combo Sheet files
+ * Also cuts the eyes-closed sheet (if there is one) and gives each baby its eyes-closed sprite for the walking animation
 */
 
 [CustomEditor(typeof(ComboSheet))]
@@ -23,20 +24,15 @@ public class ComboSheetEditor : Editor
             Build((ComboSheet)target);
     }
 
-    private static void Build(ComboSheet comboSheet)
+    // Cuts one sheet into a sprite per cell (null where a cell is empty)
+    private static Sprite[] CutSheet(Texture2D sheet, ComboSheet comboSheet)
     {
-        if (comboSheet.sheet == null || comboSheet.bodyFrom == null || comboSheet.otherParent == null)
-        {
-            Debug.LogError("Combo Sheet needs Sheet, Body From and Other Parent filled in.", comboSheet);
-            return;
-        }
-
-        string sheetPath = AssetDatabase.GetAssetPath(comboSheet.sheet);
+        string sheetPath = AssetDatabase.GetAssetPath(sheet);
         TextureImporter importer = AssetImporter.GetAtPath(sheetPath) as TextureImporter;
         if (importer == null)
         {
             Debug.LogError($"{sheetPath} isn't an image Unity can import.", comboSheet);
-            return;
+            return null;
         }
 
         // Import settings
@@ -78,7 +74,7 @@ public class ComboSheetEditor : Editor
 
         bool useBands = columnBands.Count == comboSheet.columns && rowBands.Count == comboSheet.rows;
         if (!useBands)
-            Debug.LogWarning($"{comboSheet.sheet.name}: found {columnBands.Count} x {rowBands.Count} drawings " +
+            Debug.LogWarning($"{sheet.name}: found {columnBands.Count} x {rowBands.Count} drawings " +
                              $"instead of {comboSheet.columns} x {comboSheet.rows}, so it's cut on an even grid instead. " +
                              "Check the babies don't get cut off.", comboSheet);
 
@@ -126,7 +122,7 @@ public class ComboSheetEditor : Editor
             maxX = Mathf.Min(width - 1, maxX + 2);
             maxY = Mathf.Min(height - 1, maxY + 2);
 
-            string spriteName = $"{comboSheet.sheet.name}_{cell}";
+            string spriteName = $"{sheet.name}_{cell}";
             SpriteRect rect = oldRects.TryGetValue(spriteName, out SpriteRect existing)
                 ? existing
                 : new SpriteRect { spriteID = GUID.Generate() };
@@ -148,20 +144,40 @@ public class ComboSheetEditor : Editor
         provider.Apply();
         importer.SaveAndReimport();
 
-        // One baby file per cell
         Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
         foreach (Sprite sprite in AssetDatabase.LoadAllAssetsAtPath(sheetPath).OfType<Sprite>())
             sprites[sprite.name] = sprite;
 
+        Sprite[] result = new Sprite[cellCount];
+        for (int cell = 0; cell < cellCount; cell++)
+            if (spriteNames[cell] != null && sprites.TryGetValue(spriteNames[cell], out Sprite sprite)) result[cell] = sprite;
+        return result;
+    }
+
+    private static void Build(ComboSheet comboSheet)
+    {
+        if (comboSheet.sheet == null || comboSheet.bodyFrom == null || comboSheet.otherParent == null)
+        {
+            Debug.LogError("Combo Sheet needs Sheet, Body From and Other Parent filled in.", comboSheet);
+            return;
+        }
+
+        Sprite[] open = CutSheet(comboSheet.sheet, comboSheet);
+        if (open == null) return;
+
+        // The eyes-closed sheet is cut the same way, so cell 3 on one is cell 3 on the other
+        Sprite[] closed = comboSheet.sheetEyesClosed != null ? CutSheet(comboSheet.sheetEyesClosed, comboSheet) : null;
+
+        // One baby file per cell
         EnsureFolder(comboSheet.outputFolder);
 
         AlienSpecies body = comboSheet.bodyFrom;
         AlienSpecies other = comboSheet.otherParent;
         int made = 0, updated = 0, skipped = 0;
 
-        for (int cell = 0; cell < cellCount && cell < ComboSheet.Layout.Length; cell++)
+        for (int cell = 0; cell < open.Length && cell < ComboSheet.Layout.Length; cell++)
         {
-            if (spriteNames[cell] == null || !sprites.ContainsKey(spriteNames[cell])) continue;
+            if (open[cell] == null) continue;
 
             string layout = ComboSheet.Layout[cell];
             AlienSpecies antenna = Pick(layout[0], comboSheet.reversed, body, other);
@@ -183,7 +199,8 @@ public class ComboSheetEditor : Editor
             if (isNew) baby = ScriptableObject.CreateInstance<AlienSpecies>();
 
             baby.displayName = $"{body.displayName} x {other.displayName} {cell + 1}";
-            baby.sprite = sprites[spriteNames[cell]];
+            baby.sprite = open[cell];
+            if (closed != null && cell < closed.Length && closed[cell] != null) baby.spriteEyesClosed = closed[cell];
             baby.traitsFrom = new TraitOrigins { body = body, antenna = antenna, legs = legs, eyes = eyes, mouth = mouth };
 
             if (isNew) { AssetDatabase.CreateAsset(baby, assetPath); made++; }

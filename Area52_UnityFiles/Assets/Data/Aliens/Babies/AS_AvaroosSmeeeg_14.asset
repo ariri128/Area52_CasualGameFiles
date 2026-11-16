@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Avaroos x Smeeeg 14
   sprite: {fileID: -537306297, guid: 4dad36530c1c545778f9770821184136, type: 3}
+  spriteEyesClosed: {fileID: 1321877470, guid: 68b90d2e474424e21bd6c163994061ec, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: b2e657727e6f547799de8e1426403e0b, type: 2}
     antenna: {fileID: 11400000, guid: b2e657727e6f547799de8e1426403e0b, type: 2}

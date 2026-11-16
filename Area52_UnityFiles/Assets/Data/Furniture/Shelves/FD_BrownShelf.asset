@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Brown Shelf
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: a4e5221b421fb44aa8b1869666463541, type: 3}
   category: 6
   placement: 0
   prefab: {fileID: 5711926646495373481, guid: 395819ce7faa04668a332938dfdaa7ac, type: 3}
   price: 100
+  facingOffset: 0

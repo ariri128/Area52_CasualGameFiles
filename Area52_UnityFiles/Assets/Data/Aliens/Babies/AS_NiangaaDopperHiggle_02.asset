@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Niangaa x Dopper Higgle 2
   sprite: {fileID: -1327667127, guid: ba1491a01834a4d07b755d459839b87e, type: 3}
+  spriteEyesClosed: {fileID: -1863078026, guid: c70f1bf6ca241467fb0dc93c1c2f552d, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: 4558e5a194047409a92808241dd3d6b8, type: 2}
     antenna: {fileID: 11400000, guid: b53999fbf53f14f63928aa63be600404, type: 2}

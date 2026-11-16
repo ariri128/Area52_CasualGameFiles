@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Avaroos x Bloobus 1
   sprite: {fileID: -1233962171, guid: 1735b26135e5a4de8b765ae258ab6d5a, type: 3}
+  spriteEyesClosed: {fileID: -1526930838, guid: 938a38c2ffda14700956fb7ba383bc1b, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: b2e657727e6f547799de8e1426403e0b, type: 2}
     antenna: {fileID: 11400000, guid: 45165f7e4984c4f9f86ff1fa1c63534c, type: 2}

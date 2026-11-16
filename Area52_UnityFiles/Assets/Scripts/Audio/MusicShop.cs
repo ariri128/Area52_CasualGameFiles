@@ -91,4 +91,45 @@ public class MusicShop : MonoBehaviour
         onChanged.Invoke();
         return true;
     }
+
+
+    // SAVING
+
+    public void WriteTo(SaveData data)
+    {
+        MusicSave save = data.music;
+        save.saved = true;
+        save.owned.Clear();
+        foreach (Track track in tracks)
+            if (owned.Contains(track)) save.owned.Add(track.displayName);
+        save.current = CurrentTrack != null ? CurrentTrack.displayName : "";
+    }
+
+    // Runs before Start, so Start then plays the loaded track
+    public void ReadFrom(SaveData data)
+    {
+        MusicSave save = data.music;
+        if (!save.saved) return; // A save from before music was saved - keep the starting tracks
+
+        foreach (string name in save.owned)
+        {
+            Track track = FindTrack(name);
+            if (track != null) owned.Add(track); // Added to the starting ones, so a default track is never lost
+        }
+
+        Track current = FindTrack(save.current);
+        if (current != null && owned.Contains(current) && current.clip != null)
+        {
+            CurrentTrack = current;
+            if (AudioManager.main != null) AudioManager.main.SetMusic(current.clip);
+        }
+        onChanged.Invoke();
+    }
+
+    private Track FindTrack(string name)
+    {
+        foreach (Track track in tracks)
+            if (track.displayName == name) return track;
+        return null;
+    }
 }

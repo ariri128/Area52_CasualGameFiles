@@ -11,6 +11,9 @@ public class ComboSheet : ScriptableObject
     [Tooltip("The sheet PNG.")]
     public Texture2D sheet;
 
+    [Tooltip("The matching eyes-closed sheet (the _2 file). Cut the same way, so each baby gets both poses.")]
+    public Texture2D sheetEyesClosed;
+
     [Tooltip("The alien whose BODY every baby on this sheet has.")]
     public AlienSpecies bodyFrom;
 

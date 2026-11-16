@@ -106,7 +106,10 @@ public class DailyCoinRow : MonoBehaviour
         if (daily.WaitingForNewDay)
         {
             int seconds = Mathf.CeilToInt(daily.SecondsUntilNewDay);
-            adsLeftText.text = string.Format(comeBackFormat, $"{seconds / 60}:{seconds % 60:00}"); // 119 -> 1:59
+            string time = seconds >= 3600
+                ? $"{seconds / 3600}:{seconds / 60 % 60:00}:{seconds % 60:00}" // 43199 -> 11:59:59
+                : $"{seconds / 60}:{seconds % 60:00}"; // 119 -> 1:59
+            adsLeftText.text = string.Format(comeBackFormat, time);
         }
         else
         {

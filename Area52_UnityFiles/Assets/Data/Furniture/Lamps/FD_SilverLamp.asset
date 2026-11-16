@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Silver Lamp
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 16ddabf903aea43d9ae98926ef3206b2, type: 3}
   category: 7
   placement: 0
   prefab: {fileID: 7286511808593344892, guid: b72bdf8b5a1784ace8c20148a12778a4, type: 3}
   price: 100
+  facingOffset: 0

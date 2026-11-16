@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Dopper Higgle x Smeeeg 8
   sprite: {fileID: 655174186, guid: d27ac33d563a94000a87eaf8a1bf1ccc, type: 3}
+  spriteEyesClosed: {fileID: 353528766, guid: 169cd0d4b583848ac94d9f881a34aadd, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: b53999fbf53f14f63928aa63be600404, type: 2}
     antenna: {fileID: 11400000, guid: beaf08a0607ca469895c92344f40a4dd, type: 2}

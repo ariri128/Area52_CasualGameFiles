@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Whizzber x Dopper Higgle 3
   sprite: {fileID: -772171325, guid: 2d5ed087601c04e58b0186ef0f196aee, type: 3}
+  spriteEyesClosed: {fileID: -1605836723, guid: 27d67c8ba20b94e73b2ff316c6c95e14, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: 84ea2c2d5b3f04e8bbd1300f0da4d951, type: 2}
     antenna: {fileID: 11400000, guid: b53999fbf53f14f63928aa63be600404, type: 2}

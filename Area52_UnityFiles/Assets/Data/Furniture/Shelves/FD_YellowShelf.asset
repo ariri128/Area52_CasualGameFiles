@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Yellow Shelf
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 65b346d41062045fe941a3cb7e1d1197, type: 3}
   category: 6
   placement: 0
   prefab: {fileID: 2744461995326742120, guid: e6b072b52fa6b4c22958363bbd12db9a, type: 3}
   price: 100
+  facingOffset: 0

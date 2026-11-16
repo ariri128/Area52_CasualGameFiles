@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Alien Lamp
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 635b1d13e7f924b848c1cb4c71a2a365, type: 3}
   category: 7
   placement: 0
   prefab: {fileID: 7624029658777014385, guid: 72f2f5034aa09424f8be8de23c4f717a, type: 3}
+  price: 100
+  facingOffset: 0

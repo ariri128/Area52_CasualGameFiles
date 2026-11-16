@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Silver Couch
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 2f6edcfbe9265470b8a613448e964f3b, type: 3}
   category: 0
   placement: 0
   prefab: {fileID: 2824683254763368866, guid: e97d935d6d94140b492271610a1de772, type: 3}
   price: 100
+  facingOffset: 0

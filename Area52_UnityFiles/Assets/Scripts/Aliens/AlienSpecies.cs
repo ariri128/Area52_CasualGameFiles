@@ -61,6 +61,10 @@ public class AlienSpecies : ScriptableObject
     [Tooltip("Picture used in the rooms and in the breeding boxes. For now, the left pose.")]
     public Sprite sprite;
 
+    [Tooltip("Same picture with the eyes closed and legs moved. The alien swaps between the two to look animated. " +
+             "Leave empty and it won't animate.")]
+    public Sprite spriteEyesClosed;
+
     [Header("Original aliens only")]
     [Tooltip("How rare each of this alien's traits is. Only used on the four original aliens.")]
     public TraitRarities rarities = new TraitRarities();

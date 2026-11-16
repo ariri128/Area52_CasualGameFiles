@@ -48,6 +48,9 @@ public class CoinBank : MonoBehaviour
 
         Wallet = startingCoins;
         nextDropAt = Time.time + dropInterval;
+
+        // Switched on after the game loaded (it's inside the wallet panel)? Read the saved part now
+        if (SaveSystem.TryGetLoaded(out SaveData saved)) ReadFrom(saved);
     }
 
     private void OnDestroy()
@@ -129,5 +132,54 @@ public class CoinBank : MonoBehaviour
         onChanged.Invoke();
         AudioManager.PlayPurchase(); // Every shop spends through here, so every purchase gets the sound
         return true;
+    }
+
+
+    // WHILE THE GAME WAS CLOSED
+
+    // Every drop that would have happened while the game was closed, all at once - chests still stop at their cap
+    public void CatchUp(double secondsAway)
+    {
+        if (AlienRoster.main == null || dropInterval <= 0f) return;
+        long drops = (long)(secondsAway / dropInterval);
+        if (drops <= 0) return;
+
+        bool changed = false;
+        foreach (OwnedAlien alien in AlienRoster.main.All)
+        {
+            if (alien == null || alien.species == null || alien.IsAway) continue;
+
+            int coins = AlienMoods.main != null ? AlienMoods.main.CoinsPerDrop(alien) : alien.species.CoinsPerDrop;
+            if (coins <= 0) continue;
+
+            int before = ChestAmount(alien.roomIndex);
+            int after = (int)System.Math.Min(chestCapacity, before + coins * drops);
+            if (after == before) continue;
+
+            chests[alien.roomIndex] = after;
+            changed = true;
+        }
+
+        if (changed) onChanged.Invoke();
+    }
+
+
+    // SAVING
+
+    public void WriteTo(SaveData data)
+    {
+        data.coins.wallet = Wallet;
+        data.coins.chests.Clear();
+        foreach (KeyValuePair<int, int> chest in chests)
+            data.coins.chests.Add(new ChestSave { roomIndex = chest.Key, coins = chest.Value });
+    }
+
+    public void ReadFrom(SaveData data)
+    {
+        Wallet = data.coins.wallet;
+        chests.Clear();
+        foreach (ChestSave chest in data.coins.chests)
+            chests[chest.roomIndex] = Mathf.Min(chestCapacity, chest.coins);
+        onChanged.Invoke();
     }
 }

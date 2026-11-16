@@ -22,4 +22,11 @@ public class ArtifactDefinition : ScriptableObject
     [Tooltip("Decides what it sells for and which shop option (Common / Uncommon / Rare) it can be bought from. " +
              "The prices themselves are on the Price List.")]
     public ArtifactRarity rarity = ArtifactRarity.Common;
+
+    [Header("Special powers")]
+    [Tooltip("Keeps every alien in the room it's placed in fully fed.")]
+    public bool keepsRoomFed;
+
+    [Tooltip("Only one of this artifact can be placed in a room at a time.")]
+    public bool onlyOnePerRoom;
 }

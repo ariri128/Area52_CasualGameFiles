@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1525119789953266516}
   - component: {fileID: 952238753778642629}
   - component: {fileID: 3691043705726640657}
+  - component: {fileID: -8599104663417665673}
   m_Layer: 0
   m_Name: Sci-Fi_Room
   m_TagString: Untagged
@@ -71,6 +72,19 @@ MonoBehaviour:
   searchStep: 0.1
   replaceNudgeDistance: 0.4
   logSummary: 1
+--- !u!114 &-8599104663417665673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 705806786629896021}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 559dd800a8be44e4f918ce765658bd81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoomPicture
+  picture: {fileID: 21300000, guid: 8ea5440a94e6b4df38cbd95793e32720, type: 3}
 --- !u!1001 &3017191933743759937
 PrefabInstance:
   m_ObjectHideFlags: 0

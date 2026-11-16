@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Yarn Couch
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 5bb73f02072b34991bfb6d96cb6920ce, type: 3}
   category: 0
   placement: 0
   prefab: {fileID: 9156742522479916787, guid: 3d48c9bea5915496fb35a9be9ee0a364, type: 3}
   price: 100
+  facingOffset: 0

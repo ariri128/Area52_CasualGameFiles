@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Whizzber x Bloobus 6
   sprite: {fileID: -290594425, guid: 0ffba45ac5df04199b1ab4f02d86a047, type: 3}
+  spriteEyesClosed: {fileID: -81518630, guid: a3205e1dd32974531b4a36356280f2ea, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: 84ea2c2d5b3f04e8bbd1300f0da4d951, type: 2}
     antenna: {fileID: 11400000, guid: 45165f7e4984c4f9f86ff1fa1c63534c, type: 2}

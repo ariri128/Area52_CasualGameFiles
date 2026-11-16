@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactDefinition
   displayName: Orange Space Rock
   sprite: {fileID: 21300000, guid: 2e1ae19bbe407457b9113a42c01d9abe, type: 3}
-  findWeight: 1
+  findWeight: 1.5
   rarity: 0
+  keepsRoomFed: 0
+  onlyOnePerRoom: 0

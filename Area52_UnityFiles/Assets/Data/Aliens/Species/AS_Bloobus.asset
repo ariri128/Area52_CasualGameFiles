@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Bloobus
   sprite: {fileID: -711774984, guid: 01afc17f8305243c0b448345dc2c922f, type: 3}
+  spriteEyesClosed: {fileID: 2015464504, guid: 01afc17f8305243c0b448345dc2c922f, type: 3}
   rarities:
     body: 0
     antenna: 0
