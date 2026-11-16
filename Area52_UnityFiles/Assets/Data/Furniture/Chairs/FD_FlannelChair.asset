@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Flannel Chair
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 58c872a3ab4f14bcd9fba137a60d3dc8, type: 3}
   category: 1
   placement: 0
   prefab: {fileID: 7806280188059688348, guid: 6064c38a2f0ad46c1afde4ce2cc0b6f1, type: 3}
   price: 100
+  facingOffset: 0

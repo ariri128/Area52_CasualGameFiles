@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Felt Lamp
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: a6d0da29ef76c479f98f68780e610724, type: 3}
   category: 7
   placement: 0
   prefab: {fileID: 8594873494437760495, guid: adc63628dc93746c495669e3624afb70, type: 3}
   price: 100
+  facingOffset: 0

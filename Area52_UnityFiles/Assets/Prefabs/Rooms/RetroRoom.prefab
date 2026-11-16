@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6533587719210398306}
   - component: {fileID: 2668987529091616667}
   - component: {fileID: 5251674322942474852}
+  - component: {fileID: -5854391990649378214}
   m_Layer: 0
   m_Name: RetroRoom
   m_TagString: Untagged
@@ -75,6 +76,19 @@ MonoBehaviour:
   searchStep: 0.1
   replaceNudgeDistance: 0.4
   logSummary: 1
+--- !u!114 &-5854391990649378214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6021252760031855509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 559dd800a8be44e4f918ce765658bd81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoomPicture
+  picture: {fileID: 21300000, guid: f5b13cb55144044aa8989df46b070212, type: 3}
 --- !u!1001 &1403865571820821648
 PrefabInstance:
   m_ObjectHideFlags: 0

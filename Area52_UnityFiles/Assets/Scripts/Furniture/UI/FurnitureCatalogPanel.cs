@@ -173,7 +173,7 @@ public class FurnitureCatalogPanel : MonoBehaviour
             FurnitureSlotUI slot = Instantiate(slotTemplate, gridContainer);
             slot.gameObject.SetActive(true);
             FurnitureDefinition thisDefinition = definition;
-            slot.Setup(definition, definition.icon, definition.displayName, count, affordable, () => Select(thisDefinition));
+            slot.Setup(definition, definition.Picture, definition.displayName, count, affordable, () => Select(thisDefinition));
             slot.SetPrice(definition.price);
             slots.Add(slot);
 

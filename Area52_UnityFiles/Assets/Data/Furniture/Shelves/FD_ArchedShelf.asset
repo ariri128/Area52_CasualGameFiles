@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Arched Shelf
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 3ee38566b869d4bec8a3253b8475b9c5, type: 3}
   category: 6
   placement: 0
   prefab: {fileID: 4606750875742692414, guid: 368a76309b4c94961a1d7c1f47328cce, type: 3}
   price: 100
+  facingOffset: 0

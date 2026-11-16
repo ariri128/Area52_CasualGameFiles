@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Leather Couch
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: adb64acb27ac540dbb5ab72a8e6e1140, type: 3}
   category: 0
   placement: 0
   prefab: {fileID: 1836190598438285434, guid: dd4f06857f13f4dfb8749c94e3ab744b, type: 3}
   price: 100
+  facingOffset: 0

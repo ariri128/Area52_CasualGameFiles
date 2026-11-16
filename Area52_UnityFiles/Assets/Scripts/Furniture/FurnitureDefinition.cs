@@ -42,6 +42,12 @@ public class FurnitureDefinition : ScriptableObject
     [Tooltip("Picture shown in the Furniture Owned panel. Can be left empty for now.")]
     public Sprite icon;
 
+    [Tooltip("Photo of the piece, shown in the Furniture Owned and Catalog polaroids. Leave empty to use the Icon.")]
+    public Sprite photo;
+
+    // What the furniture panels show: the photo once it's added, the icon until then
+    public Sprite Picture => photo != null ? photo : icon;
+
     [Tooltip("Which tab this shows up under.")]
     public FurnitureCategory category = FurnitureCategory.Other;
 

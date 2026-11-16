@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Dark Gray Coffee Table
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 7c791160d75d1465f993cd39e10fceec, type: 3}
   category: 3
   placement: 0
   prefab: {fileID: 202861086960429066, guid: d4d786ca0f2c345d98eab8328027e4a5, type: 3}
   price: 100
+  facingOffset: 0

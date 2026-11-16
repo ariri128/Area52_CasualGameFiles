@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Wood Lamp
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: e3fcc61cdf2fc47d6bc5d60b51576f04, type: 3}
   category: 7
   placement: 0
   prefab: {fileID: 2247240644707798146, guid: 9a84ce95e30a94244890ef172e3a423d, type: 3}
   price: 100
+  facingOffset: 0

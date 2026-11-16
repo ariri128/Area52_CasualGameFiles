@@ -94,8 +94,10 @@ public class RoomShopPopup : MonoBehaviour
             Image previewImage = preview != null ? preview.GetComponent<Image>() : null;
             if (previewImage != null)
             {
-                previewImage.sprite = offer.preview;
-                previewImage.enabled = offer.preview != null;
+                // The offer's own preview, or the room prefab's photo if the offer doesn't have one
+                Sprite picture = offer.preview != null ? offer.preview : RoomPicture.Of(offer.roomPrefab);
+                previewImage.sprite = picture;
+                previewImage.enabled = picture != null;
             }
 
             SetText(slot.transform, "Name", offer.displayName);

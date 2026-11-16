@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Wood Coffee Table
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: dcd87fba318534c60883c64b52bd5c02, type: 3}
   category: 3
   placement: 0
   prefab: {fileID: 4517103081640360773, guid: 6dc03056dc2ab483b8104b0873ba9b50, type: 3}
   price: 100
+  facingOffset: 0

@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Green Couch
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 689c5d9d5c9c948a182e0cb6eb4c6a04, type: 3}
   category: 0
   placement: 0
   prefab: {fileID: 5555240053138205292, guid: b1ced451a45a643079fd0437eaf71f87, type: 3}
   price: 100
+  facingOffset: 0

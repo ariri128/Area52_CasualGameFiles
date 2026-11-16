@@ -188,7 +188,7 @@ public class FurnitureOwnedPanel : MonoBehaviour
 
             int available = FurnitureInventory.main.GetAvailableCount(definition);
             string count = available == 0 ? "In use" : (available > 1 ? $"x{available}" : null);
-            AddSlot(definition, definition.icon, definition.displayName, count, available > 0);
+            AddSlot(definition, definition.Picture, definition.displayName, count, available > 0);
         }
 
         Select(null);

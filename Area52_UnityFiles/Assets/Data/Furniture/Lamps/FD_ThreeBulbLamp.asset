@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureDefinition
   displayName: Three Bulb Lamp
   icon: {fileID: 0}
+  photo: {fileID: 21300000, guid: 1c6070fcc021b4dd7a900b61c5dbd7ee, type: 3}
   category: 7
   placement: 0
   prefab: {fileID: 3115287939358765212, guid: f07cb6296d34b44a4a9b2b0940ba27d1, type: 3}
   price: 100
+  facingOffset: 0
