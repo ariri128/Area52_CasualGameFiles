@@ -150,4 +150,31 @@ public class AudioManager : MonoBehaviour
         musicSource.UnPause();
         if (!musicSource.isPlaying && musicSource.clip != null) musicSource.Play();
     }
+
+    // For the radio's waveforms: how far through this track is (0 to 1), whether it's the preview or the background music
+    // Goes back to 0 when the track loops, and stays put while it's paused
+    public float ProgressOf(AudioClip clip)
+    {
+        if (clip == null || clip.length <= 0f) return 0f;
+        if (previewSource.clip == clip) return previewSource.time / clip.length;
+        if (musicSource.clip == clip) return musicSource.time / clip.length;
+        return 0f;
+    }
+
+    // Pauses the preview where it is - the background music carries on meanwhile
+    public void PausePreview()
+    {
+        if (previewSource.clip == null) return;
+        previewSource.Pause();
+        musicSource.UnPause();
+        if (!musicSource.isPlaying && musicSource.clip != null) musicSource.Play();
+    }
+
+    // Carries on the paused preview from where it was
+    public void ResumePreview()
+    {
+        if (previewSource.clip == null) return;
+        musicSource.Pause();
+        previewSource.UnPause();
+    }
 }
