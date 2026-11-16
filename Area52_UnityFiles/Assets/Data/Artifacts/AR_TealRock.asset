@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactDefinition
   displayName: Teal Space Rock
   sprite: {fileID: 21300000, guid: 1bfbd8f98c48d4033b9edd4d8790aad2, type: 3}
-  findWeight: 1
+  findWeight: 1.5
   rarity: 0
+  keepsRoomFed: 0
+  onlyOnePerRoom: 0

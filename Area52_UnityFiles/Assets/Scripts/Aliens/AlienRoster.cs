@@ -319,7 +319,7 @@ public class AlienRoster : MonoBehaviour
                 roomIndex = entry.roomIndex >= 0 && entry.roomIndex < roomCount ? entry.roomIndex : 0,
                 // Breeding and exploring get their own save steps - until then, aliens that were away come home
                 inBreedingRoom = entry.inBreedingRoom, // BreedingManager sends them home if breeding isn't really going on
-                isExploring = false,
+                isExploring = entry.isExploring, // ExplorationManager sends them home if there's no trip for them
                 fullness = Mathf.Clamp01(entry.fullness),
                 customName = entry.customName,
                 dateAcquired = entry.dateAcquired,

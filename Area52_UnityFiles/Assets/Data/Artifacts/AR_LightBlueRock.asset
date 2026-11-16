@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactDefinition
   displayName: Blue Space Rock
   sprite: {fileID: 21300000, guid: 5834a00cfe7854a5c9070ca3ef4a4339, type: 3}
-  findWeight: 1
+  findWeight: 1.5
   rarity: 0
+  keepsRoomFed: 0
+  onlyOnePerRoom: 0

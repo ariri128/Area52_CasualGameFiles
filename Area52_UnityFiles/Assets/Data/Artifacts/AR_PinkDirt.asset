@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactDefinition
   displayName: Pink Space Dirt
   sprite: {fileID: 21300000, guid: f30a9995e4b1e475691909a8f77fc553, type: 3}
-  findWeight: 1
+  findWeight: 1.5
   rarity: 0
+  keepsRoomFed: 0
+  onlyOnePerRoom: 0

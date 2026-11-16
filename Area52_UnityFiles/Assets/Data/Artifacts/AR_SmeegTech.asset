@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactDefinition
   displayName: Smeeg Tech
   sprite: {fileID: 21300000, guid: 12f773036922f47eb9f5f6b0ea2e1f18, type: 3}
-  findWeight: 1
+  findWeight: 0.6
   rarity: 2
+  keepsRoomFed: 0
+  onlyOnePerRoom: 0

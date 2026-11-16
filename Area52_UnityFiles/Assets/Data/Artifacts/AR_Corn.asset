@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactDefinition
   displayName: Corn
   sprite: {fileID: 21300000, guid: 394aebf50dc224cfea0d6ad96157dff4, type: 3}
-  findWeight: 1
+  findWeight: 0.6
   rarity: 2
   keepsRoomFed: 0
   onlyOnePerRoom: 0

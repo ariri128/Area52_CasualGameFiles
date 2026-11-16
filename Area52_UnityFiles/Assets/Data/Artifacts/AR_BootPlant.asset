@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactDefinition
   displayName: Boot Plant
   sprite: {fileID: 21300000, guid: c980114ed21034697b86bd8565b881d9, type: 3}
-  findWeight: 1
+  findWeight: 0.6
   rarity: 2
   keepsRoomFed: 0
   onlyOnePerRoom: 0
