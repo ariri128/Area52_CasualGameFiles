@@ -21,7 +21,6 @@ public class FurnitureItem : MonoBehaviour
     [SerializeField] private float facingCorrection = 0f;
 
     private BoxCollider boxCollider;
-    // private RoomFurnitureDetector room;
 
     // Outline
     private readonly List<Renderer> ownRenderers = new List<Renderer>();
@@ -43,17 +42,10 @@ public class FurnitureItem : MonoBehaviour
     // The room this piece is in, or null while it's in storage - set by RoomFurnitureDetector
     public RoomFurnitureDetector Room { get; internal set; }
 
-    /*
-    // The room this piece is in
-    public RoomFurnitureDetector Room
-    {
-        get
-        {
-            if (room == null) room = GetComponentInParent<RoomFurnitureDetector>();
-            return room;
-        }
-    }
-    */
+    // Where this piece came from: the room it started in and its name path inside that room
+    // (both empty for pieces made from the prefab). Lets a save put back this exact piece
+    public RoomFurnitureDetector OriginRoom { get; internal set; }
+    public string OriginPath { get; internal set; }
 
     public BoxCollider Collider
     {

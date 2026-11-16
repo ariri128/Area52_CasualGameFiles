@@ -20,6 +20,9 @@ public class FurnitureInventory : MonoBehaviour
     [Tooltip("Pieces the player owns at the start that aren't placed in any room.")]
     [SerializeField] private List<OwnedEntry> startingOwned = new List<OwnedEntry>();
 
+    [Tooltip("The Furniture Catalog (the same one the shop uses). Needed to find saved furniture again when loading.")]
+    [SerializeField] private FurnitureCatalog catalog;
+
     // Fired whenever what's owned, placed or stored changes
     public UnityEvent onChanged = new UnityEvent();
 
@@ -54,6 +57,19 @@ public class FurnitureInventory : MonoBehaviour
     private void Start()
     {
         CountStartingPieces();
+        if (RoomManager.main != null) RoomManager.main.onRoomAdded.AddListener(CountBoughtRoom);
+    }
+
+    // A bought room comes with its own furniture - the player owns those pieces too
+    private void CountBoughtRoom(int roomIndex)
+    {
+        GameObject roomObject = RoomManager.main.GetRoomObject(roomIndex);
+        RoomFurnitureDetector room = roomObject != null ? roomObject.GetComponent<RoomFurnitureDetector>() : null;
+        if (room == null) return;
+
+        foreach (FurnitureItem item in room.Items)
+            if (item != null && item.Definition != null) AddOwned(item.Definition, 1);
+        onChanged.Invoke();
     }
 
     private void CountStartingPieces()
@@ -190,5 +206,155 @@ public class FurnitureInventory : MonoBehaviour
     public void NotifyChanged()
     {
         onChanged.Invoke();
+    }
+
+
+    // SAVING
+
+    public void WriteTo(SaveData data)
+    {
+        CountStartingPieces();
+        FurnitureSave save = data.furniture;
+        save.saved = true;
+
+        save.owned.Clear();
+        foreach (FurnitureDefinition definition in ownedOrder)
+            save.owned.Add(new OwnedFurnitureSave { id = definition.name, count = owned[definition] });
+
+        save.rooms.Clear();
+        if (RoomManager.main == null) return;
+
+        for (int i = 0; i < RoomManager.main.RoomCount; i++)
+        {
+            GameObject roomObject = RoomManager.main.GetRoomObject(i);
+            RoomFurnitureDetector room = roomObject != null ? roomObject.GetComponent<RoomFurnitureDetector>() : null;
+            if (room == null) continue;
+
+            RoomLayoutSave layout = new RoomLayoutSave { roomIndex = i };
+            foreach (FurnitureItem item in room.Items)
+            {
+                if (item == null || item.Definition == null) continue;
+                Transform piece = item.transform;
+                layout.pieces.Add(new PlacedFurnitureSave
+                {
+                    id = item.Definition.name,
+                    origin = OriginKey(item),
+                    localPosition = room.transform.InverseTransformPoint(piece.position),
+                    localRotation = Quaternion.Inverse(room.transform.rotation) * piece.rotation,
+                    worldScale = piece.lossyScale,
+                });
+            }
+            save.rooms.Add(layout);
+        }
+    }
+
+    public void ReadFrom(SaveData data)
+    {
+        FurnitureSave save = data.furniture;
+        if (!save.saved) return; // A save from before furniture was saved - rooms keep their starting furniture
+
+        // What's owned (this replaces the starting count)
+        counted = true;
+        owned.Clear();
+        ownedOrder.Clear();
+        foreach (OwnedFurnitureSave entry in save.owned)
+        {
+            FurnitureDefinition definition = FindDefinition(entry.id);
+            if (definition != null) AddOwned(definition, entry.count);
+            else Debug.LogWarning($"Saved furniture \"{entry.id}\" isn't in the Furniture Catalog, so it was skipped.", this);
+        }
+
+        // Every room is emptied FIRST, so a piece moved from one room to another is free to use
+        List<(RoomFurnitureDetector room, RoomLayoutSave layout)> toFill = new List<(RoomFurnitureDetector, RoomLayoutSave)>();
+        foreach (RoomLayoutSave layout in save.rooms)
+        {
+            GameObject roomObject = RoomManager.main != null ? RoomManager.main.GetRoomObject(layout.roomIndex) : null;
+            RoomFurnitureDetector room = roomObject != null ? roomObject.GetComponent<RoomFurnitureDetector>() : null;
+            if (room == null) continue;
+
+            room.ClearForLoad();
+            toFill.Add((room, layout));
+        }
+
+        // Then each saved piece goes back exactly where it was
+        foreach ((RoomFurnitureDetector room, RoomLayoutSave layout) in toFill)
+        {
+            foreach (PlacedFurnitureSave saved in layout.pieces)
+            {
+                FurnitureDefinition definition = FindDefinition(saved.id);
+                if (definition == null) continue;
+
+                // The save says it's in the room - trust the room, even if the owned count is behind
+                if (GetAvailableCount(definition) <= 0) AddOwned(definition, 1);
+
+                // The exact piece it was: one that came with a room, or one made from the prefab - never mixed up
+                FurnitureItem piece = !string.IsNullOrEmpty(saved.origin) ? TakeByOrigin(definition, saved.origin) : null;
+                if (piece == null) piece = TakeFromPrefab(definition);
+                if (piece != null) room.PlaceForLoad(piece, saved.localPosition, saved.localRotation);
+            }
+        }
+
+        onChanged.Invoke();
+    }
+
+    // Finds a furniture data file by its name
+    private FurnitureDefinition FindDefinition(string id)
+    {
+        if (catalog != null)
+            foreach (FurnitureDefinition definition in catalog.furniture)
+                if (definition != null && definition.name == id) return definition;
+
+        foreach (OwnedEntry entry in startingOwned)
+            if (entry.definition != null && entry.definition.name == id) return entry.definition;
+
+        foreach (FurnitureDefinition definition in stored.Keys) // The rooms' starting pieces, after ClearForLoad
+            if (definition != null && definition.name == id) return definition;
+
+        return null;
+    }
+
+    // "2:Furniture/AlienChair" - the room it came with and its path there, or "" if it was made from the prefab
+    private static string OriginKey(FurnitureItem item)
+    {
+        if (item == null || item.OriginRoom == null || RoomManager.main == null) return "";
+        for (int i = 0; i < RoomManager.main.RoomCount; i++)
+            if (RoomManager.main.GetRoomObject(i) == item.OriginRoom.gameObject) return $"{i}:{item.OriginPath}";
+        return "";
+    }
+
+    // For loading: this exact room piece, out of storage (null if it isn't there)
+    private FurnitureItem TakeByOrigin(FurnitureDefinition definition, string origin)
+    {
+        if (!stored.TryGetValue(definition, out List<FurnitureItem> list)) return null;
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (OriginKey(list[i]) != origin) continue;
+            FurnitureItem piece = list[i];
+            list.RemoveAt(i);
+            return piece;
+        }
+        return null;
+    }
+
+    // For loading: a piece made from the prefab - a stored one if there is one, otherwise a new one
+    private FurnitureItem TakeFromPrefab(FurnitureDefinition definition)
+    {
+        if (stored.TryGetValue(definition, out List<FurnitureItem> list))
+        {
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                if (list[i].OriginRoom != null) continue; // Came with a room - not this one
+                FurnitureItem piece = list[i];
+                list.RemoveAt(i);
+                return piece;
+            }
+        }
+
+        if (definition.prefab == null) return null;
+        GameObject made = Instantiate(definition.prefab);
+        made.name = definition.prefab.name;
+        FurnitureItem item = made.GetComponent<FurnitureItem>();
+        if (item == null) Destroy(made);
+        return item;
     }
 }

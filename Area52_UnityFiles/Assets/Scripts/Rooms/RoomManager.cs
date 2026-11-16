@@ -37,6 +37,8 @@ public class RoomManager : MonoBehaviour
 
     private readonly List<GameObject> spawnedRooms = new List<GameObject>();
 
+    private int startingRoomCount; // Rooms in the list before any were bought - only bought ones need saving
+
     public int CurrentRoomIndex { get; private set; }
     public int RoomCount => rooms.Count;
     public float RoomSpacing => roomSpacing;
@@ -50,6 +52,8 @@ public class RoomManager : MonoBehaviour
             return;
         }
         main = this;
+
+        startingRoomCount = rooms.Count;
 
         SpawnRooms();
         CurrentRoomIndex = Mathf.Clamp(startRoomIndex, 0, Mathf.Max(0, rooms.Count - 1));
@@ -133,5 +137,40 @@ public class RoomManager : MonoBehaviour
             Gizmos.color = (i == startRoomIndex) ? Color.green : Color.cyan;
             Gizmos.DrawWireCube(center, roomGizmoSize);
         }
+    }
+
+
+    // SAVING
+
+    public void WriteTo(SaveData data)
+    {
+        data.rooms.currentRoom = CurrentRoomIndex;
+        data.rooms.bought.Clear();
+        for (int i = startingRoomCount; i < rooms.Count; i++)
+        {
+            data.rooms.bought.Add(new BoughtRoomSave
+            {
+                roomName = rooms[i].roomName,
+                prefabName = rooms[i].roomPrefab != null ? rooms[i].roomPrefab.name : "",
+            });
+        }
+    }
+
+    // Spawns the bought rooms again (in the same order, so every room keeps its number) and goes back to the room the player was in
+    public void ReadFrom(SaveData data)
+    {
+        foreach (BoughtRoomSave bought in data.rooms.bought)
+        {
+            GameObject prefab = RoomShop.main != null ? RoomShop.main.FindPrefab(bought.prefabName) : null;
+            if (prefab == null)
+            {
+                Debug.LogWarning($"Saved room \"{bought.prefabName}\" isn't in the Room Shop's offers, so it couldn't be loaded.", this);
+                continue;
+            }
+            AddRoom(bought.roomName, prefab);
+        }
+
+        CurrentRoomIndex = Mathf.Clamp(data.rooms.currentRoom, 0, Mathf.Max(0, rooms.Count - 1));
+        onRoomChanged.Invoke(CurrentRoomIndex);
     }
 }

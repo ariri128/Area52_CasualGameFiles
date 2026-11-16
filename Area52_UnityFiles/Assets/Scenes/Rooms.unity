@@ -10277,6 +10277,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FurnitureInventory
   startingOwned: []
+  catalog: {fileID: 11400000, guid: 6faf81b6e9ee24a87bf52d9b2c4c8be6, type: 2}
   onChanged:
     m_PersistentCalls:
       m_Calls: []
