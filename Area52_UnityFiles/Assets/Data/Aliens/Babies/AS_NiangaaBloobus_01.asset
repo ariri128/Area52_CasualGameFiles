@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Niangaa x Bloobus 1
   sprite: {fileID: -200748278, guid: 1608a6ca453354fa3a6e783af0126de3, type: 3}
+  spriteEyesClosed: {fileID: -200748278, guid: 1608a6ca453354fa3a6e783af0126de3, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: 4558e5a194047409a92808241dd3d6b8, type: 2}
     antenna: {fileID: 11400000, guid: 45165f7e4984c4f9f86ff1fa1c63534c, type: 2}

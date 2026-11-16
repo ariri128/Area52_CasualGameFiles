@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Niangaa x Smeeeg 13
   sprite: {fileID: -829954994, guid: e83e9f5d3949c4ef6adbe68f40461db5, type: 3}
+  spriteEyesClosed: {fileID: 1007186612, guid: 523fcda8483084117bde69297a37f3c6, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: 4558e5a194047409a92808241dd3d6b8, type: 2}
     antenna: {fileID: 11400000, guid: 4558e5a194047409a92808241dd3d6b8, type: 2}

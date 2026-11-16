@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Bloobus x Dopper Higgle 4
   sprite: {fileID: 246284218, guid: e76be8c9fb81e4806ac46abf00764605, type: 3}
+  spriteEyesClosed: {fileID: 1498076893, guid: ad3fce10ea44444348c73c556a2df1ce, type: 3}
   rarities:
     body: 0
     antenna: 0
     legs: 0
     eyes: 0
     mouth: 0
+  coinsPerDrop: 0
+  likedArtifact: {fileID: 0}
   traitsFrom:
     body: {fileID: 11400000, guid: 45165f7e4984c4f9f86ff1fa1c63534c, type: 2}
     antenna: {fileID: 11400000, guid: b53999fbf53f14f63928aa63be600404, type: 2}

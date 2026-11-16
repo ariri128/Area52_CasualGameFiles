@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Avaroos
   sprite: {fileID: 56216110, guid: 79017ae13bbac48ce8463d590ef7e035, type: 3}
+  spriteEyesClosed: {fileID: 1451652545, guid: 79017ae13bbac48ce8463d590ef7e035, type: 3}
   rarities:
     body: 0
     antenna: 0

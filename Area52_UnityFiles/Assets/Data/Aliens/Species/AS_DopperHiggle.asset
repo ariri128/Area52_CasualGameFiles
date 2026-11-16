@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Dopper Higgle
   sprite: {fileID: -865723887, guid: 23069b5b5bd3f47bf9101dd38880fdc8, type: 3}
+  spriteEyesClosed: {fileID: -1042950223, guid: 23069b5b5bd3f47bf9101dd38880fdc8, type: 3}
   rarities:
     body: 2
     antenna: 2

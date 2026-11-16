@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlienSpecies
   displayName: Smeeeg
   sprite: {fileID: -1963621835, guid: 293dde4197c824bff8e03c15734f4136, type: 3}
+  spriteEyesClosed: {fileID: 137047658, guid: 293dde4197c824bff8e03c15734f4136, type: 3}
   rarities:
     body: 1
     antenna: 1
