@@ -199,6 +199,70 @@ public class ArtifactInventory : MonoBehaviour
     }
 
 
+    // SAVING
+
+    public void WriteTo(SaveData data)
+    {
+        ArtifactsSave save = data.artifacts;
+        save.saved = true;
+        save.artifacts.Clear();
+
+        foreach (OwnedArtifact artifact in artifacts)
+        {
+            if (artifact == null || artifact.definition == null) continue;
+            save.artifacts.Add(new ArtifactSave
+            {
+                id = artifact.definition.name,
+                roomIndex = artifact.roomIndex,
+                isNew = artifact.isNew,
+            });
+        }
+    }
+
+    public void ReadFrom(SaveData data)
+    {
+        ArtifactsSave save = data.artifacts;
+        if (!save.saved) return; // A save from before artifacts were saved - keep the starting ones
+
+        int roomCount = RoomManager.main != null ? RoomManager.main.RoomCount : int.MaxValue;
+        artifacts.Clear();
+
+        foreach (ArtifactSave saved in save.artifacts)
+        {
+            ArtifactDefinition definition = FindDefinition(saved.id);
+            if (definition == null)
+            {
+                Debug.LogWarning($"Saved artifact \"{saved.id}\" isn't in the Artifact Catalog, so it was skipped.", this);
+                continue;
+            }
+
+            OwnedArtifact artifact = new OwnedArtifact
+            {
+                definition = definition,
+                roomIndex = saved.roomIndex < roomCount ? saved.roomIndex : -1, // A room that's gone = Unplaced
+                isNew = saved.isNew,
+            };
+            artifact.RefreshLabel();
+            artifacts.Add(artifact);
+        }
+
+        onChanged.Invoke(); // The room circles, the auto-feeder and moods all update
+    }
+
+    private ArtifactDefinition FindDefinition(string id)
+    {
+        if (catalog != null)
+            foreach (ArtifactDefinition definition in catalog.artifacts)
+                if (definition != null && definition.name == id) return definition;
+
+        // Starting artifacts set in the Inspector (still in the list while loading)
+        foreach (OwnedArtifact artifact in artifacts)
+            if (artifact != null && artifact.definition != null && artifact.definition.name == id) return artifact.definition;
+
+        return null;
+    }
+
+
     // TESTING
 
     [ContextMenu("Testing: Add Random Artifact")]

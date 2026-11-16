@@ -10453,7 +10453,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreedingManager
   catalog: {fileID: 11400000, guid: e2c6af147c7dd4e35bb003900b7596d1, type: 2}
-  breedingSeconds: 5
+  commonBreedingSeconds: 1800
+  rareBreedingSeconds: 3600
+  ultraRareBreedingSeconds: 5400
   allRoomsHoldAliens: 1
   alienRooms: 000000000100000002000000
   maxPerRoom: 4
