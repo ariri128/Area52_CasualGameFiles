@@ -291,6 +291,13 @@ public class ArtifactCollectionPopup : MonoBehaviour
             return;
         }
 
+        if (inventory.IsAlreadyInRoom(selected, room))
+        {
+            ToastPopup toast = ToastPopup.Find(ToastKind.RoomFull);
+            if (toast != null) toast.Show($"Only one {selected.DisplayName} per room");
+            return;
+        }
+
         inventory.PlaceInRoom(selected, room); // Fills the next empty circle; the box greys out and the button says Remove
     }
 

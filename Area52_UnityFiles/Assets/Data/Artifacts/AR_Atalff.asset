@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArtifactDefinition
   displayName: Atalff
   sprite: {fileID: 21300000, guid: 96e637484d80648bdaf14098ab472b71, type: 3}
-  findWeight: 1
-  rarity: 1
+  findWeight: 0.2
+  rarity: 2
+  keepsRoomFed: 1
+  onlyOnePerRoom: 1

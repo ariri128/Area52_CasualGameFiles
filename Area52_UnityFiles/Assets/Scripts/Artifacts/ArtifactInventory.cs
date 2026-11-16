@@ -88,11 +88,28 @@ public class ArtifactInventory : MonoBehaviour
 
     public bool IsRoomFull(int roomIndex) => CountInRoom(roomIndex) >= maxPerRoom;
 
+    // True if this is a one-per-room artifact and another copy is already in that room
+    public bool IsAlreadyInRoom(OwnedArtifact artifact, int roomIndex)
+    {
+        if (artifact == null || artifact.definition == null || !artifact.definition.onlyOnePerRoom) return false;
+        foreach (OwnedArtifact other in InRoom(roomIndex))
+            if (other != artifact && other.definition == artifact.definition) return true;
+        return false;
+    }
+
+    // Does this room have an artifact that keeps its aliens fed?
+    public bool KeepsRoomFed(int roomIndex)
+    {
+        foreach (OwnedArtifact artifact in InRoom(roomIndex))
+            if (artifact.definition.keepsRoomFed) return true;
+        return false;
+    }
+
     public bool CanPlace(OwnedArtifact artifact, int roomIndex)
     {
         if (artifact == null || artifact.roomIndex == roomIndex) return false;
         if (RoomManager.main != null && (roomIndex < 0 || roomIndex >= RoomManager.main.RoomCount)) return false;
-        return !IsRoomFull(roomIndex);
+        return !IsRoomFull(roomIndex) && !IsAlreadyInRoom(artifact, roomIndex);
     }
 
     // Puts an artifact in a room (or moves it there from another room) - returns false (and changes nothing) if it can't

@@ -16,3 +16,5 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: 514e6189adb584d4bba8851f8c2f3503, type: 3}
   findWeight: 1
   rarity: 0
+  keepsRoomFed: 0
+  onlyOnePerRoom: 0

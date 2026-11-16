@@ -10676,8 +10676,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3ff9f746f3bd4e839fb47e627c443fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AlienHunger
-  drainInterval: 10
-  drainAmount: 0.025
+  drainInterval: 60
+  drainAmount: 0.01
   drainWhileAway: 0
   pelletsToFill: 10
   sadAt: 0.5

@@ -61,6 +61,31 @@ public class AlienHunger : MonoBehaviour
         if (main == this) main = null;
     }
 
+    private void Start()
+    {
+        if (ArtifactInventory.main != null) ArtifactInventory.main.onChanged.AddListener(FillAutoFedRooms);
+        if (AlienRoster.main != null) AlienRoster.main.onChanged.AddListener(FillAutoFedRooms);
+        FillAutoFedRooms();
+    }
+
+    // Tops up every alien in a room with an auto-feeder
+    // Runs when artifacts are placed or moved and when aliens move rooms, so it works straight away
+    private void FillAutoFedRooms()
+    {
+        if (AlienRoster.main == null || ArtifactInventory.main == null) return;
+
+        bool changed = false;
+        foreach (OwnedAlien alien in AlienRoster.main.All)
+        {
+            if (alien == null || alien.species == null || alien.IsAway) continue;
+            if (alien.fullness >= 1f || !ArtifactInventory.main.KeepsRoomFed(alien.roomIndex)) continue;
+
+            alien.fullness = 1f;
+            changed = true;
+        }
+        if (changed) onChanged.Invoke();
+    }
+
     private void Update()
     {
         if (Time.time < nextDrainAt) return;
@@ -77,6 +102,7 @@ public class AlienHunger : MonoBehaviour
         {
             if (alien == null || alien.species == null) continue;
             if (alien.IsAway && !drainWhileAway) continue;
+            if (!alien.IsAway && ArtifactInventory.main != null && ArtifactInventory.main.KeepsRoomFed(alien.roomIndex)) continue; // Rooms with an auto-feeder never get hungry
             if (alien.fullness <= 0f) continue; // Already empty
 
             alien.fullness = Mathf.Max(0f, alien.fullness - drainAmount);
